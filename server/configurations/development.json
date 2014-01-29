@@ -1,0 +1,27 @@
+{
+  "port": 8085,
+ 
+  "url": "http://127.0.0.1:8085",
+
+  "cookie-name": "thisisthecookie",
+  "secret": "thisisthesecret",
+  "session-timeout": 7200000,
+
+  "db": "BootstrapDB",
+  "db-host": "127.0.0.1",
+  "db-port": 27017,
+
+  "cache": { 
+      "cache1": "2 minutes"
+  },
+
+  "mocks": [{
+    "definition_path": "mock1",
+    "on": true,
+    "mongo_port": 27017, 
+    "mongo_host": "127.0.0.1",
+    "mongo_db": "MockAPI",
+    "port": 9000
+  }]
+
+}
