@@ -1,0 +1,7 @@
+{
+	"paths": {
+		"root": "C:\\node\\work\\personal\\cellvia.github.io\\app",
+		"html": "/client/html/desktop",
+		"sharedHtml": "/shared/html"
+	}
+}

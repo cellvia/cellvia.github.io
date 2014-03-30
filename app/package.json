@@ -1,0 +1,36 @@
+{
+  "name": "BrandonSelway",
+  "author": "Brandon Selway",
+  "version": "0.1.1",
+  "description": "This is the website of Brandon Selway",
+  "main": "server/app.js",
+  "dependencies": {
+    "express": "3.4.4",
+    "hyperglue": "git+http://github.com/cellvia/hyperglue.git",
+    "intervalEmitter": "*",
+    "insert-css": "~0.1.0",
+    "less": "~1.6.1",
+    "digistify": "0.0.2",
+    "foldify": "*",
+    "confify": "*",
+    "marked": "^0.3.2"
+  },
+  "devDependencies": {
+    "twitter-bootstrap-3.0.0": "~3.0.0",
+    "catw": "^0.2.0"
+  },
+  "scripts": {
+    "build-desktop": "browserify client/js/desktop/app.js -o server/public/js/desktop-app.js",
+    "build-vendor": "node node_modules/catw/bin/cmd.js client/vendor/*.js -w false -o server/public/js/desktop-vendor.js",
+    "build": "npm run build-desktop && npm run build-vendor",
+    "windows-deploy": "copy server/public/js/desktop-vendor.js ../static/js/desktop-vendor.js && copy server/public/js/desktop-app.js ../static/js/desktop-app.js",
+    "watch-desktop": "watchify client/js/desktop/app.js -o server/public/js/desktop-app.js"
+  },
+  "browserify": {
+    "transform": [
+      "confify/transform.js",
+      "foldify/transform.js"
+    ]
+  },
+  "confify": "./conf.json"
+}

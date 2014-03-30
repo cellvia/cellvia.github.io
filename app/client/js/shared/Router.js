@@ -1,0 +1,17 @@
+var ViewCore = require('./ViewCore');
+
+var Router = Backbone.Router.extend({
+    go: function(data){
+      this.navigate(data.href, {
+        trigger: (data.trigger === false) ? false : true 
+      });
+    },
+    initialize: function(){
+      $.ajaxSetup({ cache: false });
+      Backbone.on('go', $.proxy(this.go, this));
+    }
+});
+
+Router = Router.extend(ViewCore);
+
+module.exports = new Router();
