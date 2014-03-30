@@ -1,10 +1,9 @@
 var path = require('path'),
-	util = require('util'),
     router = require('../shared/Router'),
     foldify = require('foldify');
 
 var routes = foldify(__dirname + '/routes'),
-    globalCollections = foldify(__dirname + '/collections/global'),
+    globalCollections = foldify(__dirname + '/../shared/collections/global'),
     LayoutView = require('./views/layout');
 
 //attach routes
@@ -18,4 +17,3 @@ new LayoutView();
 Backbone.history.start({
   pushState: true
 });
-

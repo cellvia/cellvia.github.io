@@ -11,7 +11,7 @@ module.exports = View.extend({
 				'.link': { href: "/article/"+this.post.get("slug")},
 				'.title': this.post.get("title"),
 				'.created': this.post.get("created"),
-				'.content': this.post.get("content")
+				'.content': { _html: this.post.get("content") }
 			}
 		).appendTo( this.$el );
 		this.rendered = true;
@@ -19,6 +19,7 @@ module.exports = View.extend({
 	fetchPost: function(){
 		if(this.fetched || !this.posts.fetched || !this.html.fetched) return
 		this.post = this.posts.findWhere({"slug": this.slug});
+	
 		if(!this.post) return Backbone.trigger("go", {href: "/403", message: "Post does not exist!"});
 
 		this.post.once("fetched", $.proxy(this.render, this) );

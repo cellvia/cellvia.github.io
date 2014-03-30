@@ -1,7 +1,7 @@
 var foldify = require('foldify'),
 	digistify = require('digistify');
 
-var Post = require('../../models/Post')
+var Post = require('../../../desktop/models/Post')
 
 module.exports = function(options){
 	var GistCollection = Backbone.Collection.extend({
@@ -61,6 +61,7 @@ module.exports = function(options){
 					autoContinue: false
 				};
 				this.gists.iterate(function(data){
+					data = data || {};
 					self.getGists(data.getAllEtag);
 				}, opts);
 			}else{

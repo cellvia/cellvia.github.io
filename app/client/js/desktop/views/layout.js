@@ -1,4 +1,11 @@
 var View = require('../../shared/View');
+var insertCss = require('insert-css');
+var foldify = require('foldify');
+var grid = foldify("topcoat-grid/css", {whitelist: "grid.min.css"});
+var topcoat = foldify("topcoat/css", {whitelist: "topcoat-desktop-light.css"})
+
+insertCss(grid["grid.min.css"]);
+insertCss(topcoat["topcoat-desktop-light.css"]);
 
 module.exports = View.extend({
 	el: "body",
@@ -13,11 +20,3 @@ module.exports = View.extend({
 	initialize: function(){
 	}
 })
-
-
-
-    // insertCss = require('insert-css'),
-// var parser = new less.Parser();
-// parser.parse(bootstrapLess, function(e,r){
-// 	insertCss(r.toCSS());
-// });
