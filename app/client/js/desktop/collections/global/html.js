@@ -30,7 +30,7 @@ module.exports = function(options){
 			}
 		},
 		fetch: function () {
-			if(Backbone.clientOnly){
+			if(conf.clientOnly){
 				this.fetched = true;
 				var self = this;
 				var htmls = foldify(conf.paths.root + conf.paths.html);

@@ -13,7 +13,8 @@
     "digistify": "0.0.2",
     "foldify": "*",
     "confify": "*",
-    "marked": "^0.3.2"
+    "marked": "^0.3.2",
+    "topcoat": "^0.7.5"
   },
   "devDependencies": {
     "twitter-bootstrap-3.0.0": "~3.0.0",

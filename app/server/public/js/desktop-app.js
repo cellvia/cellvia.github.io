@@ -926,8 +926,6 @@ routes(router);
 // 	insertCss(r.toCSS());
 // });
 
-Backbone.clientOnly = true;
-
 //attach global collections
 Backbone.collections = globalCollections({identifier: "~blog~"});
 
@@ -996,7 +994,7 @@ module.exports = function(options){
 			}
 		},
 		fetch: function () {
-			if(Backbone.clientOnly){
+			if(true){
 				this.fetched = true;
 				var self = this;
 				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"content\">\r\n\r\n\t</div>\r\n</div>";returnMe["posts.html"] = "<h1>My Posts</h1>\r\n<div class=\"posts\">\r\n\t<a class=\"link\"><span class=\"title\"></span></br>\r\n\t<span class=\"created\"></span></a>\t\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
