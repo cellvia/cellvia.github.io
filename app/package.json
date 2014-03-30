@@ -23,7 +23,7 @@
     "build-desktop": "browserify client/js/desktop/app.js -o server/public/js/desktop-app.js",
     "build-vendor": "node node_modules/catw/bin/cmd.js client/vendor/*.js -w false -o server/public/js/desktop-vendor.js",
     "build": "npm run build-desktop && npm run build-vendor",
-    "windows-deploy": "copy server/public/js/desktop-vendor.js ../static/js/desktop-vendor.js && copy server/public/js/desktop-app.js ../static/js/desktop-app.js",
+    "windows-deploy": "copy server\\public\\js\\*.js ..\\static\\js\\",
     "watch-desktop": "watchify client/js/desktop/app.js -o server/public/js/desktop-app.js"
   },
   "browserify": {

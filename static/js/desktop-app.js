@@ -1,603 +1,88 @@
-;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var path = require('path'),
-	util = require('util'),
-    router = require('../shared/Router'),
-    foldify = require('foldify'),
-    insertCss = require('insert-css'),
-    LayoutView = require('./views/layout');
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
-var routes = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require("foldify"), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["error"] = require("C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\routes\\error.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\routes\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
-    controllers = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require("foldify"), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["error"] = require("C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\controllers\\error.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\controllers\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()), 
-    globalCollections = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require("foldify"), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["global"] = require("C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\collections\\global\\global.js");returnMe["html"] = require("C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\collections\\global\\html.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\collections\\global\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
-    bootstrapLess = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var returnMe = '';returnMe += "//\n// Variables\n// --------------------------------------------------\n\n\n// Global values\n// --------------------------------------------------\n\n// Grays\n// -------------------------\n\n@gray-darker:            lighten(#000, 13.5%); // #222\n@gray-dark:              lighten(#000, 20%);   // #333\n@gray:                   lighten(#000, 33.5%); // #555\n@gray-light:             lighten(#000, 60%);   // #999\n@gray-lighter:           lighten(#000, 93.5%); // #eee\n\n// Brand colors\n// -------------------------\n\n@brand-primary:         #428bca;\n@brand-success:         #5cb85c;\n@brand-warning:         #f0ad4e;\n@brand-danger:          #d9534f;\n@brand-info:            #5bc0de;\n\n// Scaffolding\n// -------------------------\n\n@body-bg:               #fff;\n@text-color:            @gray-dark;\n\n// Links\n// -------------------------\n\n@link-color:            @brand-primary;\n@link-hover-color:      darken(@link-color, 15%);\n\n// Typography\n// -------------------------\n\n@font-family-sans-serif:  \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n@font-family-serif:       Georgia, \"Times New Roman\", Times, serif;\n@font-family-monospace:   Monaco, Menlo, Consolas, \"Courier New\", monospace;\n@font-family-base:        @font-family-sans-serif;\n\n@font-size-base:          14px;\n@font-size-large:         ceil(@font-size-base * 1.25); // ~18px\n@font-size-small:         ceil(@font-size-base * 0.85); // ~12px\n\n@font-size-h1:            floor(@font-size-base * 2.60); // ~36px\n@font-size-h2:            floor(@font-size-base * 2.15); // ~30px\n@font-size-h3:            ceil(@font-size-base * 1.70); // ~24px\n@font-size-h4:            ceil(@font-size-base * 1.25); // ~18px\n@font-size-h5:            @font-size-base;\n@font-size-h6:            ceil(@font-size-base * 0.85); // ~12px\n\n@line-height-base:        1.428571429; // 20/14\n@line-height-computed:    floor(@font-size-base * @line-height-base); // ~20px\n\n@headings-font-family:    @font-family-base;\n@headings-font-weight:    500;\n@headings-line-height:    1.1;\n@headings-color:          inherit;\n\n\n// Iconography\n// -------------------------\n\n@icon-font-path:          \"../fonts/\";\n@icon-font-name:          \"glyphicons-halflings-regular\";\n\n\n// Components\n// -------------------------\n// Based on 14px font-size and 1.428 line-height (~20px to start)\n\n@padding-base-vertical:          6px;\n@padding-base-horizontal:        12px;\n\n@padding-large-vertical:         10px;\n@padding-large-horizontal:       16px;\n\n@padding-small-vertical:         5px;\n@padding-small-horizontal:       10px;\n\n@line-height-large:              1.33;\n@line-height-small:              1.5;\n\n@border-radius-base:             4px;\n@border-radius-large:            6px;\n@border-radius-small:            3px;\n\n@component-active-color:         #fff;\n@component-active-bg:            @brand-primary;\n\n@caret-width-base:               4px;\n@caret-width-large:              5px;\n\n// Tables\n// -------------------------\n\n@table-cell-padding:                 8px;\n@table-condensed-cell-padding:       5px;\n\n@table-bg:                           transparent; // overall background-color\n@table-bg-accent:                    #f9f9f9; // for striping\n@table-bg-hover:                     #f5f5f5;\n@table-bg-active:                    @table-bg-hover;\n\n@table-border-color:                 #ddd; // table and cell border\n\n\n// Buttons\n// -------------------------\n\n@btn-font-weight:                normal;\n\n@btn-default-color:              #333;\n@btn-default-bg:                 #fff;\n@btn-default-border:             #ccc;\n\n@btn-primary-color:              #fff;\n@btn-primary-bg:                 @brand-primary;\n@btn-primary-border:             darken(@btn-primary-bg, 5%);\n\n@btn-success-color:              #fff;\n@btn-success-bg:                 @brand-success;\n@btn-success-border:             darken(@btn-success-bg, 5%);\n\n@btn-warning-color:              #fff;\n@btn-warning-bg:                 @brand-warning;\n@btn-warning-border:             darken(@btn-warning-bg, 5%);\n\n@btn-danger-color:               #fff;\n@btn-danger-bg:                  @brand-danger;\n@btn-danger-border:              darken(@btn-danger-bg, 5%);\n\n@btn-info-color:                 #fff;\n@btn-info-bg:                    @brand-info;\n@btn-info-border:                darken(@btn-info-bg, 5%);\n\n@btn-link-disabled-color:        @gray-light;\n\n\n// Forms\n// -------------------------\n\n@input-bg:                       #fff;\n@input-bg-disabled:              @gray-lighter;\n\n@input-color:                    @gray;\n@input-border:                   #ccc;\n@input-border-radius:            @border-radius-base;\n@input-border-focus:             #66afe9;\n\n@input-color-placeholder:        @gray-light;\n\n@input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2);\n@input-height-large:             (floor(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2);\n@input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2);\n\n@legend-color:                   @gray-dark;\n@legend-border-color:            #e5e5e5;\n\n@input-group-addon-bg:           @gray-lighter;\n@input-group-addon-border-color: @input-border;\n\n\n// Dropdowns\n// -------------------------\n\n@dropdown-bg:                    #fff;\n@dropdown-border:                rgba(0,0,0,.15);\n@dropdown-fallback-border:       #ccc;\n@dropdown-divider-bg:            #e5e5e5;\n\n@dropdown-link-color:            @gray-dark;\n@dropdown-link-hover-color:      darken(@gray-dark, 5%);\n@dropdown-link-hover-bg:         #f5f5f5;\n\n@dropdown-link-active-color:     @component-active-color;\n@dropdown-link-active-bg:        @component-active-bg;\n\n@dropdown-link-disabled-color:   @gray-light;\n\n@dropdown-header-color:          @gray-light;\n\n@dropdown-caret-color:           #000;\n\n\n// COMPONENT VARIABLES\n// --------------------------------------------------\n\n\n// Z-index master list\n// -------------------------\n// Used for a bird's eye view of components dependent on the z-axis\n// Try to avoid customizing these :)\n\n@zindex-navbar:            1000;\n@zindex-dropdown:          1000;\n@zindex-popover:           1010;\n@zindex-tooltip:           1030;\n@zindex-navbar-fixed:      1030;\n@zindex-modal-background:  1040;\n@zindex-modal:             1050;\n\n// Media queries breakpoints\n// --------------------------------------------------\n\n// Extra small screen / phone\n// Note: Deprecated @screen-xs and @screen-phone as of v3.0.1\n@screen-xs:                  480px;\n@screen-xs-min:              @screen-xs;\n@screen-phone:               @screen-xs-min;\n\n// Small screen / tablet\n// Note: Deprecated @screen-sm and @screen-tablet as of v3.0.1\n@screen-sm:                  768px;\n@screen-sm-min:              @screen-sm;\n@screen-tablet:              @screen-sm-min;\n\n// Medium screen / desktop\n// Note: Deprecated @screen-md and @screen-desktop as of v3.0.1\n@screen-md:                  992px;\n@screen-md-min:              @screen-md;\n@screen-desktop:             @screen-md-min;\n\n// Large screen / wide desktop\n// Note: Deprecated @screen-lg and @screen-lg-desktop as of v3.0.1\n@screen-lg:                  1200px;\n@screen-lg-min:              @screen-lg;\n@screen-lg-desktop:          @screen-lg-min;\n\n// So media queries don't overlap when required, provide a maximum\n@screen-xs-max:              (@screen-sm-min - 1);\n@screen-sm-max:              (@screen-md-min - 1);\n@screen-md-max:              (@screen-lg-min - 1);\n\n\n// Grid system\n// --------------------------------------------------\n\n// Number of columns in the grid system\n@grid-columns:              12;\n// Padding, to be divided by two and applied to the left and right of all columns\n@grid-gutter-width:         30px;\n// Point at which the navbar stops collapsing\n@grid-float-breakpoint:     @screen-sm;\n\n\n// Navbar\n// -------------------------\n\n// Basics of a navbar\n@navbar-height:                    50px;\n@navbar-margin-bottom:             @line-height-computed;\n@navbar-default-color:             #777;\n@navbar-default-bg:                #f8f8f8;\n@navbar-default-border:            darken(@navbar-default-bg, 6.5%);\n@navbar-border-radius:             @border-radius-base;\n@navbar-padding-horizontal:        floor(@grid-gutter-width / 2);\n@navbar-padding-vertical:          ((@navbar-height - @line-height-computed) / 2);\n\n// Navbar links\n@navbar-default-link-color:                #777;\n@navbar-default-link-hover-color:          #333;\n@navbar-default-link-hover-bg:             transparent;\n@navbar-default-link-active-color:         #555;\n@navbar-default-link-active-bg:            darken(@navbar-default-bg, 6.5%);\n@navbar-default-link-disabled-color:       #ccc;\n@navbar-default-link-disabled-bg:          transparent;\n\n// Navbar brand label\n@navbar-default-brand-color:               @navbar-default-link-color;\n@navbar-default-brand-hover-color:         darken(@navbar-default-brand-color, 10%);\n@navbar-default-brand-hover-bg:            transparent;\n\n// Navbar toggle\n@navbar-default-toggle-hover-bg:           #ddd;\n@navbar-default-toggle-icon-bar-bg:        #ccc;\n@navbar-default-toggle-border-color:       #ddd;\n\n\n// Inverted navbar\n//\n// Reset inverted navbar basics\n@navbar-inverse-color:                      @gray-light;\n@navbar-inverse-bg:                         #222;\n@navbar-inverse-border:                     darken(@navbar-inverse-bg, 10%);\n\n// Inverted navbar links\n@navbar-inverse-link-color:                 @gray-light;\n@navbar-inverse-link-hover-color:           #fff;\n@navbar-inverse-link-hover-bg:              transparent;\n@navbar-inverse-link-active-color:          @navbar-inverse-link-hover-color;\n@navbar-inverse-link-active-bg:             darken(@navbar-inverse-bg, 10%);\n@navbar-inverse-link-disabled-color:        #444;\n@navbar-inverse-link-disabled-bg:           transparent;\n\n// Inverted navbar brand label\n@navbar-inverse-brand-color:                @navbar-inverse-link-color;\n@navbar-inverse-brand-hover-color:          #fff;\n@navbar-inverse-brand-hover-bg:             transparent;\n\n// Inverted navbar toggle\n@navbar-inverse-toggle-hover-bg:            #333;\n@navbar-inverse-toggle-icon-bar-bg:         #fff;\n@navbar-inverse-toggle-border-color:        #333;\n\n\n// Navs\n// -------------------------\n\n@nav-link-padding:                          10px 15px;\n@nav-link-hover-bg:                         @gray-lighter;\n\n@nav-disabled-link-color:                   @gray-light;\n@nav-disabled-link-hover-color:             @gray-light;\n\n@nav-open-link-hover-color:                 #fff;\n@nav-open-caret-border-color:               #fff;\n\n// Tabs\n@nav-tabs-border-color:                     #ddd;\n\n@nav-tabs-link-hover-border-color:          @gray-lighter;\n\n@nav-tabs-active-link-hover-bg:             @body-bg;\n@nav-tabs-active-link-hover-color:          @gray;\n@nav-tabs-active-link-hover-border-color:   #ddd;\n\n@nav-tabs-justified-link-border-color:            #ddd;\n@nav-tabs-justified-active-link-border-color:     @body-bg;\n\n// Pills\n@nav-pills-active-link-hover-bg:            @component-active-bg;\n@nav-pills-active-link-hover-color:         @component-active-color;\n\n\n// Pagination\n// -------------------------\n\n@pagination-bg:                        #fff;\n@pagination-border:                    #ddd;\n\n@pagination-hover-bg:                  @gray-lighter;\n\n@pagination-active-bg:                 @brand-primary;\n@pagination-active-color:              #fff;\n\n@pagination-disabled-color:            @gray-light;\n\n\n// Pager\n// -------------------------\n\n@pager-border-radius:                  15px;\n@pager-disabled-color:                 @gray-light;\n\n\n// Jumbotron\n// -------------------------\n\n@jumbotron-padding:              30px;\n@jumbotron-color:                inherit;\n@jumbotron-bg:                   @gray-lighter;\n\n@jumbotron-heading-color:        inherit;\n\n\n// Form states and alerts\n// -------------------------\n\n@state-success-text:             #468847;\n@state-success-bg:               #dff0d8;\n@state-success-border:           darken(spin(@state-success-bg, -10), 5%);\n\n@state-info-text:                #3a87ad;\n@state-info-bg:                  #d9edf7;\n@state-info-border:              darken(spin(@state-info-bg, -10), 7%);\n\n@state-warning-text:             #c09853;\n@state-warning-bg:               #fcf8e3;\n@state-warning-border:           darken(spin(@state-warning-bg, -10), 5%);\n\n@state-danger-text:              #b94a48;\n@state-danger-bg:                #f2dede;\n@state-danger-border:            darken(spin(@state-danger-bg, -10), 5%);\n\n\n// Tooltips\n// -------------------------\n@tooltip-max-width:           200px;\n@tooltip-color:               #fff;\n@tooltip-bg:                  #000;\n\n@tooltip-arrow-width:         5px;\n@tooltip-arrow-color:         @tooltip-bg;\n\n\n// Popovers\n// -------------------------\n@popover-bg:                          #fff;\n@popover-max-width:                   276px;\n@popover-border-color:                rgba(0,0,0,.2);\n@popover-fallback-border-color:       #ccc;\n\n@popover-title-bg:                    darken(@popover-bg, 3%);\n\n@popover-arrow-width:                 10px;\n@popover-arrow-color:                 #fff;\n\n@popover-arrow-outer-width:           (@popover-arrow-width + 1);\n@popover-arrow-outer-color:           rgba(0,0,0,.25);\n@popover-arrow-outer-fallback-color:  #999;\n\n\n// Labels\n// -------------------------\n\n@label-default-bg:            @gray-light;\n@label-primary-bg:            @brand-primary;\n@label-success-bg:            @brand-success;\n@label-info-bg:               @brand-info;\n@label-warning-bg:            @brand-warning;\n@label-danger-bg:             @brand-danger;\n\n@label-color:                 #fff;\n@label-link-hover-color:      #fff;\n\n\n// Modals\n// -------------------------\n@modal-inner-padding:         20px;\n\n@modal-title-padding:         15px;\n@modal-title-line-height:     @line-height-base;\n\n@modal-content-bg:                             #fff;\n@modal-content-border-color:                   rgba(0,0,0,.2);\n@modal-content-fallback-border-color:          #999;\n\n@modal-backdrop-bg:           #000;\n@modal-header-border-color:   #e5e5e5;\n@modal-footer-border-color:   @modal-header-border-color;\n\n\n// Alerts\n// -------------------------\n@alert-padding:               15px;\n@alert-border-radius:         @border-radius-base;\n@alert-link-font-weight:      bold;\n\n@alert-success-bg:            @state-success-bg;\n@alert-success-text:          @state-success-text;\n@alert-success-border:        @state-success-border;\n\n@alert-info-bg:               @state-info-bg;\n@alert-info-text:             @state-info-text;\n@alert-info-border:           @state-info-border;\n\n@alert-warning-bg:            @state-warning-bg;\n@alert-warning-text:          @state-warning-text;\n@alert-warning-border:        @state-warning-border;\n\n@alert-danger-bg:             @state-danger-bg;\n@alert-danger-text:           @state-danger-text;\n@alert-danger-border:         @state-danger-border;\n\n\n// Progress bars\n// -------------------------\n@progress-bg:                 #f5f5f5;\n@progress-bar-color:          #fff;\n\n@progress-bar-bg:             @brand-primary;\n@progress-bar-success-bg:     @brand-success;\n@progress-bar-warning-bg:     @brand-warning;\n@progress-bar-danger-bg:      @brand-danger;\n@progress-bar-info-bg:        @brand-info;\n\n\n// List group\n// -------------------------\n@list-group-bg:               #fff;\n@list-group-border:           #ddd;\n@list-group-border-radius:    @border-radius-base;\n\n@list-group-hover-bg:         #f5f5f5;\n@list-group-active-color:     @component-active-color;\n@list-group-active-bg:        @component-active-bg;\n@list-group-active-border:    @list-group-active-bg;\n\n@list-group-link-color:          #555;\n@list-group-link-heading-color:  #333;\n\n\n// Panels\n// -------------------------\n@panel-bg:                    #fff;\n@panel-inner-border:          #ddd;\n@panel-border-radius:         @border-radius-base;\n@panel-footer-bg:             #f5f5f5;\n\n@panel-default-text:          @gray-dark;\n@panel-default-border:        #ddd;\n@panel-default-heading-bg:    #f5f5f5;\n\n@panel-primary-text:          #fff;\n@panel-primary-border:        @brand-primary;\n@panel-primary-heading-bg:    @brand-primary;\n\n@panel-success-text:          @state-success-text;\n@panel-success-border:        @state-success-border;\n@panel-success-heading-bg:    @state-success-bg;\n\n@panel-warning-text:          @state-warning-text;\n@panel-warning-border:        @state-warning-border;\n@panel-warning-heading-bg:    @state-warning-bg;\n\n@panel-danger-text:           @state-danger-text;\n@panel-danger-border:         @state-danger-border;\n@panel-danger-heading-bg:     @state-danger-bg;\n\n@panel-info-text:             @state-info-text;\n@panel-info-border:           @state-info-border;\n@panel-info-heading-bg:       @state-info-bg;\n\n\n// Thumbnails\n// -------------------------\n@thumbnail-padding:           4px;\n@thumbnail-bg:                @body-bg;\n@thumbnail-border:            #ddd;\n@thumbnail-border-radius:     @border-radius-base;\n\n@thumbnail-caption-color:     @text-color;\n@thumbnail-caption-padding:   9px;\n\n\n// Wells\n// -------------------------\n@well-bg:                     #f5f5f5;\n\n\n// Badges\n// -------------------------\n@badge-color:                 #fff;\n@badge-link-hover-color:      #fff;\n@badge-bg:                    @gray-light;\n\n@badge-active-color:          @link-color;\n@badge-active-bg:             #fff;\n\n@badge-font-weight:           bold;\n@badge-line-height:           1;\n@badge-border-radius:         10px;\n\n\n// Breadcrumbs\n// -------------------------\n@breadcrumb-bg:               #f5f5f5;\n@breadcrumb-color:            #ccc;\n@breadcrumb-active-color:     @gray-light;\n@breadcrumb-separator:        \"/\";\n\n\n// Carousel\n// ------------------------\n\n@carousel-text-shadow:                        0 1px 2px rgba(0,0,0,.6);\n\n@carousel-control-color:                      #fff;\n@carousel-control-width:                      15%;\n@carousel-control-opacity:                    .5;\n@carousel-control-font-size:                  20px;\n\n@carousel-indicator-active-bg:                #fff;\n@carousel-indicator-border-color:             #fff;\n\n@carousel-caption-color:                      #fff;\n\n\n// Close\n// ------------------------\n@close-color:                 #000;\n@close-font-weight:           bold;\n@close-text-shadow:           0 1px 0 #fff;\n\n\n// Code\n// ------------------------\n@code-color:                  #c7254e;\n@code-bg:                     #f9f2f4;\n\n@pre-bg:                      #f5f5f5;\n@pre-color:                   @gray-dark;\n@pre-border-color:            #ccc;\n@pre-scrollable-max-height:   340px;\n\n// Type\n// ------------------------\n@text-muted:                  @gray-light;\n@abbr-border-color:           @gray-light;\n@headings-small-color:        @gray-light;\n@blockquote-small-color:      @gray-light;\n@blockquote-border-color:     @gray-lighter;\n@page-header-border-color:    @gray-lighter;\n\n// Miscellaneous\n// -------------------------\n\n// Hr border color\n@hr-border:                   @gray-lighter;\n\n// Horizontal forms & lists\n@component-offset-horizontal: 180px;\n\n\n// Container sizes\n// --------------------------------------------------\n\n// Small screen / tablet\n@container-tablet:             ((720px + @grid-gutter-width));\n@container-sm:                 @container-tablet;\n\n// Medium screen / desktop\n@container-desktop:            ((940px + @grid-gutter-width));\n@container-md:                 @container-desktop;\n\n// Large screen / wide desktop\n@container-large-desktop:      ((1140px + @grid-gutter-width));\n@container-lg:                 @container-large-desktop;\n";returnMe += "//\n// Mixins\n// --------------------------------------------------\n\n\n// Utilities\n// -------------------------\n\n// Clearfix\n// Source: http://nicolasgallagher.com/micro-clearfix-hack/\n//\n// For modern browsers\n// 1. The space content is one way to avoid an Opera bug when the\n//    contenteditable attribute is included anywhere else in the document.\n//    Otherwise it causes space to appear at the top and bottom of elements\n//    that are clearfixed.\n// 2. The use of `table` rather than `block` is only necessary if using\n//    `:before` to contain the top-margins of child elements.\n.clearfix() {\n  &:before,\n  &:after {\n    content: \" \"; /* 1 */\n    display: table; /* 2 */\n  }\n  &:after {\n    clear: both;\n  }\n}\n\n// Webkit-style focus\n.tab-focus() {\n  // Default\n  outline: thin dotted #333;\n  // Webkit\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n\n// Center-align a block level element\n.center-block() {\n  display: block;\n  margin-left: auto;\n  margin-right: auto;\n}\n\n// Sizing shortcuts\n.size(@width; @height) {\n  width: @width;\n  height: @height;\n}\n.square(@size) {\n  .size(@size; @size);\n}\n\n// Placeholder text\n.placeholder(@color: @input-color-placeholder) {\n  &:-moz-placeholder            { color: @color; } // Firefox 4-18\n  &::-moz-placeholder           { color: @color; } // Firefox 19+\n  &:-ms-input-placeholder       { color: @color; } // Internet Explorer 10+\n  &::-webkit-input-placeholder  { color: @color; } // Safari and Chrome\n}\n\n// Text overflow\n// Requires inline-block or block for proper styling\n.text-overflow() {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n// CSS image replacement\n//\n// Heads up! v3 launched with with only `.hide-text()`, but per our pattern for\n// mixins being reused as classes with the same name, this doesn't hold up. As\n// of v3.0.1 we have added `.text-hide()` and deprecated `.hide-text()`. Note\n// that we cannot chain the mixins together in Less, so they are repeated.\n//\n// Source: https://github.com/h5bp/html5-boilerplate/commit/aa0396eae757\n\n// Deprecated as of v3.0.1 (will be removed in v4)\n.hide-text() {\n  font: ~\"0/0\" a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n// New mixin to use as of v3.0.1\n.text-hide() {\n  font: ~\"0/0\" a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n\n\n\n// CSS3 PROPERTIES\n// --------------------------------------------------\n\n// Single side border-radius\n.border-top-radius(@radius) {\n  border-top-right-radius: @radius;\n   border-top-left-radius: @radius;\n}\n.border-right-radius(@radius) {\n  border-bottom-right-radius: @radius;\n     border-top-right-radius: @radius;\n}\n.border-bottom-radius(@radius) {\n  border-bottom-right-radius: @radius;\n   border-bottom-left-radius: @radius;\n}\n.border-left-radius(@radius) {\n  border-bottom-left-radius: @radius;\n     border-top-left-radius: @radius;\n}\n\n// Drop shadows\n.box-shadow(@shadow) {\n  -webkit-box-shadow: @shadow; // iOS <4.3 & Android <4.1\n          box-shadow: @shadow;\n}\n\n// Transitions\n.transition(@transition) {\n  -webkit-transition: @transition;\n          transition: @transition;\n}\n.transition-property(@transition-property) {\n  -webkit-transition-property: @transition-property;\n          transition-property: @transition-property;\n}\n.transition-delay(@transition-delay) {\n  -webkit-transition-delay: @transition-delay;\n          transition-delay: @transition-delay;\n}\n.transition-duration(@transition-duration) {\n  -webkit-transition-duration: @transition-duration;\n          transition-duration: @transition-duration;\n}\n.transition-transform(@transition) {\n  -webkit-transition: -webkit-transform @transition;\n     -moz-transition: -moz-transform @transition;\n       -o-transition: -o-transform @transition;\n          transition: transform @transition;\n}\n\n// Transformations\n.rotate(@degrees) {\n  -webkit-transform: rotate(@degrees);\n      -ms-transform: rotate(@degrees); // IE9+\n          transform: rotate(@degrees);\n}\n.scale(@ratio) {\n  -webkit-transform: scale(@ratio);\n      -ms-transform: scale(@ratio); // IE9+\n          transform: scale(@ratio);\n}\n.translate(@x; @y) {\n  -webkit-transform: translate(@x, @y);\n      -ms-transform: translate(@x, @y); // IE9+\n          transform: translate(@x, @y);\n}\n.skew(@x; @y) {\n  -webkit-transform: skew(@x, @y);\n      -ms-transform: skewX(@x) skewY(@y); // See https://github.com/twbs/bootstrap/issues/4885; IE9+\n          transform: skew(@x, @y);\n}\n.translate3d(@x; @y; @z) {\n  -webkit-transform: translate3d(@x, @y, @z);\n          transform: translate3d(@x, @y, @z);\n}\n\n.rotateX(@degrees) {\n  -webkit-transform: rotateX(@degrees);\n      -ms-transform: rotateX(@degrees); // IE9+\n          transform: rotateX(@degrees);\n}\n.rotateY(@degrees) {\n  -webkit-transform: rotateY(@degrees);\n      -ms-transform: rotateY(@degrees); // IE9+\n          transform: rotateY(@degrees);\n}\n.perspective(@perspective) {\n  -webkit-perspective: @perspective;\n     -moz-perspective: @perspective;\n          perspective: @perspective;\n}\n.perspective-origin(@perspective) {\n  -webkit-perspective-origin: @perspective;\n     -moz-perspective-origin: @perspective;\n          perspective-origin: @perspective;\n}\n.transform-origin(@origin){\n  -webkit-transform-origin: @origin;\n     -moz-transform-origin: @origin;\n          transform-origin: @origin;\n}\n\n\n// Backface visibility\n// Prevent browsers from flickering when using CSS 3D transforms.\n// Default value is `visible`, but can be changed to `hidden`\n// See git pull https://github.com/dannykeane/bootstrap.git backface-visibility for examples\n.backface-visibility(@visibility){\n  -webkit-backface-visibility: @visibility;\n     -moz-backface-visibility: @visibility;\n          backface-visibility: @visibility;\n}\n\n// Box sizing\n.box-sizing(@boxmodel) {\n  -webkit-box-sizing: @boxmodel;\n     -moz-box-sizing: @boxmodel;\n          box-sizing: @boxmodel;\n}\n\n// User select\n// For selecting text on the page\n.user-select(@select) {\n  -webkit-user-select: @select;\n     -moz-user-select: @select;\n      -ms-user-select: @select; // IE10+\n       -o-user-select: @select;\n          user-select: @select;\n}\n\n// Resize anything\n.resizable(@direction) {\n  resize: @direction; // Options: horizontal, vertical, both\n  overflow: auto; // Safari fix\n}\n\n// CSS3 Content Columns\n.content-columns(@column-count; @column-gap: @grid-gutter-width) {\n  -webkit-column-count: @column-count;\n     -moz-column-count: @column-count;\n          column-count: @column-count;\n  -webkit-column-gap: @column-gap;\n     -moz-column-gap: @column-gap;\n          column-gap: @column-gap;\n}\n\n// Optional hyphenation\n.hyphens(@mode: auto) {\n  word-wrap: break-word;\n  -webkit-hyphens: @mode;\n     -moz-hyphens: @mode;\n      -ms-hyphens: @mode; // IE10+\n       -o-hyphens: @mode;\n          hyphens: @mode;\n}\n\n// Opacity\n.opacity(@opacity) {\n  opacity: @opacity;\n  // IE8 filter\n  @opacity-ie: (@opacity * 100);\n  filter: ~\"alpha(opacity=@{opacity-ie})\";\n}\n\n\n\n// GRADIENTS\n// --------------------------------------------------\n\n#gradient {\n\n  // Horizontal gradient, from left to right\n  //\n  // Creates two color stops, start and end, by specifying a color and position for each color stop.\n  // Color stops are not available in IE9 and below.\n  .horizontal(@start-color: #555; @end-color: #333; @start-percent: 0%; @end-percent: 100%) {\n    background-image: -webkit-gradient(linear, @start-percent top, @end-percent top, from(@start-color), to(@end-color)); // Safari 4+, Chrome 2+\n    background-image: -webkit-linear-gradient(left, color-stop(@start-color @start-percent), color-stop(@end-color @end-percent)); // Safari 5.1+, Chrome 10+\n    background-image: -moz-linear-gradient(left, @start-color @start-percent, @end-color @end-percent); // FF 3.6+\n    background-image:  linear-gradient(to right, @start-color @start-percent, @end-color @end-percent); // Standard, IE10\n    background-repeat: repeat-x;\n    filter: e(%(\"progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)\",argb(@start-color),argb(@end-color))); // IE9 and down\n  }\n\n  // Vertical gradient, from top to bottom\n  //\n  // Creates two color stops, start and end, by specifying a color and position for each color stop.\n  // Color stops are not available in IE9 and below.\n  .vertical(@start-color: #555; @end-color: #333; @start-percent: 0%; @end-percent: 100%) {\n    background-image: -webkit-gradient(linear, left @start-percent, left @end-percent, from(@start-color), to(@end-color)); // Safari 4+, Chrome 2+\n    background-image: -webkit-linear-gradient(top, @start-color, @start-percent, @end-color, @end-percent); // Safari 5.1+, Chrome 10+\n    background-image:  -moz-linear-gradient(top, @start-color @start-percent, @end-color @end-percent); // FF 3.6+\n    background-image: linear-gradient(to bottom, @start-color @start-percent, @end-color @end-percent); // Standard, IE10\n    background-repeat: repeat-x;\n    filter: e(%(\"progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)\",argb(@start-color),argb(@end-color))); // IE9 and down\n  }\n\n  .directional(@start-color: #555; @end-color: #333; @deg: 45deg) {\n    background-repeat: repeat-x;\n    background-image: -webkit-linear-gradient(@deg, @start-color, @end-color); // Safari 5.1+, Chrome 10+\n    background-image: -moz-linear-gradient(@deg, @start-color, @end-color); // FF 3.6+\n    background-image: linear-gradient(@deg, @start-color, @end-color); // Standard, IE10\n  }\n  .horizontal-three-colors(@start-color: #00b3ee; @mid-color: #7a43b6; @color-stop: 50%; @end-color: #c3325f) {\n    background-image: -webkit-gradient(left, linear, 0 0, 0 100%, from(@start-color), color-stop(@color-stop, @mid-color), to(@end-color));\n    background-image: -webkit-linear-gradient(left, @start-color, @mid-color @color-stop, @end-color);\n    background-image: -moz-linear-gradient(left, @start-color, @mid-color @color-stop, @end-color);\n    background-image: linear-gradient(to right, @start-color, @mid-color @color-stop, @end-color);\n    background-repeat: no-repeat;\n    filter: e(%(\"progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)\",argb(@start-color),argb(@end-color))); // IE9 and down, gets no color-stop at all for proper fallback\n  }\n  .vertical-three-colors(@start-color: #00b3ee; @mid-color: #7a43b6; @color-stop: 50%; @end-color: #c3325f) {\n    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@start-color), color-stop(@color-stop, @mid-color), to(@end-color));\n    background-image: -webkit-linear-gradient(@start-color, @mid-color @color-stop, @end-color);\n    background-image: -moz-linear-gradient(top, @start-color, @mid-color @color-stop, @end-color);\n    background-image: linear-gradient(@start-color, @mid-color @color-stop, @end-color);\n    background-repeat: no-repeat;\n    filter: e(%(\"progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)\",argb(@start-color),argb(@end-color))); // IE9 and down, gets no color-stop at all for proper fallback\n  }\n  .radial(@inner-color: #555; @outer-color: #333) {\n    background-image: -webkit-gradient(radial, center center, 0, center center, 460, from(@inner-color), to(@outer-color));\n    background-image: -webkit-radial-gradient(circle, @inner-color, @outer-color);\n    background-image: -moz-radial-gradient(circle, @inner-color, @outer-color);\n    background-image: radial-gradient(circle, @inner-color, @outer-color);\n    background-repeat: no-repeat;\n  }\n  .striped(@color: rgba(255,255,255,.15); @angle: 45deg) {\n    background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, @color), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, @color), color-stop(.75, @color), color-stop(.75, transparent), to(transparent));\n    background-image: -webkit-linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);\n    background-image: -moz-linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);\n    background-image: linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);\n  }\n}\n\n// Reset filters for IE\n//\n// When you need to remove a gradient background, do not forget to use this to reset\n// the IE filter for IE9 and below.\n.reset-filter() {\n  filter: e(%(\"progid:DXImageTransform.Microsoft.gradient(enabled = false)\"));\n}\n\n\n\n// Retina images\n//\n// Short retina mixin for setting background-image and -size\n\n.img-retina(@file-1x; @file-2x; @width-1x; @height-1x) {\n  background-image: url(\"@{file-1x}\");\n\n  @media\n  only screen and (-webkit-min-device-pixel-ratio: 2),\n  only screen and (   min--moz-device-pixel-ratio: 2),\n  only screen and (     -o-min-device-pixel-ratio: 2/1),\n  only screen and (        min-device-pixel-ratio: 2),\n  only screen and (                min-resolution: 192dpi),\n  only screen and (                min-resolution: 2dppx) {\n    background-image: url(\"@{file-2x}\");\n    background-size: @width-1x @height-1x;\n  }\n}\n\n\n// Responsive image\n//\n// Keep images from scaling beyond the width of their parents.\n\n.img-responsive(@display: block;) {\n  display: @display;\n  max-width: 100%; // Part 1: Set a maximum relative to the parent\n  height: auto; // Part 2: Scale the height according to the width, otherwise you get stretching\n}\n\n\n// COMPONENT MIXINS\n// --------------------------------------------------\n\n// Horizontal dividers\n// -------------------------\n// Dividers (basically an hr) within dropdowns and nav lists\n.nav-divider(@color: #e5e5e5) {\n  height: 1px;\n  margin: ((@line-height-computed / 2) - 1) 0;\n  overflow: hidden;\n  background-color: @color;\n}\n\n// Panels\n// -------------------------\n.panel-variant(@border; @heading-text-color; @heading-bg-color; @heading-border;) {\n  border-color: @border;\n  & > .panel-heading {\n    color: @heading-text-color;\n    background-color: @heading-bg-color;\n    border-color: @heading-border;\n    + .panel-collapse .panel-body {\n      border-top-color: @border;\n    }\n  }\n  & > .panel-footer {\n    + .panel-collapse .panel-body {\n      border-bottom-color: @border;\n    }\n  }\n}\n\n// Alerts\n// -------------------------\n.alert-variant(@background; @border; @text-color) {\n  background-color: @background;\n  border-color: @border;\n  color: @text-color;\n  hr {\n    border-top-color: darken(@border, 5%);\n  }\n  .alert-link {\n    color: darken(@text-color, 10%);\n  }\n}\n\n// Tables\n// -------------------------\n.table-row-variant(@state; @background; @border) {\n  // Exact selectors below required to override `.table-striped` and prevent\n  // inheritance to nested tables.\n  .table > thead > tr,\n  .table > tbody > tr,\n  .table > tfoot > tr {\n    > td.@{state},\n    > th.@{state},\n    &.@{state} > td,\n    &.@{state} > th {\n      background-color: @background;\n      border-color: @border;\n    }\n  }\n\n  // Hover states for `.table-hover`\n  // Note: this is not available for cells or rows within `thead` or `tfoot`.\n  .table-hover > tbody > tr {\n    > td.@{state}:hover,\n    > th.@{state}:hover,\n    &.@{state}:hover > td,\n    &.@{state}:hover > th {\n      background-color: darken(@background, 5%);\n      border-color: darken(@border, 5%);\n    }\n  }\n}\n\n// Button variants\n// -------------------------\n// Easily pump out default styles, as well as :hover, :focus, :active,\n// and disabled options for all buttons\n.button-variant(@color; @background; @border) {\n  color: @color;\n  background-color: @background;\n  border-color: @border;\n\n  &:hover,\n  &:focus,\n  &:active,\n  &.active,\n  .open .dropdown-toggle& {\n    color: @color;\n    background-color: darken(@background, 8%);\n        border-color: darken(@border, 12%);\n  }\n  &:active,\n  &.active,\n  .open .dropdown-toggle& {\n    background-image: none;\n  }\n  &.disabled,\n  &[disabled],\n  fieldset[disabled] & {\n    &,\n    &:hover,\n    &:focus,\n    &:active,\n    &.active {\n      background-color: @background;\n          border-color: @border;\n    }\n  }\n}\n\n// Button sizes\n// -------------------------\n.button-size(@padding-vertical; @padding-horizontal; @font-size; @line-height; @border-radius) {\n  padding: @padding-vertical @padding-horizontal;\n  font-size: @font-size;\n  line-height: @line-height;\n  border-radius: @border-radius;\n}\n\n// Pagination\n// -------------------------\n.pagination-size(@padding-vertical; @padding-horizontal; @font-size; @border-radius) {\n  > li {\n    > a,\n    > span {\n      padding: @padding-vertical @padding-horizontal;\n      font-size: @font-size;\n    }\n    &:first-child {\n      > a,\n      > span {\n        .border-left-radius(@border-radius);\n      }\n    }\n    &:last-child {\n      > a,\n      > span {\n        .border-right-radius(@border-radius);\n      }\n    }\n  }\n}\n\n// Labels\n// -------------------------\n.label-variant(@color) {\n  background-color: @color;\n  &[href] {\n    &:hover,\n    &:focus {\n      background-color: darken(@color, 10%);\n    }\n  }\n}\n\n// Navbar vertical align\n// -------------------------\n// Vertically center elements in the navbar.\n// Example: an element has a height of 30px, so write out `.navbar-vertical-align(30px);` to calculate the appropriate top margin.\n.navbar-vertical-align(@element-height) {\n  margin-top: ((@navbar-height - @element-height) / 2);\n  margin-bottom: ((@navbar-height - @element-height) / 2);\n}\n\n// Progress bars\n// -------------------------\n.progress-bar-variant(@color) {\n  background-color: @color;\n  .progress-striped & {\n    #gradient > .striped();\n  }\n}\n\n// Responsive utilities\n// -------------------------\n// More easily include all the states for responsive-utilities.less.\n.responsive-visibility() {\n  display: block !important;\n  tr& { display: table-row !important; }\n  th&,\n  td& { display: table-cell !important; }\n}\n\n.responsive-invisibility() {\n  display: none !important;\n  tr& { display: none !important; }\n  th&,\n  td& { display: none !important; }\n}\n\n// Grid System\n// -----------\n\n// Centered container element\n.container-fixed() {\n  margin-right: auto;\n  margin-left: auto;\n  padding-left:  (@grid-gutter-width / 2);\n  padding-right: (@grid-gutter-width / 2);\n  .clearfix();\n}\n\n// Creates a wrapper for a series of columns\n.make-row(@gutter: @grid-gutter-width) {\n  margin-left:  (@gutter / -2);\n  margin-right: (@gutter / -2);\n  .clearfix();\n}\n\n// Generate the extra small columns\n.make-xs-column(@columns; @gutter: @grid-gutter-width) {\n  position: relative;\n  float: left;\n  width: percentage((@columns / @grid-columns));\n  // Prevent columns from collapsing when empty\n  min-height: 1px;\n  // Inner gutter via padding\n  padding-left:  (@gutter / 2);\n  padding-right: (@gutter / 2);\n}\n\n// Generate the small columns\n.make-sm-column(@columns; @gutter: @grid-gutter-width) {\n  position: relative;\n  // Prevent columns from collapsing when empty\n  min-height: 1px;\n  // Inner gutter via padding\n  padding-left:  (@gutter / 2);\n  padding-right: (@gutter / 2);\n\n  // Calculate width based on number of columns available\n  @media (min-width: @screen-sm-min) {\n    float: left;\n    width: percentage((@columns / @grid-columns));\n  }\n}\n\n// Generate the small column offsets\n.make-sm-column-offset(@columns) {\n  @media (min-width: @screen-sm-min) {\n    margin-left: percentage((@columns / @grid-columns));\n  }\n}\n.make-sm-column-push(@columns) {\n  @media (min-width: @screen-sm-min) {\n    left: percentage((@columns / @grid-columns));\n  }\n}\n.make-sm-column-pull(@columns) {\n  @media (min-width: @screen-sm-min) {\n    right: percentage((@columns / @grid-columns));\n  }\n}\n\n// Generate the medium columns\n.make-md-column(@columns; @gutter: @grid-gutter-width) {\n  position: relative;\n  // Prevent columns from collapsing when empty\n  min-height: 1px;\n  // Inner gutter via padding\n  padding-left:  (@gutter / 2);\n  padding-right: (@gutter / 2);\n\n  // Calculate width based on number of columns available\n  @media (min-width: @screen-md-min) {\n    float: left;\n    width: percentage((@columns / @grid-columns));\n  }\n}\n\n// Generate the medium column offsets\n.make-md-column-offset(@columns) {\n  @media (min-width: @screen-md-min) {\n    margin-left: percentage((@columns / @grid-columns));\n  }\n}\n.make-md-column-push(@columns) {\n  @media (min-width: @screen-md) {\n    left: percentage((@columns / @grid-columns));\n  }\n}\n.make-md-column-pull(@columns) {\n  @media (min-width: @screen-md-min) {\n    right: percentage((@columns / @grid-columns));\n  }\n}\n\n// Generate the large columns\n.make-lg-column(@columns; @gutter: @grid-gutter-width) {\n  position: relative;\n  // Prevent columns from collapsing when empty\n  min-height: 1px;\n  // Inner gutter via padding\n  padding-left:  (@gutter / 2);\n  padding-right: (@gutter / 2);\n\n  // Calculate width based on number of columns available\n  @media (min-width: @screen-lg-min) {\n    float: left;\n    width: percentage((@columns / @grid-columns));\n  }\n}\n\n// Generate the large column offsets\n.make-lg-column-offset(@columns) {\n  @media (min-width: @screen-lg-min) {\n    margin-left: percentage((@columns / @grid-columns));\n  }\n}\n.make-lg-column-push(@columns) {\n  @media (min-width: @screen-lg-min) {\n    left: percentage((@columns / @grid-columns));\n  }\n}\n.make-lg-column-pull(@columns) {\n  @media (min-width: @screen-lg-min) {\n    right: percentage((@columns / @grid-columns));\n  }\n}\n\n\n// Form validation states\n//\n// Used in forms.less to generate the form validation CSS for warnings, errors,\n// and successes.\n\n.form-control-validation(@text-color: #555; @border-color: #ccc; @background-color: #f5f5f5) {\n  // Color the label and help text\n  .help-block,\n  .control-label {\n    color: @text-color;\n  }\n  // Set the border and box shadow on specific inputs to match\n  .form-control {\n    border-color: @border-color;\n    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075)); // Redeclare so transitions work\n    &:focus {\n      border-color: darken(@border-color, 10%);\n      @shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px lighten(@border-color, 20%);\n      .box-shadow(@shadow);\n    }\n  }\n  // Set validation states also for addons\n  .input-group-addon {\n    color: @text-color;\n    border-color: @border-color;\n    background-color: @background-color;\n  }\n}\n\n// Form control focus state\n//\n// Generate a customized focus state and for any input with the specified color,\n// which defaults to the `@input-focus-border` variable.\n//\n// We highly encourage you to not customize the default value, but instead use\n// this to tweak colors on an as-needed basis. This aesthetic change is based on\n// WebKit's default styles, but applicable to a wider range of browsers. Its\n// usability and accessibility should be taken into account with any change.\n//\n// Example usage: change the default blue border and shadow to white for better\n// contrast against a dark gray background.\n\n.form-control-focus(@color: @input-border-focus) {\n  @color-rgba: rgba(red(@color), green(@color), blue(@color), .6);\n  &:focus {\n    border-color: @color;\n    outline: 0;\n    .box-shadow(~\"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px @{color-rgba}\");\n  }\n}\n\n// Form control sizing\n//\n// Relative text size, padding, and border-radii changes for form controls. For\n// horizontal sizing, wrap controls in the predefined grid classes. `<select>`\n// element gets special love because it's special, and that's a fact!\n\n.input-size(@input-height; @padding-vertical; @padding-horizontal; @font-size; @line-height; @border-radius) {\n  height: @input-height;\n  padding: @padding-vertical @padding-horizontal;\n  font-size: @font-size;\n  line-height: @line-height;\n  border-radius: @border-radius;\n\n  select& {\n    height: @input-height;\n    line-height: @input-height;\n  }\n\n  textarea& {\n    height: auto;\n  }\n}\n";returnMe += "//\n// Grid system\n// --------------------------------------------------\n\n\n// Set the container width, and override it for fixed navbars in media queries\n.container {\n  .container-fixed();\n}\n\n// mobile first defaults\n.row {\n  .make-row();\n}\n\n// Common styles for small and large grid columns\n.col-xs-1,\n.col-xs-2,\n.col-xs-3,\n.col-xs-4,\n.col-xs-5,\n.col-xs-6,\n.col-xs-7,\n.col-xs-8,\n.col-xs-9,\n.col-xs-10,\n.col-xs-11,\n.col-xs-12,\n.col-sm-1,\n.col-sm-2,\n.col-sm-3,\n.col-sm-4,\n.col-sm-5,\n.col-sm-6,\n.col-sm-7,\n.col-sm-8,\n.col-sm-9,\n.col-sm-10,\n.col-sm-11,\n.col-sm-12,\n.col-md-1,\n.col-md-2,\n.col-md-3,\n.col-md-4,\n.col-md-5,\n.col-md-6,\n.col-md-7,\n.col-md-8,\n.col-md-9,\n.col-md-10,\n.col-md-11,\n.col-md-12,\n.col-lg-1,\n.col-lg-2,\n.col-lg-3,\n.col-lg-4,\n.col-lg-5,\n.col-lg-6,\n.col-lg-7,\n.col-lg-8,\n.col-lg-9,\n.col-lg-10,\n.col-lg-11,\n.col-lg-12 {\n  position: relative;\n  // Prevent columns from collapsing when empty\n  min-height: 1px;\n  // Inner gutter via padding\n  padding-left:  (@grid-gutter-width / 2);\n  padding-right: (@grid-gutter-width / 2);\n}\n\n\n// Extra small grid\n//\n// Grid classes for extra small devices like smartphones. No offset, push, or\n// pull classes are present here due to the size of the target.\n//\n// Note that `.col-xs-12` doesn't get floated on purpose--there's no need since\n// it's full-width.\n\n.col-xs-1,\n.col-xs-2,\n.col-xs-3,\n.col-xs-4,\n.col-xs-5,\n.col-xs-6,\n.col-xs-7,\n.col-xs-8,\n.col-xs-9,\n.col-xs-10,\n.col-xs-11 {\n  float: left;\n}\n.col-xs-1  { width: percentage((1 / @grid-columns)); }\n.col-xs-2  { width: percentage((2 / @grid-columns)); }\n.col-xs-3  { width: percentage((3 / @grid-columns)); }\n.col-xs-4  { width: percentage((4 / @grid-columns)); }\n.col-xs-5  { width: percentage((5 / @grid-columns)); }\n.col-xs-6  { width: percentage((6 / @grid-columns)); }\n.col-xs-7  { width: percentage((7 / @grid-columns)); }\n.col-xs-8  { width: percentage((8 / @grid-columns)); }\n.col-xs-9  { width: percentage((9 / @grid-columns)); }\n.col-xs-10 { width: percentage((10/ @grid-columns)); }\n.col-xs-11 { width: percentage((11/ @grid-columns)); }\n.col-xs-12 { width: 100%; }\n\n\n// Small grid\n//\n// Columns, offsets, pushes, and pulls for the small device range, from phones\n// to tablets.\n//\n// Note that `.col-sm-12` doesn't get floated on purpose--there's no need since\n// it's full-width.\n\n@media (min-width: @screen-sm) {\n  .container {\n    width: @container-sm;\n  }\n\n  .col-sm-1,\n  .col-sm-2,\n  .col-sm-3,\n  .col-sm-4,\n  .col-sm-5,\n  .col-sm-6,\n  .col-sm-7,\n  .col-sm-8,\n  .col-sm-9,\n  .col-sm-10,\n  .col-sm-11 {\n    float: left;\n  }\n  .col-sm-1  { width: percentage((1 / @grid-columns)); }\n  .col-sm-2  { width: percentage((2 / @grid-columns)); }\n  .col-sm-3  { width: percentage((3 / @grid-columns)); }\n  .col-sm-4  { width: percentage((4 / @grid-columns)); }\n  .col-sm-5  { width: percentage((5 / @grid-columns)); }\n  .col-sm-6  { width: percentage((6 / @grid-columns)); }\n  .col-sm-7  { width: percentage((7 / @grid-columns)); }\n  .col-sm-8  { width: percentage((8 / @grid-columns)); }\n  .col-sm-9  { width: percentage((9 / @grid-columns)); }\n  .col-sm-10 { width: percentage((10/ @grid-columns)); }\n  .col-sm-11 { width: percentage((11/ @grid-columns)); }\n  .col-sm-12 { width: 100%; }\n\n  // Push and pull columns for source order changes\n  .col-sm-push-1  { left: percentage((1 / @grid-columns)); }\n  .col-sm-push-2  { left: percentage((2 / @grid-columns)); }\n  .col-sm-push-3  { left: percentage((3 / @grid-columns)); }\n  .col-sm-push-4  { left: percentage((4 / @grid-columns)); }\n  .col-sm-push-5  { left: percentage((5 / @grid-columns)); }\n  .col-sm-push-6  { left: percentage((6 / @grid-columns)); }\n  .col-sm-push-7  { left: percentage((7 / @grid-columns)); }\n  .col-sm-push-8  { left: percentage((8 / @grid-columns)); }\n  .col-sm-push-9  { left: percentage((9 / @grid-columns)); }\n  .col-sm-push-10 { left: percentage((10/ @grid-columns)); }\n  .col-sm-push-11 { left: percentage((11/ @grid-columns)); }\n\n  .col-sm-pull-1  { right: percentage((1 / @grid-columns)); }\n  .col-sm-pull-2  { right: percentage((2 / @grid-columns)); }\n  .col-sm-pull-3  { right: percentage((3 / @grid-columns)); }\n  .col-sm-pull-4  { right: percentage((4 / @grid-columns)); }\n  .col-sm-pull-5  { right: percentage((5 / @grid-columns)); }\n  .col-sm-pull-6  { right: percentage((6 / @grid-columns)); }\n  .col-sm-pull-7  { right: percentage((7 / @grid-columns)); }\n  .col-sm-pull-8  { right: percentage((8 / @grid-columns)); }\n  .col-sm-pull-9  { right: percentage((9 / @grid-columns)); }\n  .col-sm-pull-10 { right: percentage((10/ @grid-columns)); }\n  .col-sm-pull-11 { right: percentage((11/ @grid-columns)); }\n\n  // Offsets\n  .col-sm-offset-1  { margin-left: percentage((1 / @grid-columns)); }\n  .col-sm-offset-2  { margin-left: percentage((2 / @grid-columns)); }\n  .col-sm-offset-3  { margin-left: percentage((3 / @grid-columns)); }\n  .col-sm-offset-4  { margin-left: percentage((4 / @grid-columns)); }\n  .col-sm-offset-5  { margin-left: percentage((5 / @grid-columns)); }\n  .col-sm-offset-6  { margin-left: percentage((6 / @grid-columns)); }\n  .col-sm-offset-7  { margin-left: percentage((7 / @grid-columns)); }\n  .col-sm-offset-8  { margin-left: percentage((8 / @grid-columns)); }\n  .col-sm-offset-9  { margin-left: percentage((9 / @grid-columns)); }\n  .col-sm-offset-10 { margin-left: percentage((10/ @grid-columns)); }\n  .col-sm-offset-11 { margin-left: percentage((11/ @grid-columns)); }\n}\n\n\n// Medium grid\n//\n// Columns, offsets, pushes, and pulls for the desktop device range.\n//\n// Note that `.col-md-12` doesn't get floated on purpose--there's no need since\n// it's full-width.\n\n@media (min-width: @screen-md) {\n  .container {\n    width: @container-md;\n  }\n  .col-md-1,\n  .col-md-2,\n  .col-md-3,\n  .col-md-4,\n  .col-md-5,\n  .col-md-6,\n  .col-md-7,\n  .col-md-8,\n  .col-md-9,\n  .col-md-10,\n  .col-md-11 {\n    float: left;\n  }\n  .col-md-1  { width: percentage((1 / @grid-columns)); }\n  .col-md-2  { width: percentage((2 / @grid-columns)); }\n  .col-md-3  { width: percentage((3 / @grid-columns)); }\n  .col-md-4  { width: percentage((4 / @grid-columns)); }\n  .col-md-5  { width: percentage((5 / @grid-columns)); }\n  .col-md-6  { width: percentage((6 / @grid-columns)); }\n  .col-md-7  { width: percentage((7 / @grid-columns)); }\n  .col-md-8  { width: percentage((8 / @grid-columns)); }\n  .col-md-9  { width: percentage((9 / @grid-columns)); }\n  .col-md-10 { width: percentage((10/ @grid-columns)); }\n  .col-md-11 { width: percentage((11/ @grid-columns)); }\n  .col-md-12 { width: 100%; }\n\n  // Push and pull columns for source order changes\n  .col-md-push-0  { left: auto; }\n  .col-md-push-1  { left: percentage((1 / @grid-columns)); }\n  .col-md-push-2  { left: percentage((2 / @grid-columns)); }\n  .col-md-push-3  { left: percentage((3 / @grid-columns)); }\n  .col-md-push-4  { left: percentage((4 / @grid-columns)); }\n  .col-md-push-5  { left: percentage((5 / @grid-columns)); }\n  .col-md-push-6  { left: percentage((6 / @grid-columns)); }\n  .col-md-push-7  { left: percentage((7 / @grid-columns)); }\n  .col-md-push-8  { left: percentage((8 / @grid-columns)); }\n  .col-md-push-9  { left: percentage((9 / @grid-columns)); }\n  .col-md-push-10 { left: percentage((10/ @grid-columns)); }\n  .col-md-push-11 { left: percentage((11/ @grid-columns)); }\n\n  .col-md-pull-0  { right: auto; }\n  .col-md-pull-1  { right: percentage((1 / @grid-columns)); }\n  .col-md-pull-2  { right: percentage((2 / @grid-columns)); }\n  .col-md-pull-3  { right: percentage((3 / @grid-columns)); }\n  .col-md-pull-4  { right: percentage((4 / @grid-columns)); }\n  .col-md-pull-5  { right: percentage((5 / @grid-columns)); }\n  .col-md-pull-6  { right: percentage((6 / @grid-columns)); }\n  .col-md-pull-7  { right: percentage((7 / @grid-columns)); }\n  .col-md-pull-8  { right: percentage((8 / @grid-columns)); }\n  .col-md-pull-9  { right: percentage((9 / @grid-columns)); }\n  .col-md-pull-10 { right: percentage((10/ @grid-columns)); }\n  .col-md-pull-11 { right: percentage((11/ @grid-columns)); }\n\n  // Offsets\n  .col-md-offset-0  { margin-left: 0; }\n  .col-md-offset-1  { margin-left: percentage((1 / @grid-columns)); }\n  .col-md-offset-2  { margin-left: percentage((2 / @grid-columns)); }\n  .col-md-offset-3  { margin-left: percentage((3 / @grid-columns)); }\n  .col-md-offset-4  { margin-left: percentage((4 / @grid-columns)); }\n  .col-md-offset-5  { margin-left: percentage((5 / @grid-columns)); }\n  .col-md-offset-6  { margin-left: percentage((6 / @grid-columns)); }\n  .col-md-offset-7  { margin-left: percentage((7 / @grid-columns)); }\n  .col-md-offset-8  { margin-left: percentage((8 / @grid-columns)); }\n  .col-md-offset-9  { margin-left: percentage((9 / @grid-columns)); }\n  .col-md-offset-10 { margin-left: percentage((10/ @grid-columns)); }\n  .col-md-offset-11 { margin-left: percentage((11/ @grid-columns)); }\n}\n\n\n// Large grid\n//\n// Columns, offsets, pushes, and pulls for the large desktop device range.\n//\n// Note that `.col-lg-12` doesn't get floated on purpose--there's no need since\n// it's full-width.\n\n@media (min-width: @screen-lg-min) {\n  .container {\n    width: @container-lg;\n  }\n\n  .col-lg-1,\n  .col-lg-2,\n  .col-lg-3,\n  .col-lg-4,\n  .col-lg-5,\n  .col-lg-6,\n  .col-lg-7,\n  .col-lg-8,\n  .col-lg-9,\n  .col-lg-10,\n  .col-lg-11 {\n    float: left;\n  }\n  .col-lg-1  { width: percentage((1 / @grid-columns)); }\n  .col-lg-2  { width: percentage((2 / @grid-columns)); }\n  .col-lg-3  { width: percentage((3 / @grid-columns)); }\n  .col-lg-4  { width: percentage((4 / @grid-columns)); }\n  .col-lg-5  { width: percentage((5 / @grid-columns)); }\n  .col-lg-6  { width: percentage((6 / @grid-columns)); }\n  .col-lg-7  { width: percentage((7 / @grid-columns)); }\n  .col-lg-8  { width: percentage((8 / @grid-columns)); }\n  .col-lg-9  { width: percentage((9 / @grid-columns)); }\n  .col-lg-10 { width: percentage((10/ @grid-columns)); }\n  .col-lg-11 { width: percentage((11/ @grid-columns)); }\n  .col-lg-12 { width: 100%; }\n\n  // Push and pull columns for source order changes\n  .col-lg-push-0  { left: auto; }\n  .col-lg-push-1  { left: percentage((1 / @grid-columns)); }\n  .col-lg-push-2  { left: percentage((2 / @grid-columns)); }\n  .col-lg-push-3  { left: percentage((3 / @grid-columns)); }\n  .col-lg-push-4  { left: percentage((4 / @grid-columns)); }\n  .col-lg-push-5  { left: percentage((5 / @grid-columns)); }\n  .col-lg-push-6  { left: percentage((6 / @grid-columns)); }\n  .col-lg-push-7  { left: percentage((7 / @grid-columns)); }\n  .col-lg-push-8  { left: percentage((8 / @grid-columns)); }\n  .col-lg-push-9  { left: percentage((9 / @grid-columns)); }\n  .col-lg-push-10 { left: percentage((10/ @grid-columns)); }\n  .col-lg-push-11 { left: percentage((11/ @grid-columns)); }\n\n  .col-lg-pull-0  { right: auto; }\n  .col-lg-pull-1  { right: percentage((1 / @grid-columns)); }\n  .col-lg-pull-2  { right: percentage((2 / @grid-columns)); }\n  .col-lg-pull-3  { right: percentage((3 / @grid-columns)); }\n  .col-lg-pull-4  { right: percentage((4 / @grid-columns)); }\n  .col-lg-pull-5  { right: percentage((5 / @grid-columns)); }\n  .col-lg-pull-6  { right: percentage((6 / @grid-columns)); }\n  .col-lg-pull-7  { right: percentage((7 / @grid-columns)); }\n  .col-lg-pull-8  { right: percentage((8 / @grid-columns)); }\n  .col-lg-pull-9  { right: percentage((9 / @grid-columns)); }\n  .col-lg-pull-10 { right: percentage((10/ @grid-columns)); }\n  .col-lg-pull-11 { right: percentage((11/ @grid-columns)); }\n\n  // Offsets\n  .col-lg-offset-0  { margin-left: 0; }\n  .col-lg-offset-1  { margin-left: percentage((1 / @grid-columns)); }\n  .col-lg-offset-2  { margin-left: percentage((2 / @grid-columns)); }\n  .col-lg-offset-3  { margin-left: percentage((3 / @grid-columns)); }\n  .col-lg-offset-4  { margin-left: percentage((4 / @grid-columns)); }\n  .col-lg-offset-5  { margin-left: percentage((5 / @grid-columns)); }\n  .col-lg-offset-6  { margin-left: percentage((6 / @grid-columns)); }\n  .col-lg-offset-7  { margin-left: percentage((7 / @grid-columns)); }\n  .col-lg-offset-8  { margin-left: percentage((8 / @grid-columns)); }\n  .col-lg-offset-9  { margin-left: percentage((9 / @grid-columns)); }\n  .col-lg-offset-10 { margin-left: percentage((10/ @grid-columns)); }\n  .col-lg-offset-11 { margin-left: percentage((11/ @grid-columns)); }\n}\n";return returnMe;})());
-
-//attach controllers
-controllers(router);
-
-//attach routes
-routes(router);
-
-var parser = new less.Parser();
-parser.parse(bootstrapLess, function(e,r){
-	insertCss(r.toCSS());
-});
-
-Backbone.clientOnly = true;
-
-//attach global collections
-Backbone.collections = globalCollections({identifier: "~blog~"});
-
-new LayoutView();
-
-Backbone.history.start({
-  pushState: true
-});
-
-
-},{"../shared/Router":14,"./views/layout":11,"C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\collections\\global\\global.js":2,"C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\collections\\global\\html.js":3,"C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\collections\\global\\posts.js":4,"C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\controllers\\error.js":5,"C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\controllers\\posts.js":6,"C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\routes\\error.js":8,"C:\\node\\work\\personal\\cellvia.github.io\\private\\client\\js\\app\\desktop\\routes\\posts.js":9,"foldify":24,"insert-css":29,"path":19,"util":20}],2:[function(require,module,exports){
-var process=require("__browserify_process");module.exports = function(options){
-	var GlobalCollection = Backbone.Collection.extend({
-		model: Backbone.Model,
-		url: function(){
-			return '/globalCollection/' + this.id;
-		},
-		parse: function(resp){
-			this.fetched = true;
-			process.nextTick($.proxy( function(){
-				this.trigger("fetched");
-			}, this));
-			return resp;
-		},
-		initialize: function(models, options){
-			this.options || (this.options = options || {});
-			this.id = this.options.id || 0;
-		}
-	});
-
-	return new GlobalCollection([], options);
-};
-},{"__browserify_process":21}],3:[function(require,module,exports){
-var process=require("__browserify_process"),__dirname="/desktop\\collections\\global";var foldify = require('foldify'),
-	hyperglue = require('hyperglue');
-
-module.exports = function(options){
-	var HTMLCollection = Backbone.Collection.extend({
-		model: Backbone.Model,
-		url: function(){
-			return '/HTMLCollection/' + this.id;
-		},
-		parse: function(resp){
-			process.nextTick($.proxy( function(){
-				this.trigger("fetched");
-			}, this));
-			this.fetched = true;
-			var output = [];
-			for(var name in resp){
-				output.push({id: name, template: resp[name]});
-			}
-			return output;
-		},
-		initialize: function(models, options){
-			this.options || (this.options = options || {});
-			this.id = this.options.id || 0;
-		},
-		render: function(template, map){
-			if((template = this.get(template)) && (template = template.get("template")) ){
-				return hyperglue(template, map);
-			}
-		},
-		sync: function () {
-			if(Backbone.clientOnly){
-				this.fetched = true;
-				var pathToDir = '../../../../../../html/desktop';
-				var htmls = foldify(__dirname + pathToDir);
-				for(var name in htmls){
-					this.add({id: name, template: htmls[name]});
-				}
-				this.trigger('fetched');
-			}else{
-				return Backbone.sync.apply(this, arguments);			
-			}
-	    }     
-	});
-
-	return new HTMLCollection([], options);
-};
-},{"__browserify_process":21,"foldify":24,"hyperglue":27}],4:[function(require,module,exports){
-var process=require("__browserify_process");var foldify = require('foldify'),
-	digistify = require('digistify');
-
-var Post = require('../../models/Post')
-
-module.exports = function(options){
-	var GistCollection = Backbone.Collection.extend({
-		model: Post,
-		initialize: function(models, options){
-			this.options || (this.options = options || {});			
-			this.options.identifier = options.identifier;
-		},
-		sync: function () {
-			var self = this;
-			if(!self.fetched){
-				digistify("cellvia", {transform: "article", identifier: this.options.identifier}, function(err, gists){
-					self.fetched = true;
-					gists.map(function(gist){
-						gist.slug = slug(gist.title);
-						return gist;
-					});
-					console.log(gists)
-					self.add(gists);
-					self.trigger('fetched');
-				});				
-			}else{
-				process.nextTick(function(){
-					self.trigger("fetched");				
-				});
-			}
-	    }
-	});
-
-	return new GistCollection([], options);
-};
-
-function slug(input)
-{
-    return input
-        .replace(/^\s\s*/, '') // Trim start
-        .replace(/\s\s*$/, '') // Trim end
-        .toLowerCase() // Camel case is bad
-        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
-        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
-}
-},{"../../models/Post":7,"__browserify_process":21,"digistify":22,"foldify":24}],5:[function(require,module,exports){
-var ErrorView = require('../views/error');
-
-module.exports = function(router){
-	router.error = function(status){
-    	router.view( new ErrorView(status), {group: "errors"} );
-  	};
-}
-},{"../views/error":10}],6:[function(require,module,exports){
-var PostsView = require('../views/posts');
-var PostView = require('../views/post');
-
-module.exports = function(router){
-	router.posts = function(){
-    	router.view( PostsView );
-	}
-
-	router.post = function(slug){
-    	router.view( PostView.bind(PostView, {"slug":slug}) );
-	}
-}
-},{"../views/post":12,"../views/posts":13}],7:[function(require,module,exports){
-var process=require("__browserify_process");var digistify = require('digistify');
-
-module.exports = Backbone.Model.extend({
-	sync: function(){	
-		var self = this;
-		if(!self.fetched){
-			digistify(this.id, {contentTransform: "article"}, function(err, content){
-				self.set("content", content);
-				self.fetched = true;
-				self.trigger("fetched");
-			});			
-		}else{
-			process.nextTick(function(){
-				self.trigger("fetched");				
-			});
-		}
-	}
-})
-},{"__browserify_process":21,"digistify":22}],8:[function(require,module,exports){
-module.exports = function(router){
-	router.route('500'                                , 'error'                , $.proxy(function(){ this.error(500); }, router) );
-	router.route('404'                                , 'error'                , $.proxy(function(){ this.error(404); }, router) );
-	router.route('403'                                , 'error'                , $.proxy(function(){ this.error(403); }, router) );
-}
-},{}],9:[function(require,module,exports){
-module.exports = function(router){
-
-	router.route('', 'posts' );
-	router.route('posts', 'posts' );
-
-	router.route('article/:slug', 'post' );
-
-}
-},{}],10:[function(require,module,exports){
-var View = require('../../shared/View');
-
-module.exports = View.extend({
-	el: "body",
-	initialize: function(){
-		alert("error!");		
-	}
-})
-
-},{"../../shared/View":15}],11:[function(require,module,exports){
-var View = require('../../shared/View');
-
-module.exports = View.extend({
-	el: "body",
-	events: {
-		"click a": "link"
-	},
-	link: function(e){
-		e.preventDefault();
-		var href = e.currentTarget.getAttribute('href');
-		alert(href);
-		Backbone.trigger("go", {href: href});
-	},
-	initialize: function(){
-	}
-})
-
-},{"../../shared/View":15}],12:[function(require,module,exports){
-var View = require('../../shared/View');
-
-module.exports = View.extend({
-	el: "#page",
-	events: {
-	},
-	setup: function(){
-		if(!this.posts.fetched || !this.html.fetched) return
-
-		this.post = this.posts.findWhere({"slug": this.slug});
-		if(!this.post) return Backbone.trigger("go", {href: "/403", message: "Post does not exist!"});
-
-		this.post.once("fetched", $.proxy(this.render, this) );
-		this.post.fetch();
-	},
-	render: function(){
-		this.$el.html("");
-		this.html.render("post.html", 
-			{
-				'.link': { href: "/article/"+this.post.get("slug")},
-				'.title': this.post.get("title"),
-				'.created': this.post.get("created"),
-				'.content': this.post.get("content")
-			}
-		).appendTo( this.$el );
-
-		// setTimeout(function(){ Backbone.trigger("go", {href: "/init"}); }, 2000);
-	},
-	initialize: function(opts){
-		this.slug = opts.slug;
-
-		this.posts = Backbone.collections.posts;
-		this.posts.once("fetched", $.proxy(this.setup, this) );
-		this.posts.fetch();
-
-		this.html = Backbone.collections.html;
-		this.html.once("fetched", $.proxy(this.setup, this) );
-		this.html.fetch();
-	}
-});
-},{"../../shared/View":15}],13:[function(require,module,exports){
-var View = require('../../shared/View');
-
-module.exports = View.extend({
-	el: "#page",
-	render: function(){
-		this.$el.html("");
-		var postsMap = this.posts.map(function(post){
-			return { 
-				'.link': { href: "/article/"+post.get("slug")},
-				'.title': post.get("title"),
-				'.created': post.get("created")
-			}
-		});
-		this.$el.html( this.html.render("posts.html", { ".posts": postsMap }) );
-
-		// setTimeout(function(){ Backbone.trigger("go", {href: "/init"}); }, 2000);
-	},
-	initialize: function(){
-
-		this.posts = Backbone.collections.posts;
-		this.posts.once("fetched", $.proxy(this.render, this) );
-		this.posts.fetch();
-
-		this.html = Backbone.collections.html;
-		this.html.once("fetched", $.proxy(this.render, this) );
-		this.html.fetch();
-	}
-});
-},{"../../shared/View":15}],14:[function(require,module,exports){
-var ViewCore = require('./ViewCore');
-
-var Router = Backbone.Router.extend({
-    go: function(data){
-      this.navigate(data.href, {
-        trigger: (data.trigger === false) ? false : true 
-      });
-    },
-    initialize: function(){
-      $.ajaxSetup({ cache: false });
-      Backbone.on('go', $.proxy(this.go, this));
-    }
-});
-
-Router = Router.extend(ViewCore);
-
-module.exports = new Router();
-},{"./ViewCore":16}],15:[function(require,module,exports){
-var ViewCore = require('./ViewCore');
-module.exports = Backbone.View.extend(ViewCore);
-},{"./ViewCore":16}],16:[function(require,module,exports){
-module.exports = {
-	_views: {},
-    _destroyViews: function(group, subview){
-      if(!this._views.hasOwnProperty(group)) return;
-      this._views[group].forEach( function(view){
-        console.log("group"+group)
-        view.destroy(undefined, true);
-        view.stopListening();
-        var el;
-        if(!subview) 
-          el = view.$el;
-        if(el && el.length)
-          el.replaceWith("<div id="+el.attr('id')+">");
-      });
-      delete this._views[group];
-    },
-    view: function(View, options){
-      options = options || {};
-      options.group = options.group || "global";
-      if( options.reset === true )
-        this.destroy();
-      if(this._views[options.group]){
-        if( options.reset !== true && options.replace !== false )
-          this._views[options.group].destroy(options.group);
-        this._views[options.group].push(new View())          
-      }else{
-        this._views[options.group] = [new View()];
+},{}],2:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
       }
-    },
-    destroy: function(group, subview){
-      if(group){
-        console.log("destroy "+group+" views")
-        this._destroyViews(group, subview)
-      }else{
-        console.log("destroy all views")
-        for(var group in this._views){
-          this._destroyViews(group, subview);
-        }
-      }
-    },
-    page_error: function(model, resp){
-        if(Number(resp.status) === 401){
-          window.location.href = '/sign-out';
-          return;
-        }
-        Backbone.trigger('go', { href: '/'+String(resp.status) });
-    }    
-}
-},{}],17:[function(require,module,exports){
-
-
-//
-// The shims in this file are not fully implemented shims for the ES5
-// features, but do work for the particular usecases there is in
-// the other modules.
-//
-
-var toString = Object.prototype.toString;
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-// Array.isArray is supported in IE9
-function isArray(xs) {
-  return toString.call(xs) === '[object Array]';
-}
-exports.isArray = typeof Array.isArray === 'function' ? Array.isArray : isArray;
-
-// Array.prototype.indexOf is supported in IE9
-exports.indexOf = function indexOf(xs, x) {
-  if (xs.indexOf) return xs.indexOf(x);
-  for (var i = 0; i < xs.length; i++) {
-    if (x === xs[i]) return i;
-  }
-  return -1;
-};
-
-// Array.prototype.filter is supported in IE9
-exports.filter = function filter(xs, fn) {
-  if (xs.filter) return xs.filter(fn);
-  var res = [];
-  for (var i = 0; i < xs.length; i++) {
-    if (fn(xs[i], i, xs)) res.push(xs[i]);
-  }
-  return res;
-};
-
-// Array.prototype.forEach is supported in IE9
-exports.forEach = function forEach(xs, fn, self) {
-  if (xs.forEach) return xs.forEach(fn, self);
-  for (var i = 0; i < xs.length; i++) {
-    fn.call(self, xs[i], i, xs);
-  }
-};
-
-// Array.prototype.map is supported in IE9
-exports.map = function map(xs, fn) {
-  if (xs.map) return xs.map(fn);
-  var out = new Array(xs.length);
-  for (var i = 0; i < xs.length; i++) {
-    out[i] = fn(xs[i], i, xs);
-  }
-  return out;
-};
-
-// Array.prototype.reduce is supported in IE9
-exports.reduce = function reduce(array, callback, opt_initialValue) {
-  if (array.reduce) return array.reduce(callback, opt_initialValue);
-  var value, isValueSet = false;
-
-  if (2 < arguments.length) {
-    value = opt_initialValue;
-    isValueSet = true;
-  }
-  for (var i = 0, l = array.length; l > i; ++i) {
-    if (array.hasOwnProperty(i)) {
-      if (isValueSet) {
-        value = callback(value, array[i], i, array);
-      }
-      else {
-        value = array[i];
-        isValueSet = true;
-      }
-    }
-  }
-
-  return value;
-};
-
-// String.prototype.substr - negative index don't work in IE8
-if ('ab'.substr(-1) !== 'b') {
-  exports.substr = function (str, start, length) {
-    // did we get a negative start, calculate how much it is from the beginning of the string
-    if (start < 0) start = str.length + start;
-
-    // call the original function
-    return str.substr(start, length);
+    });
   };
 } else {
-  exports.substr = function (str, start, length) {
-    return str.substr(start, length);
-  };
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
 }
 
-// String.prototype.trim is supported in IE9
-exports.trim = function (str) {
-  if (str.trim) return str.trim();
-  return str.replace(/^\s+|\s+$/g, '');
-};
+},{}],3:[function(require,module,exports){
+// shim for using process in browser
 
-// Function.prototype.bind is supported in IE9
-exports.bind = function () {
-  var args = Array.prototype.slice.call(arguments);
-  var fn = args.shift();
-  if (fn.bind) return fn.bind.apply(fn, args);
-  var self = args.shift();
-  return function () {
-    fn.apply(self, args.concat([Array.prototype.slice.call(arguments)]));
-  };
-};
+var process = module.exports = {};
 
-// Object.create is supported in IE9
-function create(prototype, properties) {
-  var object;
-  if (prototype === null) {
-    object = { '__proto__' : null };
-  }
-  else {
-    if (typeof prototype !== 'object') {
-      throw new TypeError(
-        'typeof prototype[' + (typeof prototype) + '] != \'object\''
-      );
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
     }
-    var Type = function () {};
-    Type.prototype = prototype;
-    object = new Type();
-    object.__proto__ = prototype;
-  }
-  if (typeof properties !== 'undefined' && Object.defineProperties) {
-    Object.defineProperties(object, properties);
-  }
-  return object;
-}
-exports.create = typeof Object.create === 'function' ? Object.create : create;
 
-// Object.keys and Object.getOwnPropertyNames is supported in IE9 however
-// they do show a description and number property on Error objects
-function notObject(object) {
-  return ((typeof object != "object" && typeof object != "function") || object === null);
-}
+    if (canPost) {
+        var queue = [];
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
 
-function keysShim(object) {
-  if (notObject(object)) {
-    throw new TypeError("Object.keys called on a non-object");
-  }
-
-  var result = [];
-  for (var name in object) {
-    if (hasOwnProperty.call(object, name)) {
-      result.push(name);
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
     }
-  }
-  return result;
-}
 
-// getOwnPropertyNames is almost the same as Object.keys one key feature
-//  is that it returns hidden properties, since that can't be implemented,
-//  this feature gets reduced so it just shows the length property on arrays
-function propertyShim(object) {
-  if (notObject(object)) {
-    throw new TypeError("Object.getOwnPropertyNames called on a non-object");
-  }
-
-  var result = keysShim(object);
-  if (exports.isArray(object) && exports.indexOf(object, 'length') === -1) {
-    result.push('length');
-  }
-  return result;
-}
-
-var keys = typeof Object.keys === 'function' ? Object.keys : keysShim;
-var getOwnPropertyNames = typeof Object.getOwnPropertyNames === 'function' ?
-  Object.getOwnPropertyNames : propertyShim;
-
-if (new Error().hasOwnProperty('description')) {
-  var ERROR_PROPERTY_FILTER = function (obj, array) {
-    if (toString.call(obj) === '[object Error]') {
-      array = exports.filter(array, function (name) {
-        return name !== 'description' && name !== 'number' && name !== 'message';
-      });
-    }
-    return array;
-  };
-
-  exports.keys = function (object) {
-    return ERROR_PROPERTY_FILTER(object, keys(object));
-  };
-  exports.getOwnPropertyNames = function (object) {
-    return ERROR_PROPERTY_FILTER(object, getOwnPropertyNames(object));
-  };
-} else {
-  exports.keys = keys;
-  exports.getOwnPropertyNames = getOwnPropertyNames;
-}
-
-// Object.getOwnPropertyDescriptor - supported in IE8 but only on dom elements
-function valueObject(value, key) {
-  return { value: value[key] };
-}
-
-if (typeof Object.getOwnPropertyDescriptor === 'function') {
-  try {
-    Object.getOwnPropertyDescriptor({'a': 1}, 'a');
-    exports.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-  } catch (e) {
-    // IE8 dom element issue - use a try catch and default to valueObject
-    exports.getOwnPropertyDescriptor = function (value, key) {
-      try {
-        return Object.getOwnPropertyDescriptor(value, key);
-      } catch (e) {
-        return valueObject(value, key);
-      }
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
     };
-  }
-} else {
-  exports.getOwnPropertyDescriptor = valueObject;
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
 }
 
-},{}],18:[function(require,module,exports){
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
 
-// not implemented
-// The reason for having an empty file and not throwing is to allow
-// untraditional implementation of this module.
-
-},{}],19:[function(require,module,exports){
-var process=require("__browserify_process");// Copyright Joyent, Inc. and other Node contributors.
+},{}],4:[function(require,module,exports){
+(function (process){
+// Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the
@@ -617,9 +102,6 @@ var process=require("__browserify_process");// Copyright Joyent, Inc. and other 
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var util = require('util');
-var shims = require('_shims');
 
 // resolves . and .. elements in a path array with directory names there
 // must be no slashes, empty elements, or device names (c:\) in the array
@@ -669,7 +151,7 @@ exports.resolve = function() {
     var path = (i >= 0) ? arguments[i] : process.cwd();
 
     // Skip empty and invalid entries
-    if (!util.isString(path)) {
+    if (typeof path !== 'string') {
       throw new TypeError('Arguments to path.resolve must be strings');
     } else if (!path) {
       continue;
@@ -683,7 +165,7 @@ exports.resolve = function() {
   // handle relative paths to be safe (might happen when process.cwd() fails)
 
   // Normalize the path
-  resolvedPath = normalizeArray(shims.filter(resolvedPath.split('/'), function(p) {
+  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
     return !!p;
   }), !resolvedAbsolute).join('/');
 
@@ -694,10 +176,10 @@ exports.resolve = function() {
 // posix version
 exports.normalize = function(path) {
   var isAbsolute = exports.isAbsolute(path),
-      trailingSlash = shims.substr(path, -1) === '/';
+      trailingSlash = substr(path, -1) === '/';
 
   // Normalize the path
-  path = normalizeArray(shims.filter(path.split('/'), function(p) {
+  path = normalizeArray(filter(path.split('/'), function(p) {
     return !!p;
   }), !isAbsolute).join('/');
 
@@ -719,8 +201,8 @@ exports.isAbsolute = function(path) {
 // posix version
 exports.join = function() {
   var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(shims.filter(paths, function(p, index) {
-    if (!util.isString(p)) {
+  return exports.normalize(filter(paths, function(p, index) {
+    if (typeof p !== 'string') {
       throw new TypeError('Arguments to path.join must be strings');
     }
     return p;
@@ -807,7 +289,34 @@ exports.extname = function(path) {
   return splitPath(path)[3];
 };
 
-},{"__browserify_process":21,"_shims":17,"util":20}],20:[function(require,module,exports){
+function filter (xs, f) {
+    if (xs.filter) return xs.filter(f);
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (f(xs[i], i, xs)) res.push(xs[i]);
+    }
+    return res;
+}
+
+// String.prototype.substr - negative index don't work in IE8
+var substr = 'ab'.substr(-1) === 'b'
+    ? function (str, start, len) { return str.substr(start, len) }
+    : function (str, start, len) {
+        if (start < 0) start = str.length + start;
+        return str.substr(start, len);
+    }
+;
+
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3}],5:[function(require,module,exports){
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+},{}],6:[function(require,module,exports){
+(function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -828,8 +337,6 @@ exports.extname = function(path) {
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var shims = require('_shims');
 
 var formatRegExp = /%[sdj%]/g;
 exports.format = function(f) {
@@ -869,6 +376,62 @@ exports.format = function(f) {
   }
   return str;
 };
+
+
+// Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+exports.deprecate = function(fn, msg) {
+  // Allow for deprecating things in the process of starting up.
+  if (isUndefined(global.process)) {
+    return function() {
+      return exports.deprecate(fn, msg).apply(this, arguments);
+    };
+  }
+
+  if (process.noDeprecation === true) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function(set) {
+  if (isUndefined(debugEnviron))
+    debugEnviron = process.env.NODE_DEBUG || '';
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
 
 /**
  * Echos the value of a value. Trys to print the value out
@@ -956,7 +519,7 @@ function stylizeNoColor(str, styleType) {
 function arrayToHash(array) {
   var hash = {};
 
-  shims.forEach(array, function(val, idx) {
+  array.forEach(function(val, idx) {
     hash[val] = true;
   });
 
@@ -974,7 +537,7 @@ function formatValue(ctx, value, recurseTimes) {
       value.inspect !== exports.inspect &&
       // Also filter out any prototype objects using the circular check.
       !(value.constructor && value.constructor.prototype === value)) {
-    var ret = value.inspect(recurseTimes);
+    var ret = value.inspect(recurseTimes, ctx);
     if (!isString(ret)) {
       ret = formatValue(ctx, ret, recurseTimes);
     }
@@ -988,11 +551,18 @@ function formatValue(ctx, value, recurseTimes) {
   }
 
   // Look up the keys of the object.
-  var keys = shims.keys(value);
+  var keys = Object.keys(value);
   var visibleKeys = arrayToHash(keys);
 
   if (ctx.showHidden) {
-    keys = shims.getOwnPropertyNames(value);
+    keys = Object.getOwnPropertyNames(value);
+  }
+
+  // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+  if (isError(value)
+      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
   }
 
   // Some type of object without properties can be shortcutted.
@@ -1104,8 +674,7 @@ function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
       output.push('');
     }
   }
-
-  shims.forEach(keys, function(key) {
+  keys.forEach(function(key) {
     if (!key.match(/^\d+$/)) {
       output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
           key, true));
@@ -1117,7 +686,7 @@ function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
 
 function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
   var name, str, desc;
-  desc = shims.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
   if (desc.get) {
     if (desc.set) {
       str = ctx.stylize('[Getter/Setter]', 'special');
@@ -1129,12 +698,11 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
       str = ctx.stylize('[Setter]', 'special');
     }
   }
-
   if (!hasOwnProperty(visibleKeys, key)) {
     name = '[' + key + ']';
   }
   if (!str) {
-    if (shims.indexOf(ctx.seen, desc.value) < 0) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
       if (isNull(recurseTimes)) {
         str = formatValue(ctx, desc.value, null);
       } else {
@@ -1177,7 +745,7 @@ function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
 
 function reduceToSingleString(output, base, braces) {
   var numLinesEst = 0;
-  var length = shims.reduce(output, function(prev, cur) {
+  var length = output.reduce(function(prev, cur) {
     numLinesEst++;
     if (cur.indexOf('\n') >= 0) numLinesEst++;
     return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
@@ -1199,7 +767,7 @@ function reduceToSingleString(output, base, braces) {
 // NOTE: These type checking functions intentionally don't use `instanceof`
 // because it is fragile and can be easily faked with `Object.create()`.
 function isArray(ar) {
-  return shims.isArray(ar);
+  return Array.isArray(ar);
 }
 exports.isArray = isArray;
 
@@ -1244,7 +812,7 @@ function isRegExp(re) {
 exports.isRegExp = isRegExp;
 
 function isObject(arg) {
-  return typeof arg === 'object' && arg;
+  return typeof arg === 'object' && arg !== null;
 }
 exports.isObject = isObject;
 
@@ -1254,7 +822,8 @@ function isDate(d) {
 exports.isDate = isDate;
 
 function isError(e) {
-  return isObject(e) && objectToString(e) === '[object Error]';
+  return isObject(e) &&
+      (objectToString(e) === '[object Error]' || e instanceof Error);
 }
 exports.isError = isError;
 
@@ -1273,14 +842,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-function isBuffer(arg) {
-  return arg && typeof arg === 'object'
-    && typeof arg.copy === 'function'
-    && typeof arg.fill === 'function'
-    && typeof arg.binarySlice === 'function'
-  ;
-}
-exports.isBuffer = isBuffer;
+exports.isBuffer = require('./support/isBuffer');
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -1324,23 +886,13 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = function(ctor, superCtor) {
-  ctor.super_ = superCtor;
-  ctor.prototype = shims.create(superCtor.prototype, {
-    constructor: {
-      value: ctor,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-};
+exports.inherits = require('inherits');
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
   if (!add || !isObject(add)) return origin;
 
-  var keys = shims.keys(add);
+  var keys = Object.keys(add);
   var i = keys.length;
   while (i--) {
     origin[keys[i]] = add[keys[i]];
@@ -1352,63 +904,465 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-},{"_shims":17}],21:[function(require,module,exports){
-// shim for using process in browser
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":5,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"inherits":2}],7:[function(require,module,exports){
+var path = require('path'),
+	util = require('util'),
+    router = require('../shared/Router'),
+    foldify = require('foldify'),
+    // insertCss = require('insert-css'),
+    conf = require('confify');
 
-var process = module.exports = {};
+var routes = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["error"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\error.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
+    globalCollections = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["global"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\collections\\global\\global.js");returnMe["html"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\collections\\global\\html.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\collections\\global\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
+    // bootstrapLess = foldify('twitter-bootstrap-3.0.0/less', {whitelist: ["variables.less", "mixins.less", "grid.less"], output: "string"} ),
+    LayoutView = require('./views/layout');
 
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
+//attach routes
+routes(router);
 
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
+// var parser = new less.Parser();
+// parser.parse(bootstrapLess, function(e,r){
+// 	insertCss(r.toCSS());
+// });
 
-    if (canPost) {
-        var queue = [];
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
+Backbone.clientOnly = true;
 
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
+//attach global collections
+Backbone.collections = globalCollections({identifier: "~blog~"});
 
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
+new LayoutView();
 
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
+Backbone.history.start({
+  pushState: true
+});
 
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-}
 
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
+},{"../shared/Router":18,"./views/layout":15,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\collections\\global\\global.js":8,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\collections\\global\\html.js":9,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\collections\\global\\posts.js":10,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\error.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\posts.js":13,"confify":21,"foldify":24,"path":4,"util":6}],8:[function(require,module,exports){
+(function (process){
+module.exports = function(options){
+	var GlobalCollection = Backbone.Collection.extend({
+		model: Backbone.Model,
+		url: function(){
+			return '/globalCollection/' + this.id;
+		},
+		parse: function(resp){
+			this.fetched = true;
+			process.nextTick($.proxy( function(){
+				this.trigger("fetched");
+			}, this));
+			return resp;
+		},
+		initialize: function(models, options){
+			this.options || (this.options = options || {});
+			this.id = this.options.id || 0;
+		}
+	});
+
+	return new GlobalCollection([], options);
+};
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3}],9:[function(require,module,exports){
+(function (process){
+var foldify = require('foldify'),
+	hyperglue = require('hyperglue'),
+	util = require('util'),
+	conf = require('confify');
+
+module.exports = function(options){
+	var HTMLCollection = Backbone.Collection.extend({
+		model: Backbone.Model,
+		url: function(){
+			return '/HTMLCollection/' + this.id;
+		},
+		parse: function(resp){
+			process.nextTick($.proxy( function(){
+				this.trigger("fetched");
+			}, this));
+			this.fetched = true;
+			var output = [];
+			for(var name in resp){
+				output.push({id: name, template: resp[name]});
+			}
+			return output;
+		},
+		initialize: function(models, options){
+			this.options || (this.options = options || {});
+			this.id = this.options.id || 0;
+		},
+		render: function(template, map){
+			if((template = this.get(template)) && (template = template.get("template")) ){
+				return hyperglue(template, map);
+			}
+		},
+		fetch: function () {
+			if(Backbone.clientOnly){
+				this.fetched = true;
+				var self = this;
+				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"content\">\r\n\r\n\t</div>\r\n</div>";returnMe["posts.html"] = "<h1>My Posts</h1>\r\n<div class=\"posts\">\r\n\t<a class=\"link\"><span class=\"title\"></span></br>\r\n\t<span class=\"created\"></span></a>\t\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
+				for(var name in htmls){
+					self.add({id: name, template: htmls[name]});
+				}
+				process.nextTick(function(){
+					self.trigger('fetched');
+				});
+			}else{
+				return Backbone.fetch.apply(this, arguments);			
+			}
+	    }     
+	});
+
+	return new HTMLCollection([], options);
+};
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"confify":21,"foldify":24,"hyperglue":27,"util":6}],10:[function(require,module,exports){
+(function (process){
+var foldify = require('foldify'),
+	digistify = require('digistify');
+
+var Post = require('../../models/Post')
+
+module.exports = function(options){
+	var GistCollection = Backbone.Collection.extend({
+		model: Post,
+		comparator: function(gist){
+			return -gist.get("id");
+		},
+		initialize: function(models, options){
+			var self = this;
+			this.options || (this.options = options || {});			
+			this.options.identifier = options.identifier;
+			this.gists = new IDBStore({
+			  dbVersion: 1,
+			  storeName: options.identifier,
+			  keyPath: 'id',
+			  autoIncrement: false,
+			  onStoreReady: function(){
+			  	self.initialized = true;
+			    self.trigger("initialized");
+			  }
+			});
+		},
+		getGists: function(etag){
+			var self = this;
+			var opts = {
+				transform: "article",
+				identifier: this.options.identifier
+			};
+			if(etag) opts.etag = etag;
+			digistify("cellvia", opts, function(err, data){
+				if(data === "unmodified"){
+					self.gists.getAll(function(gists){
+						self.add(gists)
+						self.fetched = true;
+						self.trigger('fetched');
+					}, {order: 'DESC'} );
+				}else{
+					var gists = data.data;
+					gists.map(function(gist){
+						gist.slug = slug(gist.title);
+						gist.getAllEtag = data.etag;
+						return gist;
+					});
+					self.gists.putBatch( gists );
+					self.fetched = true;
+					self.add( gists );
+					self.trigger('fetched');
+				}
+			});
+		},
+		fetch: function () {
+			var self = this;
+			if(!self.fetched){
+				if(!self.initialized)
+					return self.once("initialized", self.fetch);
+				var opts = {
+					autoContinue: false
+				};
+				this.gists.iterate(function(data){
+					self.getGists(data.getAllEtag);
+				}, opts);
+			}else{
+				process.nextTick(function(){
+					self.trigger("fetched");				
+				});
+			}
+	    }
+	});
+
+	return new GistCollection([], options);
 };
 
-},{}],22:[function(require,module,exports){
-var process=require("__browserify_process");var request = require('request');
+function slug(input)
+{
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../models/Post":11,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"digistify":22,"foldify":24}],11:[function(require,module,exports){
+(function (process){
+var digistify = require('digistify');
+var marked = require('marked');
+
+module.exports = Backbone.Model.extend({
+	getGist: function(etag){
+		var self = this;
+		var opts = {
+			fileTransform: function(file){
+				return marked(file.content);
+			}
+		};
+		if(etag) opts.etag = etag;
+		digistify(self.id, opts, function(err, data){
+			if(data === "unmodified"){
+				self.fetched = true;
+				self.trigger("fetched");
+			}else{
+				var contents = data.data;
+				self.set("content", contents.length === 1 ? contents[0] : contents );
+				self.set("etag", data.etag);
+				self.collection.gists.put(self.toJSON());
+				self.fetched = true;
+				self.trigger('fetched');
+			}
+		});
+	},
+	fetch: function(){	
+		var self = this;
+		var etag;
+		if(!self.fetched){
+			this.getGist(this.get("etag"));
+		}else{
+			process.nextTick(function(){
+				self.trigger("fetched");				
+			});
+		}
+	}
+})
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"digistify":22,"marked":29}],12:[function(require,module,exports){
+var ErrorView = require('../views/error');
+
+module.exports = function(router){
+
+	router.error = function(status){
+    	router.view( ErrorView, {errorCode: status, group: "errors"} );
+  	};
+
+	router.route('500', 'error', $.proxy(function(){ this.error(500); }, router) );
+	router.route('404', 'error', $.proxy(function(){ this.error(404); }, router) );
+	router.route('403', 'error', $.proxy(function(){ this.error(403); }, router) );
+
+}
+},{"../views/error":14}],13:[function(require,module,exports){
+var PostsView = require('../views/posts');
+var PostView = require('../views/post');
+
+module.exports = function(router){
+
+	router.posts = function(){
+    	router.view( PostsView );
+	}
+	router.route('', 'posts' );
+	router.route('posts', 'posts' );
+
+	router.post = function(slug){
+    	router.view( PostView, {"slug": slug} );
+	}
+	router.route('article/:slug', 'post' );
+	
+}
+
+},{"../views/post":16,"../views/posts":17}],14:[function(require,module,exports){
+var View = require('../../shared/View');
+
+module.exports = View.extend({
+	el: "body",
+	initialize: function(opts){
+		alert("error!"+opts.errorCode);		
+	}
+})
+
+},{"../../shared/View":19}],15:[function(require,module,exports){
+var View = require('../../shared/View');
+
+module.exports = View.extend({
+	el: "body",
+	events: {
+		"click a": "link"
+	},
+	link: function(e){
+		e.preventDefault();
+		var href = e.currentTarget.getAttribute('href');
+		Backbone.trigger("go", {href: href});			
+	},
+	initialize: function(){
+	}
+})
+
+},{"../../shared/View":19}],16:[function(require,module,exports){
+var View = require('../../shared/View');
+
+module.exports = View.extend({
+	el: "#page",
+	events: {
+	},
+	render: function(){
+		if(this.rendered) return
+		this.html.render("post.html", 
+			{
+				'.link': { href: "/article/"+this.post.get("slug")},
+				'.title': this.post.get("title"),
+				'.created': this.post.get("created"),
+				'.content': this.post.get("content")
+			}
+		).appendTo( this.$el );
+		this.rendered = true;
+	},
+	fetchPost: function(){
+		if(this.fetched || !this.posts.fetched || !this.html.fetched) return
+		this.post = this.posts.findWhere({"slug": this.slug});
+		if(!this.post) return Backbone.trigger("go", {href: "/403", message: "Post does not exist!"});
+
+		this.post.once("fetched", $.proxy(this.render, this) );
+		this.post.fetch();
+		this.fetched = true;
+	},
+	initialize: function(opts){
+		this.slug = opts.slug;
+
+		this.posts = Backbone.collections.posts;
+		this.posts.once("fetched", $.proxy(this.fetchPost, this) );
+		this.posts.fetch();
+
+		this.html = Backbone.collections.html;
+		this.html.once("fetched", $.proxy(this.fetchPost, this) );
+		this.html.fetch();
+	}
+});
+},{"../../shared/View":19}],17:[function(require,module,exports){
+var View = require('../../shared/View');
+
+module.exports = View.extend({
+	el: "#page",
+	render: function(){
+		if(this.rendered || !this.posts.fetched || !this.html.fetched ) return			
+		var postsMap = this.posts.map(function(post){
+			return { 
+				'.link': { href: "/article/"+post.get("slug")},
+				'.title': post.get("title"),
+				'.created': post.get("created")
+			}
+		});
+		this.html.render("posts.html", { ".posts": postsMap }).appendTo(this.$el);
+		this.rendered = true;
+	},
+	initialize: function(){
+		this.posts = Backbone.collections.posts;
+		if(!this.posts.initialized)
+			return this.posts.once("initialized", $.proxy(this.initialize, this));
+
+		this.posts.once("fetched", $.proxy(this.render, this) );
+		this.posts.fetch();
+
+		this.html = Backbone.collections.html;
+		this.html.once("fetched", $.proxy(this.render, this) );
+		this.html.fetch();
+	}
+});
+},{"../../shared/View":19}],18:[function(require,module,exports){
+var ViewCore = require('./ViewCore');
+
+var Router = Backbone.Router.extend({
+    go: function(data){
+      this.navigate(data.href, {
+        trigger: (data.trigger === false) ? false : true 
+      });
+    },
+    initialize: function(){
+      $.ajaxSetup({ cache: false });
+      Backbone.on('go', $.proxy(this.go, this));
+    }
+});
+
+Router = Router.extend(ViewCore);
+
+module.exports = new Router();
+},{"./ViewCore":20}],19:[function(require,module,exports){
+var ViewCore = require('./ViewCore');
+module.exports = Backbone.View.extend(ViewCore);
+},{"./ViewCore":20}],20:[function(require,module,exports){
+module.exports = {
+    _destroyViews: function(group, options, subview){
+      options = options || {};
+      if(!this._views.hasOwnProperty(group)) return;
+      this._views[group].forEach( function(view){
+        view.destroy(undefined, true);
+        view.stopListening();
+        if(options.replace === false) return
+        var el;        
+        if(!subview) 
+          el = view.$el;
+        if(el && el.length)
+          el.replaceWith("<div id="+el.attr('id')+">");          
+      });
+      delete this._views[group];
+    },
+    view: function(View, options){
+      options = options || {};
+      options.group = options.group || "global";
+      if(this._views && this._views[options.group]){
+        if( options.resetAll === true )
+          this.destroy(null, options);
+        else if( options.reset !== false )
+          this.destroy(null, options);
+        if(!this._views) this._views = {};
+        if(!this._views[options.group]) this._views[options.group] = [];
+        this._views[options.group].push(new View(options))          
+      }else{
+        this._views = {};
+        this._views[options.group] = [new View(options)];
+      }
+    },
+    destroy: function(group, options, subview){
+      if(group && this._views[group]){
+        this._destroyViews(group, options, subview)
+      }
+      else{
+        for(var group in this._views){
+          this._destroyViews(group, options, subview);
+        }
+      }
+    },
+    page_error: function(model, resp){
+        if(Number(resp.status) === 401){
+          window.location.href = '/sign-out';
+          return;
+        }
+        Backbone.trigger('go', { href: '/'+String(resp.status) });
+    }    
+}
+},{}],21:[function(require,module,exports){
+(function (process){
+function merge(a, b){
+    for(var prop in b){
+        a[prop] = b[prop];
+    }
+}
+
+module.exports = function browser(srcObj){
+	if(!process.browser && typeof srcObj === "string") srcObj = require(srcObj);
+    merge(browser, srcObj);
+};
+
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3}],22:[function(require,module,exports){
+(function (process){
+var request = require('request');
 
 var exportObj = {
 	defaults: {},
@@ -1419,7 +1373,7 @@ var exportObj = {
 			exportObj.defaults[prop] = val;		
 	},
 	getGists: function (user, options, cb){
-		if(!isNaN(user)) return exportObj.getContent.apply(exportObj, arguments);
+		if(!isNaN(user)) return exportObj.getFiles.apply(exportObj, arguments);
 		if(typeof options === "function"){
 			cb = options;
 			options = {};
@@ -1447,21 +1401,23 @@ var exportObj = {
 		}
 
 		var opts = {json: true, headers: {} };
+		if(options.etag){
+			opts.headers['If-None-Match'] = options.etag;
+			delete options.etag; 
+		}
 		if(typeof options.headers === "object") merge(opts.headers, options.headers);
 		if(typeof exportObj.defaults.headers === "object") merge(opts.headers, exportObj.defaults.headers);
 		if(!process.browser && !opts.headers['User-Agent']) opts.headers['User-Agent'] = options.userAgent || 'node.js';
 
-		function finalize(){
-			if(offset || limit) gists = gists.slice(offset, limit);
-			if( transform ) gists = gists.map(transform);
-			cb(null, gists);
-		}
+		var etag;
 
 		function recurs(){
 			opts.url = get_gists_url(user, {per_page: 100, page: ++counter});
 			request( opts, function(err, resp, newgists){
+				if(resp.statusCode == 304) return cb(null, "unmodified");
 				if(err) return cb(err);
 				if(resp.statusCode != 200) return cb(new Error("invalid url: "+ opts.url));
+				if(!etag) etag = resp.headers ? resp.headers['ETag'] : resp.getResponseHeader('ETag');
 				if(typeof newgists !== "object" || typeof newgists.length === "undefined" || newgists.message) return cb(new Error("error: "+ newgists));
 				if(!newgists.length) return finalize();
 
@@ -1492,9 +1448,15 @@ var exportObj = {
 			});
 		}
 		recurs();
+
+		function finalize(){
+			if(offset || limit) gists = gists.slice(offset, limit);
+			if( transform ) gists = gists.map(transform);
+			cb(null, { data: gists, etag: etag });
+		}
 	},
 
-	getContent: function(id, options, cb){
+	getFiles: function(id, options, cb){
 		if(typeof options === "function"){
 			cb = options;
 			options = {};
@@ -1503,35 +1465,37 @@ var exportObj = {
 		var contents = [];
 		var transform;
 
-		switch(options.contentTransform){
+		switch(options.fileTransform){
 			case "article":
 				transform = function(file){
 					return file.content
 				}
 			break;
 			default:
-				transform = typeof options.contentTransform === "function" ? options.contentTransform : false;
+				transform = typeof options.fileTransform === "function" ? options.fileTransform : false;
 			break;
 		}
 
 		var opts = {json: true, headers: {}, url: get_gist_url(id) };
+		if(options.etag){
+			opts.headers['If-None-Match'] = options.etag;
+			delete options.etag; 
+		}
 		if(typeof options.headers === "object") merge(opts.headers, options.headers);
 		if(typeof exportObj.defaults.headers === "object") merge(opts.headers, exportObj.defaults.headers);
 		if(!process.browser && !opts.headers['User-Agent']) opts.headers['User-Agent'] = options.userAgent || 'node.js';
 
 		request( opts, function(err, resp, gist){
+			if(resp.statusCode == 304) return cb(null, "unmodified");
 			if(err) return cb(err);
 			if(resp.statusCode != 200) return cb(new Error("invalid url? "+ opts.url));
+			var etag = resp.headers ? resp.headers['ETag'] : resp.getResponseHeader('ETag');
 			for(var file in gist.files){
 				if(options.language && gist.files[file].language.toLowerCase() !== options.language.toLowerCase()) continue
 				contents.push(gist.files[file]);
 			}
 			if(transform) contents = contents.map(transform);
-			if(contents.length === 1){
-				cb(null, contents[0]);
-			}else{
-				cb(null, contents);
-			}
+			cb(null, { data: contents, etag: etag });
 		});
 	}
 }
@@ -1543,7 +1507,8 @@ function merge(a, b){ a = a || {}; for (var x in b){ if(typeof a[x] !== "undefin
 module.exports = exportObj.getGists;
 module.exports.setDefault = exportObj.setDefault;
 
-},{"__browserify_process":21,"request":23}],23:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"request":23}],23:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -1957,6 +1922,7 @@ function b64_enc (data) {
 }
 
 },{}],24:[function(require,module,exports){
+(function (process){
 var fs = require('fs'),
 	path = require('path'),
 	minimatch = require('minimatchify');
@@ -2034,7 +2000,7 @@ function fold(toBeFolded){
 };
 
 function populate(dirname, options){
-	if(!fs.readdirSync) throw "you must run the foldify browserify transform (foldify/transform.js) for foldify to work in the browser!";
+	if(process.browser) throw "you must run the foldify browserify transform (foldify/transform.js) for foldify to work in the browser!";
 	var proxy = {},
 		toString = options.output && options.output.toLowerCase() === "string",
 		toArray = options.output && options.output.toLowerCase() === "array",
@@ -2360,8 +2326,10 @@ function bind(fn){
 function isArray(obj){
 	return ~Object.prototype.toString.call(obj).toLowerCase().indexOf("array");
 }
-},{"fs":18,"minimatchify":25,"path":19}],25:[function(require,module,exports){
-var process=require("__browserify_process");if(typeof JSON === "undefined"){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"fs":1,"minimatchify":25,"path":4}],25:[function(require,module,exports){
+(function (process){
+if(typeof JSON === "undefined"){
 
 /*
     json2.js
@@ -4052,7 +4020,8 @@ function regExpEscape (s) {
 
 
 
-},{"__browserify_process":21,"path":19,"sigmund":26}],26:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"path":4,"sigmund":26}],26:[function(require,module,exports){
 module.exports = sigmund
 function sigmund (subject, maxSessions) {
     maxSessions = maxSessions || 10;
@@ -4293,24 +4262,1273 @@ function orphan(els) {
 }
 
 },{}],29:[function(require,module,exports){
-var inserted = {};
+(function (global){
+/**
+ * marked - a markdown parser
+ * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
+ * https://github.com/chjj/marked
+ */
 
-module.exports = function (css) {
-    if (inserted[css]) return;
-    inserted[css] = true;
-    
-    var elem = document.createElement('style');
-    elem.setAttribute('type', 'text/css');
+;(function() {
 
-    if ('textContent' in elem) {
-      elem.textContent = css;
-    } else {
-      elem.styleSheet.cssText = css;
-    }
-    
-    var head = document.getElementsByTagName('head')[0];
-    head.appendChild(elem);
+/**
+ * Block-Level Grammar
+ */
+
+var block = {
+  newline: /^\n+/,
+  code: /^( {4}[^\n]+\n*)+/,
+  fences: noop,
+  hr: /^( *[-*_]){3,} *(?:\n+|$)/,
+  heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
+  nptable: noop,
+  lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
+  blockquote: /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,
+  list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
+  html: /^ *(?:comment|closed|closing) *(?:\n{2,}|\s*$)/,
+  def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
+  table: noop,
+  paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
+  text: /^[^\n]+/
 };
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16])
-;
+block.bullet = /(?:[*+-]|\d+\.)/;
+block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
+block.item = replace(block.item, 'gm')
+  (/bull/g, block.bullet)
+  ();
+
+block.list = replace(block.list)
+  (/bull/g, block.bullet)
+  ('hr', '\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))')
+  ('def', '\\n+(?=' + block.def.source + ')')
+  ();
+
+block.blockquote = replace(block.blockquote)
+  ('def', block.def)
+  ();
+
+block._tag = '(?!(?:'
+  + 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code'
+  + '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo'
+  + '|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b';
+
+block.html = replace(block.html)
+  ('comment', /<!--[\s\S]*?-->/)
+  ('closed', /<(tag)[\s\S]+?<\/\1>/)
+  ('closing', /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)
+  (/tag/g, block._tag)
+  ();
+
+block.paragraph = replace(block.paragraph)
+  ('hr', block.hr)
+  ('heading', block.heading)
+  ('lheading', block.lheading)
+  ('blockquote', block.blockquote)
+  ('tag', '<' + block._tag)
+  ('def', block.def)
+  ();
+
+/**
+ * Normal Block Grammar
+ */
+
+block.normal = merge({}, block);
+
+/**
+ * GFM Block Grammar
+ */
+
+block.gfm = merge({}, block.normal, {
+  fences: /^ *(`{3,}|~{3,}) *(\S+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/,
+  paragraph: /^/
+});
+
+block.gfm.paragraph = replace(block.paragraph)
+  ('(?!', '(?!'
+    + block.gfm.fences.source.replace('\\1', '\\2') + '|'
+    + block.list.source.replace('\\1', '\\3') + '|')
+  ();
+
+/**
+ * GFM + Tables Block Grammar
+ */
+
+block.tables = merge({}, block.gfm, {
+  nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
+  table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
+});
+
+/**
+ * Block Lexer
+ */
+
+function Lexer(options) {
+  this.tokens = [];
+  this.tokens.links = {};
+  this.options = options || marked.defaults;
+  this.rules = block.normal;
+
+  if (this.options.gfm) {
+    if (this.options.tables) {
+      this.rules = block.tables;
+    } else {
+      this.rules = block.gfm;
+    }
+  }
+}
+
+/**
+ * Expose Block Rules
+ */
+
+Lexer.rules = block;
+
+/**
+ * Static Lex Method
+ */
+
+Lexer.lex = function(src, options) {
+  var lexer = new Lexer(options);
+  return lexer.lex(src);
+};
+
+/**
+ * Preprocessing
+ */
+
+Lexer.prototype.lex = function(src) {
+  src = src
+    .replace(/\r\n|\r/g, '\n')
+    .replace(/\t/g, '    ')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u2424/g, '\n');
+
+  return this.token(src, true);
+};
+
+/**
+ * Lexing
+ */
+
+Lexer.prototype.token = function(src, top, bq) {
+  var src = src.replace(/^ +$/gm, '')
+    , next
+    , loose
+    , cap
+    , bull
+    , b
+    , item
+    , space
+    , i
+    , l;
+
+  while (src) {
+    // newline
+    if (cap = this.rules.newline.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[0].length > 1) {
+        this.tokens.push({
+          type: 'space'
+        });
+      }
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      cap = cap[0].replace(/^ {4}/gm, '');
+      this.tokens.push({
+        type: 'code',
+        text: !this.options.pedantic
+          ? cap.replace(/\n+$/, '')
+          : cap
+      });
+      continue;
+    }
+
+    // fences (gfm)
+    if (cap = this.rules.fences.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'code',
+        lang: cap[2],
+        text: cap[3]
+      });
+      continue;
+    }
+
+    // heading
+    if (cap = this.rules.heading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[1].length,
+        text: cap[2]
+      });
+      continue;
+    }
+
+    // table no leading pipe (gfm)
+    if (top && (cap = this.rules.nptable.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i].split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // lheading
+    if (cap = this.rules.lheading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[2] === '=' ? 1 : 2,
+        text: cap[1]
+      });
+      continue;
+    }
+
+    // hr
+    if (cap = this.rules.hr.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'hr'
+      });
+      continue;
+    }
+
+    // blockquote
+    if (cap = this.rules.blockquote.exec(src)) {
+      src = src.substring(cap[0].length);
+
+      this.tokens.push({
+        type: 'blockquote_start'
+      });
+
+      cap = cap[0].replace(/^ *> ?/gm, '');
+
+      // Pass `top` to keep the current
+      // "toplevel" state. This is exactly
+      // how markdown.pl works.
+      this.token(cap, top, true);
+
+      this.tokens.push({
+        type: 'blockquote_end'
+      });
+
+      continue;
+    }
+
+    // list
+    if (cap = this.rules.list.exec(src)) {
+      src = src.substring(cap[0].length);
+      bull = cap[2];
+
+      this.tokens.push({
+        type: 'list_start',
+        ordered: bull.length > 1
+      });
+
+      // Get each top-level item.
+      cap = cap[0].match(this.rules.item);
+
+      next = false;
+      l = cap.length;
+      i = 0;
+
+      for (; i < l; i++) {
+        item = cap[i];
+
+        // Remove the list item's bullet
+        // so it is seen as the next token.
+        space = item.length;
+        item = item.replace(/^ *([*+-]|\d+\.) +/, '');
+
+        // Outdent whatever the
+        // list item contains. Hacky.
+        if (~item.indexOf('\n ')) {
+          space -= item.length;
+          item = !this.options.pedantic
+            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+            : item.replace(/^ {1,4}/gm, '');
+        }
+
+        // Determine whether the next list item belongs here.
+        // Backpedal if it does not belong in this list.
+        if (this.options.smartLists && i !== l - 1) {
+          b = block.bullet.exec(cap[i + 1])[0];
+          if (bull !== b && !(bull.length > 1 && b.length > 1)) {
+            src = cap.slice(i + 1).join('\n') + src;
+            i = l - 1;
+          }
+        }
+
+        // Determine whether item is loose or not.
+        // Use: /(^|\n)(?! )[^\n]+\n\n(?!\s*$)/
+        // for discount behavior.
+        loose = next || /\n\n(?!\s*$)/.test(item);
+        if (i !== l - 1) {
+          next = item.charAt(item.length - 1) === '\n';
+          if (!loose) loose = next;
+        }
+
+        this.tokens.push({
+          type: loose
+            ? 'loose_item_start'
+            : 'list_item_start'
+        });
+
+        // Recurse.
+        this.token(item, false, bq);
+
+        this.tokens.push({
+          type: 'list_item_end'
+        });
+      }
+
+      this.tokens.push({
+        type: 'list_end'
+      });
+
+      continue;
+    }
+
+    // html
+    if (cap = this.rules.html.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: this.options.sanitize
+          ? 'paragraph'
+          : 'html',
+        pre: cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    // def
+    if ((!bq && top) && (cap = this.rules.def.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.links[cap[1].toLowerCase()] = {
+        href: cap[2],
+        title: cap[3]
+      };
+      continue;
+    }
+
+    // table (gfm)
+    if (top && (cap = this.rules.table.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i]
+          .replace(/^ *\| *| *\| *$/g, '')
+          .split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // top-level paragraph
+    if (top && (cap = this.rules.paragraph.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'paragraph',
+        text: cap[1].charAt(cap[1].length - 1) === '\n'
+          ? cap[1].slice(0, -1)
+          : cap[1]
+      });
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      // Top-level should never reach here.
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'text',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return this.tokens;
+};
+
+/**
+ * Inline-Level Grammar
+ */
+
+var inline = {
+  escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
+  autolink: /^<([^ >]+(@|:\/)[^ >]+)>/,
+  url: noop,
+  tag: /^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,
+  link: /^!?\[(inside)\]\(href\)/,
+  reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
+  nolink: /^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,
+  strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
+  em: /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+  code: /^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,
+  br: /^ {2,}\n(?!\s*$)/,
+  del: noop,
+  text: /^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
+};
+
+inline._inside = /(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;
+inline._href = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
+
+inline.link = replace(inline.link)
+  ('inside', inline._inside)
+  ('href', inline._href)
+  ();
+
+inline.reflink = replace(inline.reflink)
+  ('inside', inline._inside)
+  ();
+
+/**
+ * Normal Inline Grammar
+ */
+
+inline.normal = merge({}, inline);
+
+/**
+ * Pedantic Inline Grammar
+ */
+
+inline.pedantic = merge({}, inline.normal, {
+  strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
+  em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
+});
+
+/**
+ * GFM Inline Grammar
+ */
+
+inline.gfm = merge({}, inline.normal, {
+  escape: replace(inline.escape)('])', '~|])')(),
+  url: /^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,
+  del: /^~~(?=\S)([\s\S]*?\S)~~/,
+  text: replace(inline.text)
+    (']|', '~]|')
+    ('|', '|https?://|')
+    ()
+});
+
+/**
+ * GFM + Line Breaks Inline Grammar
+ */
+
+inline.breaks = merge({}, inline.gfm, {
+  br: replace(inline.br)('{2,}', '*')(),
+  text: replace(inline.gfm.text)('{2,}', '*')()
+});
+
+/**
+ * Inline Lexer & Compiler
+ */
+
+function InlineLexer(links, options) {
+  this.options = options || marked.defaults;
+  this.links = links;
+  this.rules = inline.normal;
+  this.renderer = this.options.renderer || new Renderer;
+  this.renderer.options = this.options;
+
+  if (!this.links) {
+    throw new
+      Error('Tokens array requires a `links` property.');
+  }
+
+  if (this.options.gfm) {
+    if (this.options.breaks) {
+      this.rules = inline.breaks;
+    } else {
+      this.rules = inline.gfm;
+    }
+  } else if (this.options.pedantic) {
+    this.rules = inline.pedantic;
+  }
+}
+
+/**
+ * Expose Inline Rules
+ */
+
+InlineLexer.rules = inline;
+
+/**
+ * Static Lexing/Compiling Method
+ */
+
+InlineLexer.output = function(src, links, options) {
+  var inline = new InlineLexer(links, options);
+  return inline.output(src);
+};
+
+/**
+ * Lexing/Compiling
+ */
+
+InlineLexer.prototype.output = function(src) {
+  var out = ''
+    , link
+    , text
+    , href
+    , cap;
+
+  while (src) {
+    // escape
+    if (cap = this.rules.escape.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += cap[1];
+      continue;
+    }
+
+    // autolink
+    if (cap = this.rules.autolink.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[2] === '@') {
+        text = cap[1].charAt(6) === ':'
+          ? this.mangle(cap[1].substring(7))
+          : this.mangle(cap[1]);
+        href = this.mangle('mailto:') + text;
+      } else {
+        text = escape(cap[1]);
+        href = text;
+      }
+      out += this.renderer.link(href, null, text);
+      continue;
+    }
+
+    // url (gfm)
+    if (!this.inLink && (cap = this.rules.url.exec(src))) {
+      src = src.substring(cap[0].length);
+      text = escape(cap[1]);
+      href = text;
+      out += this.renderer.link(href, null, text);
+      continue;
+    }
+
+    // tag
+    if (cap = this.rules.tag.exec(src)) {
+      if (!this.inLink && /^<a /i.test(cap[0])) {
+        this.inLink = true;
+      } else if (this.inLink && /^<\/a>/i.test(cap[0])) {
+        this.inLink = false;
+      }
+      src = src.substring(cap[0].length);
+      out += this.options.sanitize
+        ? escape(cap[0])
+        : cap[0];
+      continue;
+    }
+
+    // link
+    if (cap = this.rules.link.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.inLink = true;
+      out += this.outputLink(cap, {
+        href: cap[2],
+        title: cap[3]
+      });
+      this.inLink = false;
+      continue;
+    }
+
+    // reflink, nolink
+    if ((cap = this.rules.reflink.exec(src))
+        || (cap = this.rules.nolink.exec(src))) {
+      src = src.substring(cap[0].length);
+      link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
+      link = this.links[link.toLowerCase()];
+      if (!link || !link.href) {
+        out += cap[0].charAt(0);
+        src = cap[0].substring(1) + src;
+        continue;
+      }
+      this.inLink = true;
+      out += this.outputLink(cap, link);
+      this.inLink = false;
+      continue;
+    }
+
+    // strong
+    if (cap = this.rules.strong.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.strong(this.output(cap[2] || cap[1]));
+      continue;
+    }
+
+    // em
+    if (cap = this.rules.em.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.em(this.output(cap[2] || cap[1]));
+      continue;
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.codespan(escape(cap[2], true));
+      continue;
+    }
+
+    // br
+    if (cap = this.rules.br.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.br();
+      continue;
+    }
+
+    // del (gfm)
+    if (cap = this.rules.del.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.del(this.output(cap[1]));
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += escape(this.smartypants(cap[0]));
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return out;
+};
+
+/**
+ * Compile Link
+ */
+
+InlineLexer.prototype.outputLink = function(cap, link) {
+  var href = escape(link.href)
+    , title = link.title ? escape(link.title) : null;
+
+  return cap[0].charAt(0) !== '!'
+    ? this.renderer.link(href, title, this.output(cap[1]))
+    : this.renderer.image(href, title, escape(cap[1]));
+};
+
+/**
+ * Smartypants Transformations
+ */
+
+InlineLexer.prototype.smartypants = function(text) {
+  if (!this.options.smartypants) return text;
+  return text
+    // em-dashes
+    .replace(/--/g, '\u2014')
+    // opening singles
+    .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')
+    // closing singles & apostrophes
+    .replace(/'/g, '\u2019')
+    // opening doubles
+    .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c')
+    // closing doubles
+    .replace(/"/g, '\u201d')
+    // ellipses
+    .replace(/\.{3}/g, '\u2026');
+};
+
+/**
+ * Mangle Links
+ */
+
+InlineLexer.prototype.mangle = function(text) {
+  var out = ''
+    , l = text.length
+    , i = 0
+    , ch;
+
+  for (; i < l; i++) {
+    ch = text.charCodeAt(i);
+    if (Math.random() > 0.5) {
+      ch = 'x' + ch.toString(16);
+    }
+    out += '&#' + ch + ';';
+  }
+
+  return out;
+};
+
+/**
+ * Renderer
+ */
+
+function Renderer(options) {
+  this.options = options || {};
+}
+
+Renderer.prototype.code = function(code, lang, escaped) {
+  if (this.options.highlight) {
+    var out = this.options.highlight(code, lang);
+    if (out != null && out !== code) {
+      escaped = true;
+      code = out;
+    }
+  }
+
+  if (!lang) {
+    return '<pre><code>'
+      + (escaped ? code : escape(code, true))
+      + '\n</code></pre>';
+  }
+
+  return '<pre><code class="'
+    + this.options.langPrefix
+    + escape(lang, true)
+    + '">'
+    + (escaped ? code : escape(code, true))
+    + '\n</code></pre>\n';
+};
+
+Renderer.prototype.blockquote = function(quote) {
+  return '<blockquote>\n' + quote + '</blockquote>\n';
+};
+
+Renderer.prototype.html = function(html) {
+  return html;
+};
+
+Renderer.prototype.heading = function(text, level, raw) {
+  return '<h'
+    + level
+    + ' id="'
+    + this.options.headerPrefix
+    + raw.toLowerCase().replace(/[^\w]+/g, '-')
+    + '">'
+    + text
+    + '</h'
+    + level
+    + '>\n';
+};
+
+Renderer.prototype.hr = function() {
+  return this.options.xhtml ? '<hr/>\n' : '<hr>\n';
+};
+
+Renderer.prototype.list = function(body, ordered) {
+  var type = ordered ? 'ol' : 'ul';
+  return '<' + type + '>\n' + body + '</' + type + '>\n';
+};
+
+Renderer.prototype.listitem = function(text) {
+  return '<li>' + text + '</li>\n';
+};
+
+Renderer.prototype.paragraph = function(text) {
+  return '<p>' + text + '</p>\n';
+};
+
+Renderer.prototype.table = function(header, body) {
+  return '<table>\n'
+    + '<thead>\n'
+    + header
+    + '</thead>\n'
+    + '<tbody>\n'
+    + body
+    + '</tbody>\n'
+    + '</table>\n';
+};
+
+Renderer.prototype.tablerow = function(content) {
+  return '<tr>\n' + content + '</tr>\n';
+};
+
+Renderer.prototype.tablecell = function(content, flags) {
+  var type = flags.header ? 'th' : 'td';
+  var tag = flags.align
+    ? '<' + type + ' style="text-align:' + flags.align + '">'
+    : '<' + type + '>';
+  return tag + content + '</' + type + '>\n';
+};
+
+// span level renderer
+Renderer.prototype.strong = function(text) {
+  return '<strong>' + text + '</strong>';
+};
+
+Renderer.prototype.em = function(text) {
+  return '<em>' + text + '</em>';
+};
+
+Renderer.prototype.codespan = function(text) {
+  return '<code>' + text + '</code>';
+};
+
+Renderer.prototype.br = function() {
+  return this.options.xhtml ? '<br/>' : '<br>';
+};
+
+Renderer.prototype.del = function(text) {
+  return '<del>' + text + '</del>';
+};
+
+Renderer.prototype.link = function(href, title, text) {
+  if (this.options.sanitize) {
+    try {
+      var prot = decodeURIComponent(unescape(href))
+        .replace(/[^\w:]/g, '')
+        .toLowerCase();
+    } catch (e) {
+      return '';
+    }
+    if (prot.indexOf('javascript:') === 0) {
+      return '';
+    }
+  }
+  var out = '<a href="' + href + '"';
+  if (title) {
+    out += ' title="' + title + '"';
+  }
+  out += '>' + text + '</a>';
+  return out;
+};
+
+Renderer.prototype.image = function(href, title, text) {
+  var out = '<img src="' + href + '" alt="' + text + '"';
+  if (title) {
+    out += ' title="' + title + '"';
+  }
+  out += this.options.xhtml ? '/>' : '>';
+  return out;
+};
+
+/**
+ * Parsing & Compiling
+ */
+
+function Parser(options) {
+  this.tokens = [];
+  this.token = null;
+  this.options = options || marked.defaults;
+  this.options.renderer = this.options.renderer || new Renderer;
+  this.renderer = this.options.renderer;
+  this.renderer.options = this.options;
+}
+
+/**
+ * Static Parse Method
+ */
+
+Parser.parse = function(src, options, renderer) {
+  var parser = new Parser(options, renderer);
+  return parser.parse(src);
+};
+
+/**
+ * Parse Loop
+ */
+
+Parser.prototype.parse = function(src) {
+  this.inline = new InlineLexer(src.links, this.options, this.renderer);
+  this.tokens = src.reverse();
+
+  var out = '';
+  while (this.next()) {
+    out += this.tok();
+  }
+
+  return out;
+};
+
+/**
+ * Next Token
+ */
+
+Parser.prototype.next = function() {
+  return this.token = this.tokens.pop();
+};
+
+/**
+ * Preview Next Token
+ */
+
+Parser.prototype.peek = function() {
+  return this.tokens[this.tokens.length - 1] || 0;
+};
+
+/**
+ * Parse Text Tokens
+ */
+
+Parser.prototype.parseText = function() {
+  var body = this.token.text;
+
+  while (this.peek().type === 'text') {
+    body += '\n' + this.next().text;
+  }
+
+  return this.inline.output(body);
+};
+
+/**
+ * Parse Current Token
+ */
+
+Parser.prototype.tok = function() {
+  switch (this.token.type) {
+    case 'space': {
+      return '';
+    }
+    case 'hr': {
+      return this.renderer.hr();
+    }
+    case 'heading': {
+      return this.renderer.heading(
+        this.inline.output(this.token.text),
+        this.token.depth,
+        this.token.text);
+    }
+    case 'code': {
+      return this.renderer.code(this.token.text,
+        this.token.lang,
+        this.token.escaped);
+    }
+    case 'table': {
+      var header = ''
+        , body = ''
+        , i
+        , row
+        , cell
+        , flags
+        , j;
+
+      // header
+      cell = '';
+      for (i = 0; i < this.token.header.length; i++) {
+        flags = { header: true, align: this.token.align[i] };
+        cell += this.renderer.tablecell(
+          this.inline.output(this.token.header[i]),
+          { header: true, align: this.token.align[i] }
+        );
+      }
+      header += this.renderer.tablerow(cell);
+
+      for (i = 0; i < this.token.cells.length; i++) {
+        row = this.token.cells[i];
+
+        cell = '';
+        for (j = 0; j < row.length; j++) {
+          cell += this.renderer.tablecell(
+            this.inline.output(row[j]),
+            { header: false, align: this.token.align[j] }
+          );
+        }
+
+        body += this.renderer.tablerow(cell);
+      }
+      return this.renderer.table(header, body);
+    }
+    case 'blockquote_start': {
+      var body = '';
+
+      while (this.next().type !== 'blockquote_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.blockquote(body);
+    }
+    case 'list_start': {
+      var body = ''
+        , ordered = this.token.ordered;
+
+      while (this.next().type !== 'list_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.list(body, ordered);
+    }
+    case 'list_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.token.type === 'text'
+          ? this.parseText()
+          : this.tok();
+      }
+
+      return this.renderer.listitem(body);
+    }
+    case 'loose_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.listitem(body);
+    }
+    case 'html': {
+      var html = !this.token.pre && !this.options.pedantic
+        ? this.inline.output(this.token.text)
+        : this.token.text;
+      return this.renderer.html(html);
+    }
+    case 'paragraph': {
+      return this.renderer.paragraph(this.inline.output(this.token.text));
+    }
+    case 'text': {
+      return this.renderer.paragraph(this.parseText());
+    }
+  }
+};
+
+/**
+ * Helpers
+ */
+
+function escape(html, encode) {
+  return html
+    .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function unescape(html) {
+  return html.replace(/&([#\w]+);/g, function(_, n) {
+    n = n.toLowerCase();
+    if (n === 'colon') return ':';
+    if (n.charAt(0) === '#') {
+      return n.charAt(1) === 'x'
+        ? String.fromCharCode(parseInt(n.substring(2), 16))
+        : String.fromCharCode(+n.substring(1));
+    }
+    return '';
+  });
+}
+
+function replace(regex, opt) {
+  regex = regex.source;
+  opt = opt || '';
+  return function self(name, val) {
+    if (!name) return new RegExp(regex, opt);
+    val = val.source || val;
+    val = val.replace(/(^|[^\[])\^/g, '$1');
+    regex = regex.replace(name, val);
+    return self;
+  };
+}
+
+function noop() {}
+noop.exec = noop;
+
+function merge(obj) {
+  var i = 1
+    , target
+    , key;
+
+  for (; i < arguments.length; i++) {
+    target = arguments[i];
+    for (key in target) {
+      if (Object.prototype.hasOwnProperty.call(target, key)) {
+        obj[key] = target[key];
+      }
+    }
+  }
+
+  return obj;
+}
+
+
+/**
+ * Marked
+ */
+
+function marked(src, opt, callback) {
+  if (callback || typeof opt === 'function') {
+    if (!callback) {
+      callback = opt;
+      opt = null;
+    }
+
+    opt = merge({}, marked.defaults, opt || {});
+
+    var highlight = opt.highlight
+      , tokens
+      , pending
+      , i = 0;
+
+    try {
+      tokens = Lexer.lex(src, opt)
+    } catch (e) {
+      return callback(e);
+    }
+
+    pending = tokens.length;
+
+    var done = function() {
+      var out, err;
+
+      try {
+        out = Parser.parse(tokens, opt);
+      } catch (e) {
+        err = e;
+      }
+
+      opt.highlight = highlight;
+
+      return err
+        ? callback(err)
+        : callback(null, out);
+    };
+
+    if (!highlight || highlight.length < 3) {
+      return done();
+    }
+
+    delete opt.highlight;
+
+    if (!pending) return done();
+
+    for (; i < tokens.length; i++) {
+      (function(token) {
+        if (token.type !== 'code') {
+          return --pending || done();
+        }
+        return highlight(token.text, token.lang, function(err, code) {
+          if (code == null || code === token.text) {
+            return --pending || done();
+          }
+          token.text = code;
+          token.escaped = true;
+          --pending || done();
+        });
+      })(tokens[i]);
+    }
+
+    return;
+  }
+  try {
+    if (opt) opt = merge({}, marked.defaults, opt);
+    return Parser.parse(Lexer.lex(src, opt), opt);
+  } catch (e) {
+    e.message += '\nPlease report this to https://github.com/chjj/marked.';
+    if ((opt || marked.defaults).silent) {
+      return '<p>An error occured:</p><pre>'
+        + escape(e.message + '', true)
+        + '</pre>';
+    }
+    throw e;
+  }
+}
+
+/**
+ * Options
+ */
+
+marked.options =
+marked.setOptions = function(opt) {
+  merge(marked.defaults, opt);
+  return marked;
+};
+
+marked.defaults = {
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  smartLists: false,
+  silent: false,
+  highlight: null,
+  langPrefix: 'lang-',
+  smartypants: false,
+  headerPrefix: '',
+  renderer: new Renderer,
+  xhtml: false
+};
+
+/**
+ * Expose
+ */
+
+marked.Parser = Parser;
+marked.parser = Parser.parse;
+
+marked.Renderer = Renderer;
+
+marked.Lexer = Lexer;
+marked.lexer = Lexer.lex;
+
+marked.InlineLexer = InlineLexer;
+marked.inlineLexer = InlineLexer.output;
+
+marked.parse = marked;
+
+if (typeof exports === 'object') {
+  module.exports = marked;
+} else if (typeof define === 'function' && define.amd) {
+  define(function() { return marked; });
+} else {
+  this.marked = marked;
+}
+
+}).call(function() {
+  return this || (typeof window !== 'undefined' ? window : global);
+}());
+
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}]},{},[7])
