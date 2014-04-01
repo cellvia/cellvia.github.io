@@ -929,10 +929,8 @@ Backbone.collections.thoughts = globalCollections["posts"]({identifier: "~though
 
 Backbone.collections.html = globalCollections["html"]();
 
-Backbone.pushState = !!!~window.location.href.indexOf("github.io");
-
 Backbone.history.start({
-  pushState: Backbone.pushState
+  pushState: !!!~window.location.href.indexOf("github.io")
 });
 
 },{"../shared/Router":14,"./views/layout":11,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\error.js":8,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\posts.js":9,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\html.js":17,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\posts.js":18,"foldify":23,"path":4}],8:[function(require,module,exports){
@@ -1021,10 +1019,9 @@ module.exports = View.extend({
 	},
 	render: function(){
 		if(this.rendered) return
-		var precursor = !Backbone.pushState ? "#" : "";
 		this.html.render("post.html", 
 			{
-				'.link': { href: "/"+ precursor + this.type+"/"+this.slug},
+				'.link': { href: "/"+this.type+"/"+this.slug},
 				'.title': this.post.get("title"),
 				'.created': this.post.get("created"),
 				'.content': { _html: this.post.get("content") }
@@ -1063,10 +1060,9 @@ module.exports = View.extend({
 	render: function(){
 		if(this.rendered || !this.posts.fetched || !this.html.fetched ) return			
 		var self = this;
-		var precursor = !Backbone.pushState ? "#" : "";
 		var postsMap = this.posts.map(function(post){
 			return { 
-				'.link': { href: "/"+precursor+self.type+"/"+post.get("slug")},
+				'.link': { href: "/"+self.type+"/"+post.get("slug")},
 				'.title': post.get("title"),
 				'.created': post.get("created")
 			}

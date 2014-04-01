@@ -5,10 +5,9 @@ module.exports = View.extend({
 	render: function(){
 		if(this.rendered || !this.posts.fetched || !this.html.fetched ) return			
 		var self = this;
-		var precursor = !Backbone.pushState ? "#" : "";
 		var postsMap = this.posts.map(function(post){
 			return { 
-				'.link': { href: "/"+precursor+self.type+"/"+post.get("slug")},
+				'.link': { href: "/"+self.type+"/"+post.get("slug")},
 				'.title': post.get("title"),
 				'.created': post.get("created")
 			}

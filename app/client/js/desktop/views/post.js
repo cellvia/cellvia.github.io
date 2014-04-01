@@ -6,10 +6,9 @@ module.exports = View.extend({
 	},
 	render: function(){
 		if(this.rendered) return
-		var precursor = !Backbone.pushState ? "#" : "";
 		this.html.render("post.html", 
 			{
-				'.link': { href: "/"+ precursor + this.type+"/"+this.slug},
+				'.link': { href: "/"+this.type+"/"+this.slug},
 				'.title': this.post.get("title"),
 				'.created': this.post.get("created"),
 				'.content': { _html: this.post.get("content") }

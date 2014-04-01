@@ -21,8 +21,6 @@ Backbone.collections.thoughts = globalCollections["posts"]({identifier: "~though
 
 Backbone.collections.html = globalCollections["html"]();
 
-Backbone.pushState = !!!~window.location.href.indexOf("github.io");
-
 Backbone.history.start({
-  pushState: Backbone.pushState
+  pushState: !!!~window.location.href.indexOf("github.io")
 });
