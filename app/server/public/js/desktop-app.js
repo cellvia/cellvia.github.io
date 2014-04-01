@@ -930,7 +930,7 @@ Backbone.collections.thoughts = globalCollections["posts"]({identifier: "~though
 Backbone.collections.html = globalCollections["html"]();
 
 Backbone.history.start({
-  pushState: true
+  pushState: !!!~window.location.href.indexOf("github.io")
 });
 
 },{"../shared/Router":14,"./views/layout":11,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\error.js":8,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\posts.js":9,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\html.js":17,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\posts.js":18,"foldify":23,"path":4}],8:[function(require,module,exports){
