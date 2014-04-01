@@ -8,7 +8,7 @@ module.exports = View.extend({
 		if(this.rendered) return
 		this.html.render("post.html", 
 			{
-				'.link': { href: "/article/"+this.post.get("slug")},
+				'.link': { href: "/"+this.type+"/"+this.slug},
 				'.title': this.post.get("title"),
 				'.created': this.post.get("created"),
 				'.content': { _html: this.post.get("content") }
@@ -22,19 +22,20 @@ module.exports = View.extend({
 	
 		if(!this.post) return Backbone.trigger("go", {href: "/403", message: "Post does not exist!"});
 
-		this.post.once("fetched", $.proxy(this.render, this) );
+		this.listenToOnce( this.post, "fetched", this.render );
 		this.post.fetch();
 		this.fetched = true;
 	},
 	initialize: function(opts){
 		this.slug = opts.slug;
+		this.type = opts.type;
 
-		this.posts = Backbone.collections.posts;
-		this.posts.once("fetched", $.proxy(this.fetchPost, this) );
+		this.posts = Backbone.collections[this.type];
+		this.listenToOnce( this.posts, "fetched", this.fetchPost );
 		this.posts.fetch();
 
 		this.html = Backbone.collections.html;
-		this.html.once("fetched", $.proxy(this.fetchPost, this) );
+		this.listenToOnce( this.html, "fetched", this.fetchPost );
 		this.html.fetch();
 	}
 });
