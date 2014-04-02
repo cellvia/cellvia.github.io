@@ -3,15 +3,20 @@ var PostView = require('../views/post');
 
 module.exports = function(router){
 
-	router.posts = function(type){
-    	router.view( PostsView, {"type": type || 'posts'} );
-	}
-	router.post = function(type, slug){
-    	router.view( PostView, {"slug": slug, "type": type || 'posts'} );
-	}
+	router.route('', 'blog', function(type){
+    	router.view( PostsView, {"type": 'blog'} );
+	});
 
-	router.route('', 'posts');
-	router.route(':type', 'posts' );
-	router.route(':type/:slug', 'post' );
+	router.route('tag/:tag', 'taggedPosts', function(tag){
+    	router.view( PostsView, {"tag": tag} );
+	});
+
+	router.route('articles/:type', 'posts', function(type){
+    	router.view( PostsView, {"type": type} );
+	});
+
+	router.route('article/:type/:slug', 'post', function(type, slug){
+    	router.view( PostView, {"slug": slug, "type": type} );
+	});
 	
 }

@@ -1,31 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
 },{}],2:[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-},{}],3:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -80,7 +55,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -308,610 +283,14 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3}],5:[function(require,module,exports){
-module.exports = function isBuffer(arg) {
-  return arg && typeof arg === 'object'
-    && typeof arg.copy === 'function'
-    && typeof arg.fill === 'function'
-    && typeof arg.readUInt8 === 'function';
-}
-},{}],6:[function(require,module,exports){
-(function (process,global){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var formatRegExp = /%[sdj%]/g;
-exports.format = function(f) {
-  if (!isString(f)) {
-    var objects = [];
-    for (var i = 0; i < arguments.length; i++) {
-      objects.push(inspect(arguments[i]));
-    }
-    return objects.join(' ');
-  }
-
-  var i = 1;
-  var args = arguments;
-  var len = args.length;
-  var str = String(f).replace(formatRegExp, function(x) {
-    if (x === '%%') return '%';
-    if (i >= len) return x;
-    switch (x) {
-      case '%s': return String(args[i++]);
-      case '%d': return Number(args[i++]);
-      case '%j':
-        try {
-          return JSON.stringify(args[i++]);
-        } catch (_) {
-          return '[Circular]';
-        }
-      default:
-        return x;
-    }
-  });
-  for (var x = args[i]; i < len; x = args[++i]) {
-    if (isNull(x) || !isObject(x)) {
-      str += ' ' + x;
-    } else {
-      str += ' ' + inspect(x);
-    }
-  }
-  return str;
-};
-
-
-// Mark that a method should not be used.
-// Returns a modified function which warns once by default.
-// If --no-deprecation is set, then it is a no-op.
-exports.deprecate = function(fn, msg) {
-  // Allow for deprecating things in the process of starting up.
-  if (isUndefined(global.process)) {
-    return function() {
-      return exports.deprecate(fn, msg).apply(this, arguments);
-    };
-  }
-
-  if (process.noDeprecation === true) {
-    return fn;
-  }
-
-  var warned = false;
-  function deprecated() {
-    if (!warned) {
-      if (process.throwDeprecation) {
-        throw new Error(msg);
-      } else if (process.traceDeprecation) {
-        console.trace(msg);
-      } else {
-        console.error(msg);
-      }
-      warned = true;
-    }
-    return fn.apply(this, arguments);
-  }
-
-  return deprecated;
-};
-
-
-var debugs = {};
-var debugEnviron;
-exports.debuglog = function(set) {
-  if (isUndefined(debugEnviron))
-    debugEnviron = process.env.NODE_DEBUG || '';
-  set = set.toUpperCase();
-  if (!debugs[set]) {
-    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
-      var pid = process.pid;
-      debugs[set] = function() {
-        var msg = exports.format.apply(exports, arguments);
-        console.error('%s %d: %s', set, pid, msg);
-      };
-    } else {
-      debugs[set] = function() {};
-    }
-  }
-  return debugs[set];
-};
-
-
-/**
- * Echos the value of a value. Trys to print the value out
- * in the best way possible given the different types.
- *
- * @param {Object} obj The object to print out.
- * @param {Object} opts Optional options object that alters the output.
- */
-/* legacy: obj, showHidden, depth, colors*/
-function inspect(obj, opts) {
-  // default options
-  var ctx = {
-    seen: [],
-    stylize: stylizeNoColor
-  };
-  // legacy...
-  if (arguments.length >= 3) ctx.depth = arguments[2];
-  if (arguments.length >= 4) ctx.colors = arguments[3];
-  if (isBoolean(opts)) {
-    // legacy...
-    ctx.showHidden = opts;
-  } else if (opts) {
-    // got an "options" object
-    exports._extend(ctx, opts);
-  }
-  // set default options
-  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
-  if (isUndefined(ctx.depth)) ctx.depth = 2;
-  if (isUndefined(ctx.colors)) ctx.colors = false;
-  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
-  if (ctx.colors) ctx.stylize = stylizeWithColor;
-  return formatValue(ctx, obj, ctx.depth);
-}
-exports.inspect = inspect;
-
-
-// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-inspect.colors = {
-  'bold' : [1, 22],
-  'italic' : [3, 23],
-  'underline' : [4, 24],
-  'inverse' : [7, 27],
-  'white' : [37, 39],
-  'grey' : [90, 39],
-  'black' : [30, 39],
-  'blue' : [34, 39],
-  'cyan' : [36, 39],
-  'green' : [32, 39],
-  'magenta' : [35, 39],
-  'red' : [31, 39],
-  'yellow' : [33, 39]
-};
-
-// Don't use 'blue' not visible on cmd.exe
-inspect.styles = {
-  'special': 'cyan',
-  'number': 'yellow',
-  'boolean': 'yellow',
-  'undefined': 'grey',
-  'null': 'bold',
-  'string': 'green',
-  'date': 'magenta',
-  // "name": intentionally not styling
-  'regexp': 'red'
-};
-
-
-function stylizeWithColor(str, styleType) {
-  var style = inspect.styles[styleType];
-
-  if (style) {
-    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
-           '\u001b[' + inspect.colors[style][1] + 'm';
-  } else {
-    return str;
-  }
-}
-
-
-function stylizeNoColor(str, styleType) {
-  return str;
-}
-
-
-function arrayToHash(array) {
-  var hash = {};
-
-  array.forEach(function(val, idx) {
-    hash[val] = true;
-  });
-
-  return hash;
-}
-
-
-function formatValue(ctx, value, recurseTimes) {
-  // Provide a hook for user-specified inspect functions.
-  // Check that value is an object with an inspect function on it
-  if (ctx.customInspect &&
-      value &&
-      isFunction(value.inspect) &&
-      // Filter out the util module, it's inspect function is special
-      value.inspect !== exports.inspect &&
-      // Also filter out any prototype objects using the circular check.
-      !(value.constructor && value.constructor.prototype === value)) {
-    var ret = value.inspect(recurseTimes, ctx);
-    if (!isString(ret)) {
-      ret = formatValue(ctx, ret, recurseTimes);
-    }
-    return ret;
-  }
-
-  // Primitive types cannot have properties
-  var primitive = formatPrimitive(ctx, value);
-  if (primitive) {
-    return primitive;
-  }
-
-  // Look up the keys of the object.
-  var keys = Object.keys(value);
-  var visibleKeys = arrayToHash(keys);
-
-  if (ctx.showHidden) {
-    keys = Object.getOwnPropertyNames(value);
-  }
-
-  // IE doesn't make error fields non-enumerable
-  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
-  if (isError(value)
-      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
-    return formatError(value);
-  }
-
-  // Some type of object without properties can be shortcutted.
-  if (keys.length === 0) {
-    if (isFunction(value)) {
-      var name = value.name ? ': ' + value.name : '';
-      return ctx.stylize('[Function' + name + ']', 'special');
-    }
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    }
-    if (isDate(value)) {
-      return ctx.stylize(Date.prototype.toString.call(value), 'date');
-    }
-    if (isError(value)) {
-      return formatError(value);
-    }
-  }
-
-  var base = '', array = false, braces = ['{', '}'];
-
-  // Make Array say that they are Array
-  if (isArray(value)) {
-    array = true;
-    braces = ['[', ']'];
-  }
-
-  // Make functions say that they are functions
-  if (isFunction(value)) {
-    var n = value.name ? ': ' + value.name : '';
-    base = ' [Function' + n + ']';
-  }
-
-  // Make RegExps say that they are RegExps
-  if (isRegExp(value)) {
-    base = ' ' + RegExp.prototype.toString.call(value);
-  }
-
-  // Make dates with properties first say the date
-  if (isDate(value)) {
-    base = ' ' + Date.prototype.toUTCString.call(value);
-  }
-
-  // Make error with message first say the error
-  if (isError(value)) {
-    base = ' ' + formatError(value);
-  }
-
-  if (keys.length === 0 && (!array || value.length == 0)) {
-    return braces[0] + base + braces[1];
-  }
-
-  if (recurseTimes < 0) {
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    } else {
-      return ctx.stylize('[Object]', 'special');
-    }
-  }
-
-  ctx.seen.push(value);
-
-  var output;
-  if (array) {
-    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-  } else {
-    output = keys.map(function(key) {
-      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
-    });
-  }
-
-  ctx.seen.pop();
-
-  return reduceToSingleString(output, base, braces);
-}
-
-
-function formatPrimitive(ctx, value) {
-  if (isUndefined(value))
-    return ctx.stylize('undefined', 'undefined');
-  if (isString(value)) {
-    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-                                             .replace(/'/g, "\\'")
-                                             .replace(/\\"/g, '"') + '\'';
-    return ctx.stylize(simple, 'string');
-  }
-  if (isNumber(value))
-    return ctx.stylize('' + value, 'number');
-  if (isBoolean(value))
-    return ctx.stylize('' + value, 'boolean');
-  // For some reason typeof null is "object", so special case here.
-  if (isNull(value))
-    return ctx.stylize('null', 'null');
-}
-
-
-function formatError(value) {
-  return '[' + Error.prototype.toString.call(value) + ']';
-}
-
-
-function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-  var output = [];
-  for (var i = 0, l = value.length; i < l; ++i) {
-    if (hasOwnProperty(value, String(i))) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          String(i), true));
-    } else {
-      output.push('');
-    }
-  }
-  keys.forEach(function(key) {
-    if (!key.match(/^\d+$/)) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          key, true));
-    }
-  });
-  return output;
-}
-
-
-function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-  var name, str, desc;
-  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
-  if (desc.get) {
-    if (desc.set) {
-      str = ctx.stylize('[Getter/Setter]', 'special');
-    } else {
-      str = ctx.stylize('[Getter]', 'special');
-    }
-  } else {
-    if (desc.set) {
-      str = ctx.stylize('[Setter]', 'special');
-    }
-  }
-  if (!hasOwnProperty(visibleKeys, key)) {
-    name = '[' + key + ']';
-  }
-  if (!str) {
-    if (ctx.seen.indexOf(desc.value) < 0) {
-      if (isNull(recurseTimes)) {
-        str = formatValue(ctx, desc.value, null);
-      } else {
-        str = formatValue(ctx, desc.value, recurseTimes - 1);
-      }
-      if (str.indexOf('\n') > -1) {
-        if (array) {
-          str = str.split('\n').map(function(line) {
-            return '  ' + line;
-          }).join('\n').substr(2);
-        } else {
-          str = '\n' + str.split('\n').map(function(line) {
-            return '   ' + line;
-          }).join('\n');
-        }
-      }
-    } else {
-      str = ctx.stylize('[Circular]', 'special');
-    }
-  }
-  if (isUndefined(name)) {
-    if (array && key.match(/^\d+$/)) {
-      return str;
-    }
-    name = JSON.stringify('' + key);
-    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
-      name = name.substr(1, name.length - 2);
-      name = ctx.stylize(name, 'name');
-    } else {
-      name = name.replace(/'/g, "\\'")
-                 .replace(/\\"/g, '"')
-                 .replace(/(^"|"$)/g, "'");
-      name = ctx.stylize(name, 'string');
-    }
-  }
-
-  return name + ': ' + str;
-}
-
-
-function reduceToSingleString(output, base, braces) {
-  var numLinesEst = 0;
-  var length = output.reduce(function(prev, cur) {
-    numLinesEst++;
-    if (cur.indexOf('\n') >= 0) numLinesEst++;
-    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
-  }, 0);
-
-  if (length > 60) {
-    return braces[0] +
-           (base === '' ? '' : base + '\n ') +
-           ' ' +
-           output.join(',\n  ') +
-           ' ' +
-           braces[1];
-  }
-
-  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
-}
-
-
-// NOTE: These type checking functions intentionally don't use `instanceof`
-// because it is fragile and can be easily faked with `Object.create()`.
-function isArray(ar) {
-  return Array.isArray(ar);
-}
-exports.isArray = isArray;
-
-function isBoolean(arg) {
-  return typeof arg === 'boolean';
-}
-exports.isBoolean = isBoolean;
-
-function isNull(arg) {
-  return arg === null;
-}
-exports.isNull = isNull;
-
-function isNullOrUndefined(arg) {
-  return arg == null;
-}
-exports.isNullOrUndefined = isNullOrUndefined;
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-exports.isNumber = isNumber;
-
-function isString(arg) {
-  return typeof arg === 'string';
-}
-exports.isString = isString;
-
-function isSymbol(arg) {
-  return typeof arg === 'symbol';
-}
-exports.isSymbol = isSymbol;
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-exports.isUndefined = isUndefined;
-
-function isRegExp(re) {
-  return isObject(re) && objectToString(re) === '[object RegExp]';
-}
-exports.isRegExp = isRegExp;
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-exports.isObject = isObject;
-
-function isDate(d) {
-  return isObject(d) && objectToString(d) === '[object Date]';
-}
-exports.isDate = isDate;
-
-function isError(e) {
-  return isObject(e) &&
-      (objectToString(e) === '[object Error]' || e instanceof Error);
-}
-exports.isError = isError;
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-exports.isFunction = isFunction;
-
-function isPrimitive(arg) {
-  return arg === null ||
-         typeof arg === 'boolean' ||
-         typeof arg === 'number' ||
-         typeof arg === 'string' ||
-         typeof arg === 'symbol' ||  // ES6 symbol
-         typeof arg === 'undefined';
-}
-exports.isPrimitive = isPrimitive;
-
-exports.isBuffer = require('./support/isBuffer');
-
-function objectToString(o) {
-  return Object.prototype.toString.call(o);
-}
-
-
-function pad(n) {
-  return n < 10 ? '0' + n.toString(10) : n.toString(10);
-}
-
-
-var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
-              'Oct', 'Nov', 'Dec'];
-
-// 26 Feb 16:19:34
-function timestamp() {
-  var d = new Date();
-  var time = [pad(d.getHours()),
-              pad(d.getMinutes()),
-              pad(d.getSeconds())].join(':');
-  return [d.getDate(), months[d.getMonth()], time].join(' ');
-}
-
-
-// log is just a thin wrapper to console.log that prepends a timestamp
-exports.log = function() {
-  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
-};
-
-
-/**
- * Inherit the prototype methods from one constructor into another.
- *
- * The Function.prototype.inherits from lang.js rewritten as a standalone
- * function (not on Function.prototype). NOTE: If this file is to be loaded
- * during bootstrapping this function needs to be rewritten using some native
- * functions as prototype setup using normal JavaScript does not work as
- * expected during bootstrapping (see mirror.js in r114903).
- *
- * @param {function} ctor Constructor function which needs to inherit the
- *     prototype.
- * @param {function} superCtor Constructor function to inherit prototype from.
- */
-exports.inherits = require('inherits');
-
-exports._extend = function(origin, add) {
-  // Don't do anything if add isn't an object
-  if (!add || !isObject(add)) return origin;
-
-  var keys = Object.keys(add);
-  var i = keys.length;
-  while (i--) {
-    origin[keys[i]] = add[keys[i]];
-  }
-  return origin;
-};
-
-function hasOwnProperty(obj, prop) {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":5,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"inherits":2}],7:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2}],4:[function(require,module,exports){
 var path = require('path'),
     router = require('../shared/Router'),
     foldify = require('foldify');
 
 var routes = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["error"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\error.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
-    globalCollections = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["html"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\html.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
+    Posts = require('../shared/collections/Posts'),
+    Html = require('../shared/collections/Html'),
     LayoutView = require('./views/layout');
 
 new LayoutView();
@@ -921,19 +300,20 @@ routes(router);
 
 //attach global collections
 Backbone.collections = {};
-Backbone.collections.posts = globalCollections["posts"]({identifier: "~blog~"});
-Backbone.collections.code = globalCollections["posts"]({identifier: "~code~"});
-Backbone.collections.music = globalCollections["posts"]({identifier: "~music~"});
-Backbone.collections.art = globalCollections["posts"]({identifier: "~art~"});
-Backbone.collections.thoughts = globalCollections["posts"]({identifier: "~thoughts~"});
+Backbone.collections.blog = Posts({identifier: "~blog~"});
+Backbone.collections.code = Posts({identifier: "~code~"});
+Backbone.collections.music = Posts({identifier: "~music~"});
+Backbone.collections.art = Posts({identifier: "~art~"});
+Backbone.collections.thoughts = Posts({identifier: "~thoughts~"});
+Backbone.collections.projects = Posts({identifier: "~projects~"});
 
-Backbone.collections.html = globalCollections["html"]();
+Backbone.collections.html = Html();
 
 Backbone.history.start({
   pushState: !!!~window.location.href.indexOf("github.io")
 });
 
-},{"../shared/Router":14,"./views/layout":11,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\error.js":8,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\posts.js":9,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\html.js":17,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\global\\posts.js":18,"foldify":23,"path":4}],8:[function(require,module,exports){
+},{"../shared/Router":11,"../shared/collections/Html":14,"../shared/collections/Posts":15,"./views/layout":8,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\error.js":5,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\desktop\\routes\\posts.js":6,"foldify":20,"path":3}],5:[function(require,module,exports){
 var ErrorView = require('../views/error');
 
 module.exports = function(router){
@@ -947,26 +327,31 @@ module.exports = function(router){
 	router.route('403', 'error', $.proxy(function(){ this.error(403); }, router) );
 
 }
-},{"../views/error":10}],9:[function(require,module,exports){
+},{"../views/error":7}],6:[function(require,module,exports){
 var PostsView = require('../views/posts');
 var PostView = require('../views/post');
 
 module.exports = function(router){
 
-	router.posts = function(type){
-    	router.view( PostsView, {"type": type || 'posts'} );
-	}
-	router.post = function(type, slug){
-    	router.view( PostView, {"slug": slug, "type": type || 'posts'} );
-	}
+	router.route('', 'blog', function(type){
+    	router.view( PostsView, {"type": 'blog'} );
+	});
 
-	router.route('', 'posts');
-	router.route(':type', 'posts' );
-	router.route(':type/:slug', 'post' );
+	router.route('tag/:tag', 'taggedPosts', function(tag){
+    	router.view( PostsView, {"tag": tag} );
+	});
+
+	router.route('articles/:type', 'posts', function(type){
+    	router.view( PostsView, {"type": type} );
+	});
+
+	router.route('article/:type/:slug', 'post', function(type, slug){
+    	router.view( PostView, {"slug": slug, "type": type} );
+	});
 	
 }
 
-},{"../views/post":12,"../views/posts":13}],10:[function(require,module,exports){
+},{"../views/post":9,"../views/posts":10}],7:[function(require,module,exports){
 var View = require('../../shared/View');
 
 module.exports = View.extend({
@@ -976,7 +361,7 @@ module.exports = View.extend({
 	}
 })
 
-},{"../../shared/View":15}],11:[function(require,module,exports){
+},{"../../shared/View":12}],8:[function(require,module,exports){
 var View = require('../../shared/View');
 var insertCss = require('insert-css');
 var foldify = require('foldify');
@@ -1010,7 +395,7 @@ module.exports = View.extend({
 	}
 })
 
-},{"../../shared/View":15,"foldify":23,"insert-css":28}],12:[function(require,module,exports){
+},{"../../shared/View":12,"foldify":20,"insert-css":25}],9:[function(require,module,exports){
 var View = require('../../shared/View');
 
 module.exports = View.extend({
@@ -1021,7 +406,7 @@ module.exports = View.extend({
 		if(this.rendered) return
 		this.html.render("post.html", 
 			{
-				'.link': { href: "/"+this.type+"/"+this.slug},
+				'.link': { href: "/article/"+this.type+"/"+this.slug},
 				'.title': this.post.get("title"),
 				'.created': this.post.get("created"),
 				'.content': { _html: this.post.get("content") }
@@ -1052,7 +437,7 @@ module.exports = View.extend({
 		this.html.fetch();
 	}
 });
-},{"../../shared/View":15}],13:[function(require,module,exports){
+},{"../../shared/View":12}],10:[function(require,module,exports){
 var View = require('../../shared/View');
 
 module.exports = View.extend({
@@ -1060,29 +445,59 @@ module.exports = View.extend({
 	render: function(){
 		if(this.rendered || !this.posts.fetched || !this.html.fetched ) return			
 		var self = this;
+
 		var postsMap = this.posts.map(function(post){
+			var tags = post.get("tags");
+			if(tags) tags = tags.join(", ");
 			return { 
-				'.link': { href: "/"+self.type+"/"+post.get("slug")},
+				'.link': { href: "/article/" + post.get("type") + "/" + post.get("slug") },
 				'.title': post.get("title"),
-				'.created': post.get("created")
+				'.created': post.get("created"),
+				'.tags': tags
 			}
 		});
 		this.html.render("posts.html", { ".posts": postsMap }).appendTo(this.$el);
 		this.rendered = true;
 	},
+	compileByTag: function(coll, models){
+		this.posts = coll;
+		models.forEach(function(model){
+			if(!this.posts.get({id: model.get("id")}))
+				this.posts.add(model);
+		}.bind(this));
+		this.posts.fetched = true;
+		this.render();
+	},
+	counter: 0,
 	initialize: function(options){
 		this.type = options.type;
-
-		this.posts = Backbone.collections[this.type];
-		this.listenToOnce(this.posts, "fetched", this.render );
-		this.posts.fetch();
+		if(options.tag){
+			this.posts = {};
+			var models = [];
+			for(var coll in Backbone.collections){
+				if(coll === "html") continue;
+				this.counter++;
+				this.listenToOnce( Backbone.collections[coll], "fetched", function(coll){
+					models = models.concat( Backbone.collections[coll].filter(function(item){
+						var tags = item.get('tags');
+						return tags && ~tags.indexOf(options.tag); 
+					}) );
+					if(!--this.counter) this.compileByTag(Backbone.collections[coll], models);	
+				}.bind(this, coll));
+				Backbone.collections[coll].fetch();
+			}
+		}else{
+			this.posts = Backbone.collections[this.type];
+			this.listenToOnce(this.posts, "fetched", this.render );
+			this.posts.fetch();			
+		}
 
 		this.html = Backbone.collections.html;
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
 	}
 });
-},{"../../shared/View":15}],14:[function(require,module,exports){
+},{"../../shared/View":12}],11:[function(require,module,exports){
 var ViewCore = require('./ViewCore');
 
 var Router = Backbone.Router.extend({
@@ -1100,10 +515,10 @@ var Router = Backbone.Router.extend({
 Router = Router.extend(ViewCore);
 
 module.exports = new Router();
-},{"./ViewCore":16}],15:[function(require,module,exports){
+},{"./ViewCore":13}],12:[function(require,module,exports){
 var ViewCore = require('./ViewCore');
 module.exports = Backbone.View.extend(ViewCore);
-},{"./ViewCore":16}],16:[function(require,module,exports){
+},{"./ViewCore":13}],13:[function(require,module,exports){
 module.exports = {
     _destroyViews: function(group, options, subview){
       options = options || {};
@@ -1154,11 +569,10 @@ module.exports = {
         Backbone.trigger('go', { href: '/'+String(resp.status) });
     }    
 }
-},{}],17:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	hyperglue = require('hyperglue'),
-	util = require('util'),
 	conf = require('confify');
 
 module.exports = function(options){
@@ -1207,12 +621,12 @@ module.exports = function(options){
 	return new HTMLCollection([], options);
 };
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"confify":20,"foldify":23,"hyperglue":26,"util":6}],18:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2,"confify":17,"foldify":20,"hyperglue":23}],15:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	digistify = require('digistify');
 
-var Post = require('../../models/Post')
+var Post = require('../models/Post')
 
 module.exports = function(options){
 	var GistCollection = Backbone.Collection.extend({
@@ -1225,7 +639,7 @@ module.exports = function(options){
 			var gists = [];
 			Backbone.gists.iterate(function(gist){
 				if(!~gist.description.indexOf(self.options.identifier)) return
-				if(!gist.identifier) gist.identifier = self.options.identifier;
+				if(!gist.type) gist.type = self.options.identifier.split("~").join("");
 				if(!gist.title) gist.title = gist.description.replace(self.options.identifier, '');
 				if(!gist.slug) gist.slug = slug(gist.title);
 				gists.push(gist);
@@ -1234,7 +648,9 @@ module.exports = function(options){
 			function onEnd(){
 				self.add(gists);
 		    	self.fetched = true;
-				self.trigger('fetched');
+		    	process.nextTick(function(){		    		
+					self.trigger('fetched');
+		    	});
 			}
 		},
 		digistify: function(checkData){
@@ -1247,10 +663,18 @@ module.exports = function(options){
 
 				var gists = data.data;
 				gists = gists.map(function(gist){
-					return { id: +gist.id,	
+					var tags;
+					for(var file in gist.files){
+						if(!~file.indexOf("tags:")) continue;
+						file = file.replace("tags:", "");
+						tags = file.split(/, */);
+					}
+					var ret = { id: +gist.id,	
 							 description: gist.description,
 							 created: gist.created_at,
 							 modified: gist.updated_at }
+					if(tags) ret.tags = tags;
+					return ret;
 				});
 				gists.push({id:1, etag: data.etag, description: "etag"});
 				Backbone.gists.putBatch(gists, function(){
@@ -1312,28 +736,31 @@ function slug(input, identifier)
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../../models/Post":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"digistify":21,"foldify":23}],19:[function(require,module,exports){
+},{"../models/Post":16,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2,"digistify":18,"foldify":20}],16:[function(require,module,exports){
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
 
 module.exports = Backbone.Model.extend({
 	getGist: function(){
-		var self = this;
-		var opts = {
-			fileTransform: function(file){
-				return marked(file.content);
-			}
-		};
-		if(this.content){
-			self.fetched = true;
+		if(this.get('content')){
+			this.fetched = true;
+			var self = this;
 			process.nextTick(function(){
 				self.trigger("fetched");				
 			});
 		}else{
-			digistify(self.id, opts, function(err, data){
+			var self = this;
+			digistify(self.id, {}, function(err, data){
 				var contents = data.data;
-				self.set("content", contents.length === 1 ? contents[0] : contents );
+				if(contents.length === 1){
+					self.set("content", marked(contents[0].content) );
+				}else{
+					self.set("content",marked(contents.filter(function(file){
+							return !~file.filename.indexOf("tags:");
+						})[0].content)
+					);
+				}
 				Backbone.gists.put(self.toJSON());
 				self.fetched = true;
 				self.trigger('fetched');
@@ -1351,7 +778,7 @@ module.exports = Backbone.Model.extend({
 	}
 })
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"digistify":21,"marked":29}],20:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2,"digistify":18,"marked":26}],17:[function(require,module,exports){
 (function (process){
 function merge(a, b){
     for(var prop in b){
@@ -1365,7 +792,7 @@ module.exports = function browser(srcObj){
 };
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3}],21:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2}],18:[function(require,module,exports){
 (function (process){
 var request = require('request');
 
@@ -1513,7 +940,7 @@ module.exports = exportObj.getGists;
 module.exports.setDefault = exportObj.setDefault;
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"request":22}],22:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2,"request":19}],19:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -1926,7 +1353,7 @@ function b64_enc (data) {
     return enc;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (process){
 var fs = require('fs'),
 	path = require('path'),
@@ -2333,7 +1760,7 @@ function isArray(obj){
 	return ~Object.prototype.toString.call(obj).toLowerCase().indexOf("array");
 }
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"fs":1,"minimatchify":24,"path":4}],24:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2,"fs":1,"minimatchify":21,"path":3}],21:[function(require,module,exports){
 (function (process){
 if(typeof JSON === "undefined"){
 
@@ -4027,7 +3454,7 @@ function regExpEscape (s) {
 
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"path":4,"sigmund":25}],25:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2,"path":3,"sigmund":22}],22:[function(require,module,exports){
 module.exports = sigmund
 function sigmund (subject, maxSessions) {
     maxSessions = maxSessions || 10;
@@ -4068,7 +3495,7 @@ function sigmund (subject, maxSessions) {
 
 // vim: set softtabstop=4 shiftwidth=4:
 
-},{}],26:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var domify = require('domify');
 
 module.exports = hyperglue;
@@ -4186,7 +3613,7 @@ function appendTo(dest) {
     } ); 
     return this;
 }
-},{"domify":27}],27:[function(require,module,exports){
+},{"domify":24}],24:[function(require,module,exports){
 
 /**
  * Expose `parse`.
@@ -4267,7 +3694,7 @@ function orphan(els) {
   return ret;
 }
 
-},{}],28:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var inserted = {};
 
 module.exports = function (css) {
@@ -4287,7 +3714,7 @@ module.exports = function (css) {
     head.appendChild(elem);
 };
 
-},{}],29:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 /**
  * marked - a markdown parser
@@ -5557,4 +4984,4 @@ if (typeof exports === 'object') {
 }());
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}]},{},[7])
+},{}]},{},[4])

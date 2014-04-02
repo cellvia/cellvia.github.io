@@ -15,11 +15,17 @@ start "bootstrap watchify" /min cmd /k "cd %bootpath% && npm run watch-desktop"
 
 echo 2
 ping 1.1.1.1 -n 1 -w 1000 > nul
+echo 3
+ping 1.1.1.1 -n 1 -w 1000 > nul
+echo 4
+ping 1.1.1.1 -n 1 -w 1000 > nul
+echo 5
+ping 1.1.1.1 -n 1 -w 1000 > nul
+echo 6
+ping 1.1.1.1 -n 1 -w 1000 > nul
 
 echo starting bootstrap
 start "bootstrap app" /min cmd /k "cd %bootpath% && nodemon -w server -w node_modules"
 
-echo 3
-ping 1.1.1.1 -n 1 -w 1000 > nul
 
 exit

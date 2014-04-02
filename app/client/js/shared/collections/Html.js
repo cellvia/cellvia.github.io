@@ -1,6 +1,5 @@
 var foldify = require('foldify'),
 	hyperglue = require('hyperglue'),
-	util = require('util'),
 	conf = require('confify');
 
 module.exports = function(options){

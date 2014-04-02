@@ -1,7 +1,7 @@
 var foldify = require('foldify'),
 	digistify = require('digistify');
 
-var Post = require('../../models/Post')
+var Post = require('../models/Post')
 
 module.exports = function(options){
 	var GistCollection = Backbone.Collection.extend({
@@ -14,7 +14,7 @@ module.exports = function(options){
 			var gists = [];
 			Backbone.gists.iterate(function(gist){
 				if(!~gist.description.indexOf(self.options.identifier)) return
-				if(!gist.identifier) gist.identifier = self.options.identifier;
+				if(!gist.type) gist.type = self.options.identifier.split("~").join("");
 				if(!gist.title) gist.title = gist.description.replace(self.options.identifier, '');
 				if(!gist.slug) gist.slug = slug(gist.title);
 				gists.push(gist);
@@ -23,7 +23,9 @@ module.exports = function(options){
 			function onEnd(){
 				self.add(gists);
 		    	self.fetched = true;
-				self.trigger('fetched');
+		    	process.nextTick(function(){		    		
+					self.trigger('fetched');
+		    	});
 			}
 		},
 		digistify: function(checkData){
@@ -36,10 +38,18 @@ module.exports = function(options){
 
 				var gists = data.data;
 				gists = gists.map(function(gist){
-					return { id: +gist.id,	
+					var tags;
+					for(var file in gist.files){
+						if(!~file.indexOf("tags:")) continue;
+						file = file.replace("tags:", "");
+						tags = file.split(/, */);
+					}
+					var ret = { id: +gist.id,	
 							 description: gist.description,
 							 created: gist.created_at,
 							 modified: gist.updated_at }
+					if(tags) ret.tags = tags;
+					return ret;
 				});
 				gists.push({id:1, etag: data.etag, description: "etag"});
 				Backbone.gists.putBatch(gists, function(){

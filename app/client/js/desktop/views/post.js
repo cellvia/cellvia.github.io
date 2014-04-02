@@ -8,7 +8,7 @@ module.exports = View.extend({
 		if(this.rendered) return
 		this.html.render("post.html", 
 			{
-				'.link': { href: "/"+this.type+"/"+this.slug},
+				'.link': { href: "/article/"+this.type+"/"+this.slug},
 				'.title': this.post.get("title"),
 				'.created': this.post.get("created"),
 				'.content': { _html: this.post.get("content") }
