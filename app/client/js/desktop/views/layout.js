@@ -4,6 +4,7 @@ var foldify = require('foldify');
 var grid = foldify("topcoat-grid/css", {whitelist: "grid.min.css"});
 var topcoatCss = foldify("topcoat/css", {whitelist: "topcoat-desktop-light.css"});
 var topcoatFonts = foldify("topcoat/font", {encoding: "base64"});
+var conf = require('confify');
 
 insertCss(grid["grid.min.css"]);
 
@@ -24,9 +25,19 @@ module.exports = View.extend({
 	},
 	link: function(e){
 		e.preventDefault();
-		var href = e.currentTarget.getAttribute('href');
-		Backbone.trigger("go", {href: href});			
+		Backbone.trigger("go", {href: e.currentTarget.getAttribute('href')});
 	},
 	initialize: function(){
+		if(Backbone.isMobile && conf.mobileTransitionModule){
+			var mobileTransition = require(conf.mobileTransitionModule);
+			Backbone.transition = mobileTransition( $("body") );
+		}else if(conf.desktopTransitionModule){
+			var desktopTransition = require(conf.desktopTransitionModule);
+			Backbone.transition = desktopTransition( $("#page") );
+		}else{
+			Backbone.transition = function(container, content){
+				container.html( content );
+			}
+		}
 	}
 })

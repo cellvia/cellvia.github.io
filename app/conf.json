@@ -4,5 +4,7 @@
 		"html": "/client/html/desktop",
 		"sharedHtml": "/shared/html"
 	},
+	"desktopTransitionModule": false,
+	"mobileTransitionModule": "pageslide",
 	"clientOnly": true
 }

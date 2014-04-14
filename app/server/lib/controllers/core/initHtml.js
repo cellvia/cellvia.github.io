@@ -7,8 +7,8 @@ var conf = require('confify'),
 module.exports = function(req, res, next){
 	req.html || (req.html = {});
 	req.html.layout = hyperglue(html, {
-		'#cssLink': { src: '/css/' + displayType + '.css' },
-		'#appScript': { src: '/js/' + displayType + '-app.js' },
+		// '#cssLink': { src: '/css/' + displayType + '.css' },
+		'#appScript': { src: '/js/loader.js' },
 		'#vendorScript': { src: '/js/' + displayType + '-vendor.js' }
 	}).innerHTML;
 	next();

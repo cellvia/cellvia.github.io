@@ -1,28 +1,25 @@
-var path = require('path'),
-    router = require('../shared/Router'),
+var router = require('../shared/Router'),
     foldify = require('foldify');
 
 var routes = foldify(__dirname + '/routes'),
-    Posts = require('../shared/collections/Posts'),
-    Html = require('../shared/collections/Html'),
     LayoutView = require('./views/layout');
 
+//grab global collections
+Backbone.collections = foldify(__dirname + '/../shared/collections');
+
+//initiate main view
 new LayoutView();
 
 //attach routes
 routes(router);
 
 //attach global collections
-Backbone.collections = {};
-Backbone.collections.blog = Posts({identifier: "~blog~"});
-Backbone.collections.code = Posts({identifier: "~code~"});
-Backbone.collections.music = Posts({identifier: "~music~"});
-Backbone.collections.art = Posts({identifier: "~art~"});
-Backbone.collections.thoughts = Posts({identifier: "~thoughts~"});
-Backbone.collections.projects = Posts({identifier: "~projects~"});
+['blog', 'code', 'music', 'art', 'thoughts', 'projects'].forEach(function(type){
+	Backbone.collections[type] = Backbone.collections.Posts({identifier: "~"+type+"~"});
+});
+Backbone.collections.html = Backbone.collections.Html();
 
-Backbone.collections.html = Html();
-
+//start history
 Backbone.history.start({
   pushState: !!!~window.location.href.indexOf("github.io")
 });

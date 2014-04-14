@@ -6,8 +6,8 @@ module.exports = function(router){
     	router.view( ErrorView, {errorCode: status, group: "errors"} );
   	};
 
-	router.route('500', 'error', $.proxy(function(){ this.error(500); }, router) );
-	router.route('404', 'error', $.proxy(function(){ this.error(404); }, router) );
-	router.route('403', 'error', $.proxy(function(){ this.error(403); }, router) );
+	router.route('500', 'error', router.error.bind(router, 500) );
+	router.route('404', 'error', router.error.bind(router, 404) );
+	router.route('403', 'error', router.error.bind(router, 403) );
 
 }

@@ -15,17 +15,27 @@
     "confify": "*",
     "marked": "^0.3.2",
     "topcoat": "^0.7.5",
-    "topcoat-grid": "^0.1.0"
+    "topcoat-grid": "^0.1.0",
+    "lazyloader": "^2.0.3",
+    "pageslide": "^0.2.0"
   },
   "devDependencies": {
-    "twitter-bootstrap-3.0.0": "~3.0.0",
-    "catw": "^0.2.0"
+    "catw": "^0.2.0",
+    "npm-css": "^0.2.3"
   },
   "scripts": {
+    "build-loader": "browserify client/js/loader.js -o server/public/js/loader.js",
     "build-desktop": "browserify client/js/desktop/app.js -o server/public/js/desktop-app.js",
+    "build-ie": "browserify client/js/ie/app.js -o server/public/js/ie-app.js",
+    "build-mobile": "browserify client/js/mobile/app.js -o server/public/js/mobile-app.js",
     "build-vendor": "node node_modules/catw/bin/cmd.js client/vendor/*.js -w false -o server/public/js/desktop-vendor.js",
-    "windows-deploy": "copy server\\public\\js\\*.js ..\\static\\js\\",
-    "deploy": "npm run build-desktop && npm run build-vendor && npm run windows-deploy",
+    "build-desktop-css": "node node_modules/npm-css/bin/npm-css client/css/desktop/entry.css -o server/public/css/desktop.css",
+    "build-mobile-css": "node node_modules/npm-css/bin/npm-css client/css/mobile/entry.css -o server/public/css/mobile.css",
+    "build-ie-css": "node node_modules/npm-css/bin/npm-css client/css/ie/entry.css -o server/public/css/ie.css",
+    "windows-deploy": "copy server\\public\\js\\*.js ..\\static\\js\\ && copy server\\public\\css\\*.css ..\\static\\css\\",
+    "deploy-js": "npm run build-loader && npm run build-desktop && npm run build-ie && npm run build-mobile",
+    "deploy-css": "npm run build-desktop-css && npm run build-mobile-css && npm run build-ie-css",
+    "deploy": "npm run build-vendor && npm run deploy-js && npm run deploy-css && npm run windows-deploy",
     "watch-desktop": "watchify client/js/desktop/app.js -o server/public/js/desktop-app.js"
   },
   "browserify": {

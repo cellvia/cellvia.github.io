@@ -1,5 +1,6 @@
 var foldify = require('foldify'),
-	digistify = require('digistify');
+	digistify = require('digistify'),
+	dbAdapter = require('../adapters/dbAdapter.js');
 
 var Post = require('../models/Post')
 
@@ -28,45 +29,54 @@ module.exports = function(options){
 		    	});
 			}
 		},
-		digistify: function(checkData){
-			var self = this;
-			digistify("cellvia", checkData, function(err, data){
-				if(data === "unmodified"){
-					Backbone.gists.updated = true;
-					return Backbone.trigger("gistsUpdated");					
-				}
+		addGists: function(err, data){
+			if(data === "unmodified"){
+				Backbone.gists.updated = true;
+				return Backbone.trigger("gistsUpdated");					
+			}
 
-				var gists = data.data;
-				gists = gists.map(function(gist){
-					var tags;
-					for(var file in gist.files){
-						if(!~file.indexOf("tags:")) continue;
-						file = file.replace("tags:", "");
-						tags = file.split(/, */);
-					}
-					var ret = { id: +gist.id,	
-							 description: gist.description,
-							 created: gist.created_at,
-							 modified: gist.updated_at }
-					if(tags) ret.tags = tags;
-					return ret;
-				});
-				gists.push({id:1, etag: data.etag, description: "etag"});
-				Backbone.gists.putBatch(gists, function(){
-					Backbone.gists.updated = true;
-					Backbone.trigger("gistsUpdated");
-				});
+			var gists = data.data;
+			gists = gists.map(function(gist){
+				var tags;
+				for(var file in gist.files){
+					if(!~file.indexOf("tags:")) continue;
+					file = file.replace("tags:", "");
+					tags = file.split(/, */);
+				}
+				var ret = { id: +gist.id,	
+						 description: gist.description,
+						 created: gist.created_at,
+						 modified: gist.updated_at }
+				if(tags) ret.tags = tags;
+				return ret;
+			});
+			gists.push({id:1, etag: data.etag, description: "etag"});
+			Backbone.gists.putBatch(gists, function(){
+				Backbone.gists.updated = true;
+				Backbone.trigger("gistsUpdated");
 			});
 		},
-		checkGists: function(etag){
+		digistify: function(checkData){
+			digistify("cellvia", checkData, this.addGists );
+		},
+		checkGists: function(){
 			if(Backbone.gists.updating) return
 			Backbone.gists.updating = true;
-			Backbone.gists.get(1, this.digistify, this.digistify);
+			Backbone.gists.get(1, this.digistify.bind(this), this.digistify.bind(this) );
 		},
 		fetch: function () {
 			if(!this.fetched){
+
 				if(!Backbone.gists.initialized)
 					return this.listenToOnce( Backbone, "db", this.fetch );
+
+				/* if IE load manually
+					var conf = require('confify');
+					var gists = foldify(conf.paths.root, {whitelist: "gists.json"});
+					this.addGists(false, {data: gists})
+					return this.toCollection();
+				*/
+
 				if(!Backbone.gists.updated){
 					this.listenToOnce( Backbone, "gistsUpdated", this.fetch );
 					return this.checkGists();					
@@ -83,7 +93,7 @@ module.exports = function(options){
 			this.options || (this.options = options || {});
 			if(!Backbone.gists){
 				var self = this;
-				Backbone.gists = new IDBStore({
+				Backbone.gists = dbAdapter({
 				  dbVersion: 1,
 				  storeName: "gists",
 				  keyPath: 'id',

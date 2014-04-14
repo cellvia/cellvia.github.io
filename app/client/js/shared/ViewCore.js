@@ -5,12 +5,11 @@ module.exports = {
       this._views[group].forEach( function(view){
         view.destroy(undefined, true);
         view.stopListening();
-        if(options.replace === false) return
-        var el;        
-        if(!subview) 
-          el = view.$el;
+        view.undelegateEvents();
+        if(options.replace !== true || Backbone.isMobile || subview) return
+        var el = view.$el;
         if(el && el.length)
-          el.replaceWith("<div id="+el.attr('id')+">");          
+            el.replaceWith("<div id="+el.attr('id')+">");        
       });
       delete this._views[group];
     },
@@ -24,10 +23,15 @@ module.exports = {
           this.destroy(null, options);
         if(!this._views) this._views = {};
         if(!this._views[options.group]) this._views[options.group] = [];
-        this._views[options.group].push(new View(options))          
+        process.nextTick(function(){
+          this._views[options.group].push(new View(options))                  
+        }.bind(this));
       }else{
         this._views = {};
-        this._views[options.group] = [new View(options)];
+        this._views[options.group] = []
+        process.nextTick(function(){          
+          this._views[options.group].push(new View(options));
+        }.bind(this));
       }
     },
     destroy: function(group, options, subview){

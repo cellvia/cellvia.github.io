@@ -1,7 +1,6 @@
 var View = require('../../shared/View');
 
 module.exports = View.extend({
-	el: "#page",
 	render: function(){
 		if(this.rendered || !this.posts.fetched || !this.html.fetched ) return			
 		var self = this;
@@ -16,7 +15,11 @@ module.exports = View.extend({
 				'.tags': tags
 			}
 		});
-		this.html.render("posts.html", { ".posts": postsMap }).appendTo(this.$el);
+		var rendered = this.html.render("posts.html", { ".posts": postsMap });
+		if(Backbone.isMobile)
+			Backbone.transition( this.$el.html( rendered ) );
+		else
+			Backbone.transition( this.$el, rendered );
 		this.rendered = true;
 	},
 	compileByTag: function(coll, models){
@@ -28,8 +31,10 @@ module.exports = View.extend({
 		this.posts.fetched = true;
 		this.render();
 	},
-	counter: 0,
 	initialize: function(options){
+		if(!Backbone.isMobile) this.setElement("#page");		
+		this.counter = 0;
+
 		this.type = options.type;
 		if(options.tag){
 			this.posts = {};

@@ -1,19 +1,21 @@
 var View = require('../../shared/View');
 
 module.exports = View.extend({
-	el: "#page",
-	events: {
-	},
 	render: function(){
 		if(this.rendered) return
-		this.html.render("post.html", 
+		var rendered = this.html.render("post.html", 
 			{
 				'.link': { href: "/article/"+this.type+"/"+this.slug},
 				'.title': this.post.get("title"),
 				'.created': this.post.get("created"),
 				'.content': { _html: this.post.get("content") }
 			}
-		).appendTo( this.$el );
+		);
+		if(Backbone.isMobile)
+			Backbone.transition( this.$el.html( rendered ) );
+		else
+			Backbone.transition( this.$el, rendered );
+
 		this.rendered = true;
 	},
 	fetchPost: function(){
@@ -27,6 +29,8 @@ module.exports = View.extend({
 		this.fetched = true;
 	},
 	initialize: function(opts){
+		if(!Backbone.isMobile) this.setElement("#page");		
+
 		this.slug = opts.slug;
 		this.type = opts.type;
 
