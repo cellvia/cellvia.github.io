@@ -11,7 +11,10 @@ echo 1
 ping 1.1.1.1 -n 1 -w 1000 > nul
 
 echo starting watchify
-start "bootstrap watchify" /min cmd /k "cd %bootpath% && npm run watch-desktop"
+start "bootstrap watch-desktop" /min cmd /k "cd %bootpath% && npm run watch-desktop"
+
+echo starting watchify
+start "bootstrap watch-mobile" /min cmd /k "cd %bootpath% && npm run watch-mobile"
 
 echo 2
 ping 1.1.1.1 -n 1 -w 1000 > nul

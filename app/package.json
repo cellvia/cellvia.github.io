@@ -32,11 +32,12 @@
     "build-desktop-css": "node node_modules/npm-css/bin/npm-css client/css/desktop/entry.css -o server/public/css/desktop.css",
     "build-mobile-css": "node node_modules/npm-css/bin/npm-css client/css/mobile/entry.css -o server/public/css/mobile.css",
     "build-ie-css": "node node_modules/npm-css/bin/npm-css client/css/ie/entry.css -o server/public/css/ie.css",
-    "windows-deploy": "copy server\\public\\js\\*.js ..\\static\\js\\ && copy server\\public\\css\\*.css ..\\static\\css\\",
+    "windows-deploy": "copy server\\public\\index.html ..\\ && copy server\\public\\js\\*.js ..\\js\\ && copy server\\public\\images\\*.* ..\\images\\ && copy server\\public\\css\\*.css ..\\css\\",
     "deploy-js": "npm run build-loader && npm run build-desktop && npm run build-ie && npm run build-mobile",
     "deploy-css": "npm run build-desktop-css && npm run build-mobile-css && npm run build-ie-css",
     "deploy": "npm run build-vendor && npm run deploy-js && npm run deploy-css && npm run windows-deploy",
-    "watch-desktop": "watchify client/js/desktop/app.js -o server/public/js/desktop-app.js"
+    "watch-desktop": "watchify client/js/desktop/app.js -o server/public/js/desktop-app.js",
+    "watch-mobile": "watchify client/js/mobile/app.js -o server/public/js/mobile-app.js"
   },
   "browserify": {
     "transform": [
@@ -44,5 +45,5 @@
       "foldify/transform.js"
     ]
   },
-  "confify": "./conf.json"
+  "confify": "./conf.js"
 }

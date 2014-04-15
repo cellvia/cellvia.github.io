@@ -1,23 +1,18 @@
 var View = require('../../shared/View');
 
 module.exports = View.extend({
-	el: "#page",
 	render: function(){
-		if(this.rendered || !this.posts.fetched || !this.html.fetched ) return			
-		var self = this;
-
-		var postsMap = this.posts.map(function(post){
-			var tags = post.get("tags");
-			if(tags) tags = tags.join(", ");
-			return { 
-				'.link': { href: "/article/" + post.get("type") + "/" + post.get("slug") },
-				'.title': post.get("title"),
-				'.created': post.get("created"),
-				'.tags': tags
-			}
-		});
-		var rendered = this.html.render("posts.html", { ".title": this.type, ".post": postsMap });
-		Backbone.transition( this.$el, rendered );
+		if(this.rendered || !this.posts.fetched || !this.html.fetched ) return
+		var map = { 
+			'#title a': { href: "/", _text: this.type },
+			'#menu': this.posts.map(function(post){
+				return { 'a': { href: "/article/" + post.get("type") + "/" + post.get("slug"), 
+								_text: post.get("title") } 
+						}
+			})
+		}
+		var rendered = this.html.render("body.html", map);		
+		Backbone.transition( this.$el.html( rendered ) );
 		this.rendered = true;
 	},
 	compileByTag: function(coll, models){

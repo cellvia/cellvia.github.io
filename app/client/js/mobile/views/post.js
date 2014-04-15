@@ -1,7 +1,6 @@
 var View = require('../../shared/View');
 
 module.exports = View.extend({
-	el: "#page",
 	render: function(){
 		if(this.rendered) return
 		var rendered = this.html.render("post.html", 
@@ -12,8 +11,7 @@ module.exports = View.extend({
 				'.content': { _html: this.post.get("content") }
 			}
 		);
-		Backbone.transition( this.$el, rendered );
-
+		Backbone.transition( this.$el.html( rendered ) );
 		this.rendered = true;
 	},
 	fetchPost: function(){

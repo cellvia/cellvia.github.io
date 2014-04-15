@@ -8,6 +8,8 @@ taskkill /F /IM node.exe > nul
 taskkill /F /IM cmd.exe /FI "windowtitle eq bootstrap*" > nul
 
 echo deploying
-start "bootstrap deploy" /min cmd /k "cd %bootpath% && npm run deploy && nodemon -w server -w node_modules"
+start "bootstrap deploy" /min cmd /k "cd %bootpath% && npm run deploy && cd .. && local_windows_devservers.bat"
+
+
 
 exit

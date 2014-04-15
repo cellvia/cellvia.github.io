@@ -1,15 +1,11 @@
 var View = require('../../shared/View');
 var insertCss = require('insert-css');
 var foldify = require('foldify');
-var grid = foldify("topcoat-grid/css", {whitelist: "grid.min.css"});
-var topcoatCss = foldify("topcoat/css", {whitelist: "topcoat-desktop-light.css"});
+var topcoatCss = foldify("topcoat/css", {whitelist: "topcoat-mobile-light.css"});
 var topcoatFonts = foldify("topcoat/font", {encoding: "base64"});
-var conf = require('confify');
-
-insertCss(grid["grid.min.css"]);
 
 insertCss(
-	topcoatCss["topcoat-desktop-light.css"]
+	topcoatCss["topcoat-mobile-light.css"]
 		.replace(/..\/font\/(.*?)\.otf/g, 
 			function(match, p1){
 				p1 = p1 + ".otf";
@@ -22,27 +18,23 @@ module.exports = View.extend({
 	events: {
 		"click a": "link"
 	},
-	el: "body",
 	link: function(e){
 		e.preventDefault();
 		Backbone.trigger("go", {href: e.currentTarget.getAttribute('href')});
 	},
 	render: function(){
+		if(this.rendered) return
 		var map = { 
 			'#title a': { href: "/", _text: "Brandon's Blog" },
 			'#menu': Backbone.sections.map(function(section){
-				return {'a': {
-					href: '/articles/'+section,
-					_text: section
-				}}
+				return { 'a': { href: '/articles/'+section, _text: section } }
 			})
 		}
-		var rendered = this.html.render("body.html", map);
-		console.log(rendered)
-		Backbone.transition( this.$el, rendered );
+		var rendered = this.html.render("body.html", map);		
+		Backbone.transition( this.$el.html( rendered ) );
+		this.rendered = true;
 	},
 	initialize: function(){
-
 		this.html = Backbone.collections.html;
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();

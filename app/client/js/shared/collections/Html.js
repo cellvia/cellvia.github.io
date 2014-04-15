@@ -32,10 +32,9 @@ module.exports = function(options){
 			if(conf.clientOnly){
 				this.fetched = true;
 				var self = this;
-				var htmls = foldify(conf.paths.root + conf.paths.html);
-				for(var name in htmls){
+				var htmls = foldify(conf.paths.html, {whitelist: [conf.displayType+"/*", "shared/*"], recursive: true});
+				for(var name in htmls)
 					self.add({id: name, template: htmls[name]});
-				}
 				process.nextTick(function(){
 					self.trigger('fetched');
 				});

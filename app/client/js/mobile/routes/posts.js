@@ -1,10 +1,11 @@
 var PostsView = require('../views/posts');
+var LayoutView = require('../views/layout');
 var PostView = require('../views/post');
 
 module.exports = function(router){
 
 	router.route('', 'blog', function(type){
-    	// router.destroy(null, {replace: true});
+    	router.view( LayoutView );
 	});
 
 	router.route('tag/:tag', 'taggedPosts', function(tag){
