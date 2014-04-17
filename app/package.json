@@ -17,7 +17,9 @@
     "topcoat": "^0.7.5",
     "topcoat-grid": "^0.1.0",
     "lazyloader": "^2.0.3",
-    "pageslide": "^0.2.0"
+    "pageslide": "^0.2.0",
+    "fastclick": "^1.0.1",
+    "topcoat-icons": "^0.2.0"
   },
   "devDependencies": {
     "catw": "^0.2.0",

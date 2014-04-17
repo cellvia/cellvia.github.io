@@ -8,7 +8,7 @@ var Router = Backbone.Router.extend({
     },
     initialize: function(){
       $.ajaxSetup({ cache: false });
-      Backbone.on('go', $.proxy(this.go, this));
+      Backbone.on('go', this.go.bind(this));
     }
 });
 

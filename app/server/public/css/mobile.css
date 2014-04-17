@@ -1,0 +1,140 @@
+a{
+	text-decoration: none;
+	color: inherit;
+	-webkit-touch-callout: none;
+	-webkit-tap-highlight-color: rgb(0, 0, 0);
+}
+
+
+body{
+	overflow:hidden;
+}
+
+.page{
+	overflow: hidden;
+}
+
+.header{
+	position:relative;
+	height: 4.5rem;
+	z-index: 100;
+}
+
+.page-content{
+	position:relative;
+	z-index: 99;
+}
+
+.page-footer{
+	position: absolute;
+	height: 3.5rem;
+	bottom: 0;
+	z-index: 100;
+	width:100%;
+}
+
+.page-footer .topcoat-navigation-bar__item{
+	top: 1rem;
+	line-height: inherit;	
+	border-left: 1px solid #333;
+	border-right: 1px solid white;
+}
+
+.page-footer .topcoat-navigation-bar__item:first-child{
+	border-left: 0;
+}
+
+.page-footer .topcoat-navigation-bar__item:last-child{
+	border-right: 0;
+}
+
+.goback {
+	position: absolute;
+	top: 1.5em;
+	z-index: 100;
+}
+
+.topcoat-icon--back {
+	background: url("../images/back.svg") no-repeat;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+}
+
+.topcoat-icon--next {
+	background: url("../images/next.svg") no-repeat;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+}
+
+.topcoat-icon--email {
+	background: url("../images/email.svg") no-repeat;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+}
+
+.topcoat-icon--twitter {
+	background: url("../images/twitter.svg") no-repeat;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+}
+
+.topcoat-icon--github {
+	background: url("../images/github.svg") no-repeat;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+}
+
+.topcoat-icon--linkedin {
+	background: url("../images/linkedin.svg") no-repeat;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+}
+
+.page-title{
+	position: relative;
+}
+
+div.sections .page-title span{
+	font-size: 1.5em;
+	width: 80%;
+	display: inline-block;	
+}
+
+div.posts .page-title span{
+	font-size: 1em;
+	width: 80%;
+	display: inline-block;	
+}
+
+div.post .page-title span{
+	font-size: 0.75em;
+	width: 80%;
+	display: inline-block;	
+}
+
+
+.topcoat-list__item{
+	position: relative;
+	padding: 0 !important;
+	clear: both;
+}
+
+.list a{
+	display: block;
+	padding: 1.25rem 0 1.25rem 0;
+}
+
+.posts .list a, .post .list a {
+	padding-left: 1.25rem;
+	text-align: left;
+}
+
+.topcoat-list{
+	border-top: 0 !important;
+}

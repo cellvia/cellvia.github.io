@@ -1,4 +1,21 @@
 module.exports = {
+    events: function() {
+      return _.extend({},this._events,this.viewEvents);
+    },
+    _events: {
+      'click a': '_link'
+    },
+    _link: function(e){
+        e.preventDefault();
+        process.nextTick(function(){
+          if(e.isPropagationStopped()) return
+          var href = e.currentTarget.getAttribute('href');
+          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
+            Backbone.trigger("go", {href: href});          
+          else
+            window.open(href);
+        })
+    },
     _destroyViews: function(group, options, subview){
       options = options || {};
       if(!this._views.hasOwnProperty(group)) return;
@@ -6,6 +23,10 @@ module.exports = {
         view.destroy(undefined, {}, true);
         view.stopListening();
         view.undelegateEvents();
+        if(view.iscroll){
+          view.iscroll.destroy();
+          delete view.iscroll;
+        } 
         if(options.replace !== true || Backbone.isMobile || subview) return
         var el = view.$el;
         if(el && el.length)
@@ -13,7 +34,7 @@ module.exports = {
       });
       delete this._views[group];
     },
-    view: function(View, options){
+    view: function(View, options){      
       options = options || {};
       options.group = options.group || "global";
       if(!this._views) this._views = {};
@@ -50,5 +71,9 @@ module.exports = {
           return;
         }
         Backbone.trigger('go', { href: '/'+resp.status });
-    }    
+    },
+    reinitialize: function(){
+      this.delegateEvents();
+      this.initialize(this.options);
+    }
 }

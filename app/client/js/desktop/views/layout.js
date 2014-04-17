@@ -19,14 +19,7 @@ insertCss(
 );
 
 module.exports = View.extend({
-	events: {
-		"click a": "link"
-	},
 	el: "body",
-	link: function(e){
-		e.preventDefault();
-		Backbone.trigger("go", {href: e.currentTarget.getAttribute('href')});
-	},
 	render: function(){
 		var map = { 
 			'#title a': { href: "/", _text: "Brandon's Blog" },
@@ -42,9 +35,11 @@ module.exports = View.extend({
 		Backbone.transition( this.$el, rendered );
 	},
 	initialize: function(){
-
 		this.html = Backbone.collections.html;
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
+
+		//updates gist cache
+		Backbone.collections[Backbone.sections[0]].fetch();
 	}
 });

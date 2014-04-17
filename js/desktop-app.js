@@ -391,14 +391,7 @@ insertCss(
 );
 
 module.exports = View.extend({
-	events: {
-		"click a": "link"
-	},
 	el: "body",
-	link: function(e){
-		e.preventDefault();
-		Backbone.trigger("go", {href: e.currentTarget.getAttribute('href')});
-	},
 	render: function(){
 		var map = { 
 			'#title a': { href: "/", _text: "Brandon's Blog" },
@@ -414,10 +407,12 @@ module.exports = View.extend({
 		Backbone.transition( this.$el, rendered );
 	},
 	initialize: function(){
-
 		this.html = Backbone.collections.html;
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
+
+		//updates gist cache
+		Backbone.collections[Backbone.sections[0]].fetch();
 	}
 });
 
@@ -483,7 +478,7 @@ module.exports = View.extend({
 				'.tags': tags
 			}
 		});
-		var rendered = this.html.render("posts.html", { ".title": post.get("type"), ".post": postsMap });
+		var rendered = this.html.render("posts.html", { ".title": this.type, ".post": postsMap });
 		Backbone.transition( this.$el, rendered );
 		this.rendered = true;
 	},
@@ -537,7 +532,7 @@ var Router = Backbone.Router.extend({
     },
     initialize: function(){
       $.ajaxSetup({ cache: false });
-      Backbone.on('go', $.proxy(this.go, this));
+      Backbone.on('go', this.go.bind(this));
     }
 });
 
@@ -550,6 +545,23 @@ module.exports = Backbone.View.extend(ViewCore);
 },{"./ViewCore":13}],13:[function(require,module,exports){
 (function (process){
 module.exports = {
+    events: function() {
+      return _.extend({},this._events,this.viewEvents);
+    },
+    _events: {
+      'click a': '_link'
+    },
+    _link: function(e){
+        e.preventDefault();
+        process.nextTick(function(){
+          if(e.isPropagationStopped()) return
+          var href = e.currentTarget.getAttribute('href');
+          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
+            Backbone.trigger("go", {href: href});          
+          else
+            window.open(href);
+        })
+    },
     _destroyViews: function(group, options, subview){
       options = options || {};
       if(!this._views.hasOwnProperty(group)) return;
@@ -557,6 +569,10 @@ module.exports = {
         view.destroy(undefined, {}, true);
         view.stopListening();
         view.undelegateEvents();
+        if(view.iscroll){
+          view.iscroll.destroy();
+          delete view.iscroll;
+        } 
         if(options.replace !== true || Backbone.isMobile || subview) return
         var el = view.$el;
         if(el && el.length)
@@ -564,7 +580,7 @@ module.exports = {
       });
       delete this._views[group];
     },
-    view: function(View, options){
+    view: function(View, options){      
       options = options || {};
       options.group = options.group || "global";
       if(!this._views) this._views = {};
@@ -601,7 +617,11 @@ module.exports = {
           return;
         }
         Backbone.trigger('go', { href: '/'+resp.status });
-    }    
+    },
+    reinitialize: function(){
+      this.delegateEvents();
+      this.initialize(this.options);
+    }
 }
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
 },{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":2}],14:[function(require,module,exports){
@@ -682,8 +702,7 @@ module.exports = function(options){
 			if(true){
 				this.fetched = true;
 				var self = this;
-				alert("desktop");
-				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
+				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["body.html"] = "<body>\r\n\r\n\t<div id=\"header\">\r\n\t\t<h1 id=\"title\"><a></a><span></span></h1>\r\n\t\t<div id=\"menu\">\r\n\t\t\t<a></a>\r\n\t\t</div>\r\n\t</div>\r\n\t<div id=\"page\"></div>\r\n\t<div id=\"footer\"></div>\r\n</body>";returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"content\">\r\n\r\n\t</div>\r\n</div>";returnMe["posts.html"] = "<div class=\"posts\">\r\n\t<h1><a class=\"title\"></a></h1>\r\n\t<div class=\"post\">\r\n\t\t<a class=\"link\"><span class=\"title\"></span> (<span class=\"created\"></span>)</a>\r\n\t</div>\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
 				for(var name in htmls)
 					self.add({id: name, template: htmls[name]});
 				process.nextTick(function(){
@@ -731,10 +750,12 @@ module.exports = function(options){
 		    	});
 			}
 		},
-		addGists: function(err, data){
-			if(data === "unmodified"){
+		addGists: function(cacheExists, err, data){
+			if(data === "unmodified" || cacheExists && err ){
 				Backbone.gists.updated = true;
 				return Backbone.trigger("gistsUpdated");					
+			}else if (!cacheExists && err){
+				alert("you are offline and have no cache!")
 			}
 
 			var gists = data.data;
@@ -759,7 +780,7 @@ module.exports = function(options){
 			});
 		},
 		digistify: function(checkData){
-			digistify("cellvia", checkData, this.addGists );
+			digistify("cellvia", checkData, this.addGists.bind(this, !!checkData) );
 		},
 		checkGists: function(){
 			if(Backbone.gists.updating) return

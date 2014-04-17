@@ -29,10 +29,12 @@ module.exports = function(options){
 		    	});
 			}
 		},
-		addGists: function(err, data){
-			if(data === "unmodified"){
+		addGists: function(cacheExists, err, data){
+			if(data === "unmodified" || cacheExists && err ){
 				Backbone.gists.updated = true;
 				return Backbone.trigger("gistsUpdated");					
+			}else if (!cacheExists && err){
+				alert("you are offline and have no cache!")
 			}
 
 			var gists = data.data;
@@ -57,7 +59,7 @@ module.exports = function(options){
 			});
 		},
 		digistify: function(checkData){
-			digistify("cellvia", checkData, this.addGists );
+			digistify("cellvia", checkData, this.addGists.bind(this, !!checkData) );
 		},
 		checkGists: function(){
 			if(Backbone.gists.updating) return
