@@ -32,7 +32,7 @@ Backbone.footers = conf.footers;
 //transitioner
 Backbone.transition = function(container, opts){
 	var mobileTransition = require(conf.mobileTransitionModule);
-	Backbone.transition = mobileTransition( $("body") );
+	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io")} );
 	Backbone.transition._isset = true;
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
 }
