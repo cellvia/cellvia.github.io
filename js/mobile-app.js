@@ -1639,7 +1639,7 @@ Backbone.footers = [["email","mailto:brandon.selway@gmail.com"],["linkedin","htt
 //transitioner
 Backbone.transition = function(container, opts){
 	var mobileTransition = require("pageslide");
-	Backbone.transition = mobileTransition( $("body") );
+	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io")} );
 	Backbone.transition._isset = true;
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
 }
@@ -7304,15 +7304,13 @@ function PageSlide(container, options) {
         opts = opts || {};
 
         var l = stateHistory.length,
-            state = window.history && history.pushState ? window.location.pathname : window.location.hash;
+            state = window.history && history.pushState && options.useHash !== true ? window.location.pathname : window.location.hash;
 
         if(opts.reset){
             stateHistory = [state];
             this.slidePageFrom(page, 'left');
             return;
-        }
-
-        if (l === 0) {
+        }else if (l === 0) {
             stateHistory.push(state);
             this.slidePageFrom(page);
             return;
