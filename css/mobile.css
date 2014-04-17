@@ -16,27 +16,36 @@ body{
 
 .header{
 	position:relative;
-	height:11%;
+	height: 4.5rem;
 	z-index: 100;
 }
 
 .page-content{
 	position:relative;
-	height: 80%;
 	z-index: 99;
 }
 
 .page-footer{
 	position: absolute;
-	height: 8% !important;
-	top: 92%;
+	height: 3.5rem;
+	bottom: 0;
 	z-index: 100;
 	width:100%;
 }
 
 .page-footer .topcoat-navigation-bar__item{
-	top: 26%;
+	top: 1rem;
 	line-height: inherit;	
+	border-left: 1px solid #333;
+	border-right: 1px solid white;
+}
+
+.page-footer .topcoat-navigation-bar__item:first-child{
+	border-left: 0;
+}
+
+.page-footer .topcoat-navigation-bar__item:last-child{
+	border-right: 0;
 }
 
 .goback {
@@ -92,7 +101,7 @@ body{
 }
 
 div.sections .page-title span{
-	font-size: 1.8em;
+	font-size: 1.5em;
 	width: 80%;
 	display: inline-block;	
 }
