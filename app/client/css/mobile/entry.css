@@ -15,7 +15,11 @@ body{
 }
 
 .page-content{
-	position:relative;
+    position: absolute;
+    width: 100%;
+	bottom: 3.5rem;
+    top: 4.5rem;
+    overflow: auto;
 	z-index: 99;
 }
 

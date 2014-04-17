@@ -1,6 +1,7 @@
 var foldify = require('foldify'),
 	digistify = require('digistify'),
 	dbAdapter = require('../adapters/dbAdapter.js');
+	var util = require('util')
 
 var Post = require('../models/Post')
 
@@ -66,11 +67,11 @@ module.exports = function(options){
 			Backbone.gists.updating = true;
 			Backbone.gists.get(1, this.digistify.bind(this), this.digistify.bind(this) );
 		},
-		fetch: function () {
+		fetch: function (who) {
 			if(!this.fetched){
 
 				if(!Backbone.gists.initialized)
-					return this.listenToOnce( Backbone, "db", this.fetch );
+					return this.listenToOnce( Backbone, "db", this.fetch.bind(this, "db") );
 
 				/* if IE load manually
 					var conf = require('confify');
@@ -80,7 +81,7 @@ module.exports = function(options){
 				*/
 
 				if(!Backbone.gists.updated){
-					this.listenToOnce( Backbone, "gistsUpdated", this.fetch );
+					this.listenToOnce( Backbone, "gistsUpdated", this.fetch.bind(this, "gistsUpdated") );
 					return this.checkGists();					
 				}
 				this.toCollection();
@@ -95,7 +96,7 @@ module.exports = function(options){
 			this.options || (this.options = options || {});
 			if(!Backbone.gists){
 				var self = this;
-				Backbone.gists = dbAdapter({
+				var settings = {
 				  dbVersion: 1,
 				  storeName: "gists",
 				  keyPath: 'id',
@@ -103,8 +104,12 @@ module.exports = function(options){
 				  onStoreReady: function(){
 				  	Backbone.gists.initialized = true;
 				    Backbone.trigger("db");
+				  },
+				  onError: function(){
+				  	Backbone.gists = dbAdapter(settings, true)
 				  }
-				});				
+				};
+				Backbone.gists = dbAdapter(settings);
 			}
 		}
 	});

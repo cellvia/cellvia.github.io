@@ -8,6 +8,7 @@ module.exports = {
 	},
 	"desktopTransitionModule": false,
 	"mobileTransitionModule": "pageslide",
+	"useIScroll": false,
 	"clientOnly": true,
 
 	"sections": ['about', 'resume', 'code', 'music', 'video', 'thoughts', 'projects'],

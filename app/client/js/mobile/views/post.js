@@ -3,7 +3,7 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'post',
 	prerender: function(){
-		if(!this.rendered){
+		if(!this.cached){
 			var rendered = this.html.render("content.html", { 
 				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.type },
 				'.page-title span': this.post.get('title')
@@ -13,14 +13,13 @@ module.exports = View.extend({
 		Backbone.transition( this.$el );
 	},
 	render: function(){
-		if(this.rendered) return
+		if(this.cached) return
 		var rendered = this.html.render("post.html", {
 				'.created': this.post.get("created"),
 				'.post-content': { _html: this.post.get("content") }
 		});
 		this.$el.find('.page-content').html( rendered );
-        this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
-		this.rendered = true;
+		this.cached = true;
 	},
 	fetchPost: function(){
 		if(this.fetched || !this.posts.fetched || !this.html.fetched) return

@@ -13,7 +13,9 @@ module.exports = View.extend({
 		});
 		Backbone.transition( this.$el.html( rendered ), {reset: true} );
 
-        this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
+        // setTimeout( function(){ 
+        // 	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
+        // }.bind(this), 300 );
 		this.rendered = true;
 	},
 	initialize: function(){

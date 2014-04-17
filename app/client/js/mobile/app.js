@@ -4,21 +4,18 @@ $('head').append(meta);
 
 require('fastclick')(document.body);
 
-document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
-
 var router = require('../shared/Router'),
     foldify = require('foldify'),
+	insertCss = require("insert-css"),
     conf = require('confify');
+
 conf({displayType: "mobile"});
 
-var routes = foldify(__dirname + '/routes'),
+var	routes = foldify(__dirname + '/routes'),
     LayoutView = require('./views/layout');
 
 //grab global collections
 Backbone.collections = foldify(__dirname + '/../shared/collections');
-
-//attach routes
-routes(router);
 
 //attach global collections
 Backbone.sections = conf.sections.concat(conf.sections).concat(conf.sections);
@@ -37,21 +34,17 @@ Backbone.transition = function(container, opts){
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
 }
 
+// document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 Backbone.iScroll = function(container){
-    if(!Backbone.iScroll.bottomBarHeight) Backbone.iScroll.bottomBarHeight = $('.page-footer').height() || 0;
-    if(!Backbone.iScroll.scrollHeight){
-		Backbone.iScroll.scrollHeight = $(window).height() - container.position().top - Backbone.iScroll.bottomBarHeight;    	
-		Backbone.iScroll.scrollHeight = Backbone.iScroll.scrollHeight - (Backbone.iScroll.scrollHeight*.03)
-    } 
-    container.height( Backbone.iScroll.scrollHeight );
-    return new IScroll( container[0], {click: true});
+    return !!conf.useIScroll === false ? false : new IScroll( container[0], {click: true});
 }
+
+//attach routes
+routes(router);
 
 new LayoutView();
 
 //start history
 Backbone.history.start({
-  pushState: !!!~window.location.href.indexOf("github.io")
+  pushState: !!!~window.location.href.indexOf("github.io") && window.history && history.pushState
 });
-
-Backbone.router = router;

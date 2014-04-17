@@ -9,15 +9,15 @@ function isIE () {
 }
 
 if( isMobile ){
-	lazyloader(['/js/desktop-vendor.js?_=' + now, '/js/mobile-app.js?_=' + now], function(){
-		lazyloader.css('/css/mobile.css?_=' + now);	
-	});
+	lazyloader(['/js/desktop-vendor.js', '/js/mobile-app.js?_=' + now]);
+	lazyloader.css('/css/topcoat-mobile-light.min.css', function(){
+		lazyloader.css('/css/mobile.css?_=' + now);
+	});	
 }else if( !isIe || isIe > 9){
-	// lazyloader(['/js/desktop-vendor.js?_=' + now, '/js/desktop-app.js?_=' + now]);
-	// lazyloader.css('/css/desktop.css?_=' + now);
-	lazyloader(['/js/desktop-vendor.js?_=' + now, '/js/mobile-app.js?_=' + now], function(){
-		lazyloader.css('/css/mobile.css?_=' + now);	
-	});
+	lazyloader(['/js/desktop-vendor.js', '/js/mobile-app.js?_=' + now]);
+	lazyloader.css('/css/topcoat-mobile-light.min.css', function(){
+		lazyloader.css('/css/mobile.css?_=' + now);
+	});	
 }else if( isIe && isIe <= 9 ){
-	lazyloader(jsprefix + 'ie-app.js?_=' + now);
+	lazyloader('/js/ie-app.js?_=' + now);
 }
