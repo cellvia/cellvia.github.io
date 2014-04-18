@@ -11,6 +11,7 @@ module.exports = View.extend({
 			this.$el.html( rendered );
 		}
 		Backbone.transition( this.$el );
+    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 	},
 	render: function(){
 		if(this.cached) return
@@ -43,7 +44,6 @@ module.exports = View.extend({
 		this.posts = Backbone.collections[this.type];
 		this.listenToOnce( this.posts, "fetched", this.fetchPost );
 		this.posts.fetch();
-
 
 	}
 });

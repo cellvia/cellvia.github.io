@@ -1,24 +1,4 @@
 var View = require('../../shared/View');
-// var insertCss = require('insert-css');
-// var foldify = require('foldify');
-// var conf = require('confify');
-// var topcoatCss = foldify("topcoat/css", {whitelist: "topcoat-mobile-light.css"});
-// var topcoatFonts = foldify("topcoat/font", {encoding: "base64", whitelist: ["SourceSansPro-Semibold.otf", "SourceSansPro-Light.otf", "SourceSansPro-Regular.otf"]});
-// var css = foldify(conf.paths.root + '/server/public/css', {whitelist: "mobile.css"});
-
-
-// //hack to inline base64 font from node_modules/topcoat
-// insertCss(
-// 	topcoatCss["topcoat-mobile-light.css"]
-// 		.replace(/..\/font\/(.*?)\.otf/g, 
-// 			function(match, p1){
-// 				p1 = p1 + ".otf";
-// 				return "data:application/octet-stream;base64,"+topcoatFonts[p1];
-// 			}
-// 		)
-// );
-
-// insertCss(css['mobile.css']);
 
 module.exports = View.extend({
 	el: "body",
@@ -28,6 +8,7 @@ module.exports = View.extend({
 				return { 'a': { href: item[1], class: "topcoat-icon topcoat-icon--"+item[0] } }
 			})
 		});
+		rendered = $(rendered).add("<div class=\"bg\"><img src=\"http://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Shrivatsa.JPG/220px-Shrivatsa.JPG\" /></div>");
 		this.$el.append(rendered);
 	},
 	initialize: function(){
@@ -36,7 +17,7 @@ module.exports = View.extend({
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
 
-		//updates gist cache quickly
+		//immediately invoke in order to update gist cache quickly 
 		Backbone.collections[Backbone.sections[0]].fetch();
 	}
 });

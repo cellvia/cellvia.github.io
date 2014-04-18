@@ -1,2 +1,1 @@
-Backbone.isIE = true;
-alert("ieeee")
+$("body").html("IE has not yet been accounted for!")

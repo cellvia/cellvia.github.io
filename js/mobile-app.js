@@ -2227,17 +2227,13 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
-var meta =  '<meta charset="utf-8" />';
-meta += '<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />';
-$('head').append(meta);
-
-require('fastclick')(document.body);
-
 var router = require('../shared/Router'),
     foldify = require('foldify'),
 	insertCss = require("insert-css"),
+	fastclick = require('fastclick'),
     conf = require('confify');
 
+//set config
 conf({displayType: "mobile"});
 
 var	routes = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["error"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\mobile\\routes\\error.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\mobile\\routes\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
@@ -2247,15 +2243,18 @@ var	routes = ((function(){ var bind = function bind(fn){ var args = Array.protot
 Backbone.collections = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["Html"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\Html.js");returnMe["Posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\Posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
 
 //attach global collections
-Backbone.sections = (["about","resume","code","music","video","thoughts","projects"]).concat(["about","resume","code","music","video","thoughts","projects"]);
+Backbone.sections = ["about","résumé","code","sound&vision","reflections"];
 Backbone.sections.forEach(function(type){
 	Backbone.collections[type] = Backbone.collections.Posts({identifier: "~"+type+"~"});
 });
+
+//html template collection
 Backbone.collections.html = Backbone.collections.Html();
 
+//mobile footer icons ([[type, link]])
 Backbone.footers = [["email","mailto:brandon.selway@gmail.com"],["linkedin","http://www.linkedin.com/pub/brandon-selway/55/100/395"],["github","http://github.com/cellvia"],["twitter","http://twitter.com/djchairboy"]];
 
-//transitioner
+//setup pageslider
 Backbone.transition = function(container, opts){
 	var mobileTransition = require("pageslide");
 	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io")} );
@@ -2263,19 +2262,19 @@ Backbone.transition = function(container, opts){
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
 }
 
-// document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
 Backbone.iScroll = function(container){
-    return !!conf.useIScroll === false ? false : new IScroll( container[0], {click: true});
+    return !!conf.useIScroll === false ? false : new IScroll( container[0], {click: true} );
 }
 
 //attach routes
 routes(router);
 
+//instantiate base page
 new LayoutView();
 
-//start history
+//start app!
 Backbone.history.start({
-  pushState: !!!~window.location.href.indexOf("github.io") && window.history && history.pushState
+  pushState: !!!~window.location.href.indexOf("github.io") && Modernizr.history
 });
 },{"../shared/Router":18,"./views/layout":14,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\mobile\\routes\\error.js":11,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\mobile\\routes\\posts.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\Html.js":23,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\Posts.js":24,"confify":26,"fastclick":29,"foldify":30,"insert-css":35,"pageslide":37}],11:[function(require,module,exports){
 var ErrorView = require('../views/error');
@@ -2334,26 +2333,6 @@ module.exports = View.extend({
 
 },{"../../shared/View":19}],14:[function(require,module,exports){
 var View = require('../../shared/View');
-// var insertCss = require('insert-css');
-// var foldify = require('foldify');
-// var conf = require('confify');
-// var topcoatCss = foldify("topcoat/css", {whitelist: "topcoat-mobile-light.css"});
-// var topcoatFonts = foldify("topcoat/font", {encoding: "base64", whitelist: ["SourceSansPro-Semibold.otf", "SourceSansPro-Light.otf", "SourceSansPro-Regular.otf"]});
-// var css = foldify(conf.paths.root + '/server/public/css', {whitelist: "mobile.css"});
-
-
-// //hack to inline base64 font from node_modules/topcoat
-// insertCss(
-// 	topcoatCss["topcoat-mobile-light.css"]
-// 		.replace(/..\/font\/(.*?)\.otf/g, 
-// 			function(match, p1){
-// 				p1 = p1 + ".otf";
-// 				return "data:application/octet-stream;base64,"+topcoatFonts[p1];
-// 			}
-// 		)
-// );
-
-// insertCss(css['mobile.css']);
 
 module.exports = View.extend({
 	el: "body",
@@ -2363,6 +2342,7 @@ module.exports = View.extend({
 				return { 'a': { href: item[1], class: "topcoat-icon topcoat-icon--"+item[0] } }
 			})
 		});
+		rendered = $(rendered).add("<div class=\"bg\"><img src=\"http://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Shrivatsa.JPG/220px-Shrivatsa.JPG\" /></div>");
 		this.$el.append(rendered);
 	},
 	initialize: function(){
@@ -2371,7 +2351,7 @@ module.exports = View.extend({
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
 
-		//updates gist cache quickly
+		//immediately invoke in order to update gist cache quickly 
 		Backbone.collections[Backbone.sections[0]].fetch();
 	}
 });
@@ -2390,6 +2370,7 @@ module.exports = View.extend({
 			this.$el.html( rendered );
 		}
 		Backbone.transition( this.$el );
+    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 	},
 	render: function(){
 		if(this.cached) return
@@ -2423,7 +2404,6 @@ module.exports = View.extend({
 		this.listenToOnce( this.posts, "fetched", this.fetchPost );
 		this.posts.fetch();
 
-
 	}
 });
 },{"../../shared/View":19}],16:[function(require,module,exports){
@@ -2448,6 +2428,7 @@ module.exports = View.extend({
 			this.cached = true;
 		}
 		Backbone.transition( this.$el );
+    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 		this.rendered = true;
 	},
 	compileByTag: function(coll, models){
@@ -2511,16 +2492,13 @@ module.exports = View.extend({
 		if(this.rendered) return Backbone.transition( this.$el, {reset: true} );
 		var rendered = this.html.render("content.html", { 
 			'.goback': { _html: "" },
-			'.page-title span': "Brandon's Blog",
+			'.page-title span': "Brandon Selway",
 			'.menu li.section': Backbone.sections.map(function(section){
 				return { 'a': { href: '/articles/'+section, _text: section } }
 			})
 		});
 		Backbone.transition( this.$el.html( rendered ), {reset: true} );
-
-        // setTimeout( function(){ 
-        // 	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
-        // }.bind(this), 300 );
+    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 		this.rendered = true;
 	},
 	initialize: function(){
@@ -7927,14 +7905,15 @@ function PageSlide(container, options) {
     var container = container,
         isJ = container instanceof jQuery,
         currentPage,
-        stateHistory = [];
+        stateHistory = [],
+        allowPush = !options.useHash && testPushstate() && (options.allowTest !== false && doubleCheck());
 
     // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
     this.slidePage = function(page, opts) {
         opts = opts || {};
 
         var l = stateHistory.length,
-            state = window.history && history.pushState && options.useHash !== true ? window.location.pathname : window.location.hash;
+            state = allowPush ? window.location.pathname : window.location.hash;
 
         if(opts.reset){
             stateHistory = [state];
@@ -8006,6 +7985,39 @@ function PageSlide(container, options) {
         currentPage = page;
     };
 
+}
+
+//taken from https://github.com/hay/Modernizr/commit/479e424faabe92062292699102340346c82335b8
+function testPushstate(){    
+    var ua = navigator.userAgent;
+    var properCheck = !!(window.history && history.pushState);
+    if (ua.indexOf("Android") === -1) {
+        // No Android, simply return the 'proper' check
+        return properCheck;
+    } else {
+        // We need to check for the stock browser (which identifies itself
+        // as 'Mobile Safari'), however, Chrome on Android gives the same
+        // identifier (and does support history properly), so check for that too
+        if (ua.indexOf("Mobile Safari") !== -1 && ua.indexOf("Chrome") === -1) {
+            // Buggy implementation, always return false
+            return false;
+        } else {
+            // Chrome, return the proper check
+            return properCheck;
+        }
+    }
+}
+
+function doubleCheck(){
+    var original = window.location.pathname;
+        window.history.replaceState({}, 'pageSliderTest', '/pageSliderTest')
+    if(~window.location.pathname.indexOf("pageSliderTest")){
+        window.history.replaceState({}, original.replace("/", ""), original);
+        return true;
+    }else if(window.location.pathname !== original){
+        window.history.replaceState({}, original.replace("/", ""), original);
+    }
+    return false;
 }
 
 /*

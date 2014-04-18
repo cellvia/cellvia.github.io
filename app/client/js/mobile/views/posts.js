@@ -18,6 +18,7 @@ module.exports = View.extend({
 			this.cached = true;
 		}
 		Backbone.transition( this.$el );
+    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 		this.rendered = true;
 	},
 	compileByTag: function(coll, models){
