@@ -1283,6 +1283,10 @@ function newstore(options){
 			for(var p in all)
 				if(iter(all[p], n++) === false) break;			
 			return opts.onEnd ? opts.onEnd() : false;
+		},
+		clear: function(cb){
+			store.clear();
+			cb();
 		}
 	}
 }
@@ -1382,7 +1386,7 @@ module.exports = function(options){
 				Backbone.gists.updated = true;
 				return Backbone.trigger("gistsUpdated");					
 			}else if (!cacheExists && err){
-				alert("you are offline and have no cache!")
+				$("body").html("you are offline and have no cache!");
 			}
 
 			var gists = data.data;
@@ -1401,10 +1405,12 @@ module.exports = function(options){
 				return ret;
 			});
 			gists.push({id:1, etag: data.etag, description: "etag"});
-			Backbone.gists.putBatch(gists, function(){
+			var cb = Backbone.gists.putBatch.bind(Backbone.gists, gists, function(){
 				Backbone.gists.updated = true;
 				Backbone.trigger("gistsUpdated");
 			});
+
+			Backbone.gists.clear(cb, cb);
 		},
 		digistify: function(checkData){
 			digistify("cellvia", checkData, this.addGists.bind(this, !!checkData) );
@@ -1479,6 +1485,7 @@ function slug(input, identifier)
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
+var hyperglue = require('hyperglue');
 
 module.exports = Backbone.Model.extend({
 	getGist: function(){
@@ -1492,13 +1499,40 @@ module.exports = Backbone.Model.extend({
 			var self = this;
 			digistify(self.id, {}, function(err, data){
 				var contents = data.data;
+				var map = {
+						'ul': { class: "topcoat-list list" },
+						'li': { class: "topcoat-list__item" },
+					};
 				if(contents.length === 1){
-					self.set("content", marked(contents[0].content) );
+					var md = marked(contents[0].content);
+					var content = hyperglue(md, map);
+					if(!content.length){
+						content = content.outerHTML;
+					}else{
+						content = [].reduce.call(content, function(prev, next){
+							if ( next.nodeType === 3 || typeof next === "string" || typeof next === "function" ) 
+								return prev;
+							else
+								return prev + (next.outerHTML || next.innerHTML);
+						}, "");						
+					}
+					self.set("content", content );
 				}else{
-					self.set("content",marked(contents.filter(function(file){
+					var md = marked(contents.filter(function(file){
 							return !~file.filename.indexOf("tags:");
-						})[0].content)
-					);
+						})[0].content);
+					var content = hyperglue(md, map);
+					if(!content.length){
+						content = content.outerHTML;
+					}else{
+						content = [].reduce.call(content, function(prev, next){
+							if ( next.nodeType === 3 || typeof next === "string" || typeof next === "function" ) 
+								return prev;
+							else
+								return prev + (next.outerHTML || next.innerHTML);
+						}, "");						
+					}
+					self.set("content", content );
 				}
 				Backbone.gists.put(self.toJSON());
 				self.fetched = true;
@@ -1517,7 +1551,7 @@ module.exports = Backbone.Model.extend({
 	}
 })
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"digistify":23,"marked":31}],22:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"digistify":23,"hyperglue":28,"marked":31}],22:[function(require,module,exports){
 (function (process){
 function merge(a, b){
     for(var prop in b){
