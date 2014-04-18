@@ -35,7 +35,7 @@ module.exports = function(options){
 				Backbone.gists.updated = true;
 				return Backbone.trigger("gistsUpdated");					
 			}else if (!cacheExists && err){
-				alert("you are offline and have no cache!")
+				$("body").html("you are offline and have no cache!");
 			}
 
 			var gists = data.data;
@@ -54,10 +54,12 @@ module.exports = function(options){
 				return ret;
 			});
 			gists.push({id:1, etag: data.etag, description: "etag"});
-			Backbone.gists.putBatch(gists, function(){
+			var cb = Backbone.gists.putBatch.bind(Backbone.gists, gists, function(){
 				Backbone.gists.updated = true;
 				Backbone.trigger("gistsUpdated");
 			});
+
+			Backbone.gists.clear(cb, cb);
 		},
 		digistify: function(checkData){
 			digistify("cellvia", checkData, this.addGists.bind(this, !!checkData) );

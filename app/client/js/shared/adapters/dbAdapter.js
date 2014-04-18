@@ -33,6 +33,10 @@ function newstore(options){
 			for(var p in all)
 				if(iter(all[p], n++) === false) break;			
 			return opts.onEnd ? opts.onEnd() : false;
+		},
+		clear: function(cb){
+			store.clear();
+			cb();
 		}
 	}
 }

@@ -36,6 +36,8 @@ module.exports = View.extend({
 
 		this.slug = opts.slug;
 		this.type = opts.type;
+		this.$el.addClass("section-"+slug(this.type));
+		this.$el.addClass("article-"+this.slug);
 
 		this.html = Backbone.collections.html;
 		this.listenToOnce( this.html, "fetched", this.fetchPost );
@@ -47,3 +49,14 @@ module.exports = View.extend({
 
 	}
 });
+
+function slug(input, identifier)
+{
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}

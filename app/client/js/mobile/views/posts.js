@@ -44,6 +44,7 @@ module.exports = View.extend({
 		this.options = options || {};
 		this.counter = 0;
 		this.type = this.options.type;
+		this.$el.addClass("section-"+slug(this.type));
 
 		if(options.tag){
 			this.tag = this.options.tag;
@@ -72,3 +73,14 @@ module.exports = View.extend({
 
 	}
 });
+
+function slug(input, identifier)
+{
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}

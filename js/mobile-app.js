@@ -2395,6 +2395,8 @@ module.exports = View.extend({
 
 		this.slug = opts.slug;
 		this.type = opts.type;
+		this.$el.addClass("section-"+slug(this.type));
+		this.$el.addClass("article-"+this.slug);
 
 		this.html = Backbone.collections.html;
 		this.listenToOnce( this.html, "fetched", this.fetchPost );
@@ -2406,6 +2408,17 @@ module.exports = View.extend({
 
 	}
 });
+
+function slug(input, identifier)
+{
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}
 },{"../../shared/View":19}],16:[function(require,module,exports){
 (function (process){
 var View = require('../../shared/View');
@@ -2454,6 +2467,7 @@ module.exports = View.extend({
 		this.options = options || {};
 		this.counter = 0;
 		this.type = this.options.type;
+		this.$el.addClass("section-"+slug(this.type));
 
 		if(options.tag){
 			this.tag = this.options.tag;
@@ -2482,6 +2496,17 @@ module.exports = View.extend({
 
 	}
 });
+
+function slug(input, identifier)
+{
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
 },{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
 var View = require('../../shared/View');
@@ -2648,6 +2673,10 @@ function newstore(options){
 			for(var p in all)
 				if(iter(all[p], n++) === false) break;			
 			return opts.onEnd ? opts.onEnd() : false;
+		},
+		clear: function(cb){
+			store.clear();
+			cb();
 		}
 	}
 }
@@ -2747,7 +2776,7 @@ module.exports = function(options){
 				Backbone.gists.updated = true;
 				return Backbone.trigger("gistsUpdated");					
 			}else if (!cacheExists && err){
-				alert("you are offline and have no cache!")
+				$("body").html("you are offline and have no cache!");
 			}
 
 			var gists = data.data;
@@ -2766,10 +2795,12 @@ module.exports = function(options){
 				return ret;
 			});
 			gists.push({id:1, etag: data.etag, description: "etag"});
-			Backbone.gists.putBatch(gists, function(){
+			var cb = Backbone.gists.putBatch.bind(Backbone.gists, gists, function(){
 				Backbone.gists.updated = true;
 				Backbone.trigger("gistsUpdated");
 			});
+
+			Backbone.gists.clear(cb, cb);
 		},
 		digistify: function(checkData){
 			digistify("cellvia", checkData, this.addGists.bind(this, !!checkData) );
@@ -2844,6 +2875,7 @@ function slug(input, identifier)
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
+var hyperglue = require('hyperglue');
 
 module.exports = Backbone.Model.extend({
 	getGist: function(){
@@ -2857,13 +2889,25 @@ module.exports = Backbone.Model.extend({
 			var self = this;
 			digistify(self.id, {}, function(err, data){
 				var contents = data.data;
+				var map = {
+						'ul': { class: "topcoat-list list" },
+						'li': { class: "topcoat-list__item" },
+					};
 				if(contents.length === 1){
-					self.set("content", marked(contents[0].content) );
+					var md = marked(contents[0].content).replace("\r", "");
+					var content = hyperglue(md, map).outerHTML;
+					console.log(md)
+					console.log(hyperglue(md, map))
+					console.log(content)
+					self.set("content", content );
 				}else{
-					self.set("content",marked(contents.filter(function(file){
+					var md = marked(contents.filter(function(file){
 							return !~file.filename.indexOf("tags:");
-						})[0].content)
-					);
+						})[0].content).replace("\r", "");
+					console.log(md)
+					console.log(hyperglue(md, map))
+					console.log(content)
+					self.set("content", hyperglue(md, map).outerHTML );
 				}
 				Backbone.gists.put(self.toJSON());
 				self.fetched = true;
@@ -2882,7 +2926,7 @@ module.exports = Backbone.Model.extend({
 	}
 })
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"marked":36}],26:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
 (function (process){
 function merge(a, b){
     for(var prop in b){

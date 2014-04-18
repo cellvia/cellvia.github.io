@@ -170,3 +170,39 @@ div.post .page-title span{
 	border-top: 0 !important;
 	background-color: transparent;
 }
+
+.image-container{
+	display: inline-block;
+	overflow: hidden;
+}
+
+.image-container.img__me{
+	width: 8rem;
+	height: 8rem;
+	border-radius: 50%;
+}
+
+.image-container img{
+	width: 100%;
+	height: auto;
+}
+
+.article-about .link, .section-rsum .link{
+	display: none;
+}
+
+.article-about p:first-child{
+	text-align: center;
+	text-indent: 0;
+	padding: 0;
+}
+
+.page-content p{
+	padding: 0 1.5rem;
+	text-align: justify;
+	text-indent: 1rem;
+}
+
+.page-content p:last-child{
+	padding: 0 1.5rem;
+}
