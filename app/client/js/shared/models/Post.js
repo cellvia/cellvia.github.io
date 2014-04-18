@@ -19,20 +19,35 @@ module.exports = Backbone.Model.extend({
 						'li': { class: "topcoat-list__item" },
 					};
 				if(contents.length === 1){
-					var md = marked(contents[0].content).replace("\r", "");
-					var content = hyperglue(md, map).outerHTML;
-					console.log(md)
-					console.log(hyperglue(md, map))
-					console.log(content)
+					var md = marked(contents[0].content);
+					var content = hyperglue(md, map);
+					if(!content.length){
+						content = content.outerHTML;
+					}else{
+						content = [].reduce.call(content, function(prev, next){
+							if ( next.nodeType === 3 || typeof next === "string" || typeof next === "function" ) 
+								return prev;
+							else
+								return prev + (next.outerHTML || next.innerHTML);
+						}, "");						
+					}
 					self.set("content", content );
 				}else{
 					var md = marked(contents.filter(function(file){
 							return !~file.filename.indexOf("tags:");
-						})[0].content).replace("\r", "");
-					console.log(md)
-					console.log(hyperglue(md, map))
-					console.log(content)
-					self.set("content", hyperglue(md, map).outerHTML );
+						})[0].content);
+					var content = hyperglue(md, map);
+					if(!content.length){
+						content = content.outerHTML;
+					}else{
+						content = [].reduce.call(content, function(prev, next){
+							if ( next.nodeType === 3 || typeof next === "string" || typeof next === "function" ) 
+								return prev;
+							else
+								return prev + (next.outerHTML || next.innerHTML);
+						}, "");						
+					}
+					self.set("content", content );
 				}
 				Backbone.gists.put(self.toJSON());
 				self.fetched = true;
