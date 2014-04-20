@@ -1628,8 +1628,8 @@ var substr = 'ab'.substr(-1) === 'b'
     }
 ;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
@@ -2225,8 +2225,8 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
 var router = require('../shared/Router'),
     foldify = require('foldify'),
 	insertCss = require("insert-css"),
@@ -2252,7 +2252,7 @@ Backbone.sections.forEach(function(type){
 Backbone.collections.html = Backbone.collections.Html();
 
 //mobile footer icons ([[type, link]])
-Backbone.footers = [["email","mailto:brandon.selway@gmail.com"],["linkedin","http://www.linkedin.com/pub/brandon-selway/55/100/395"],["github","http://github.com/cellvia"],["twitter","http://twitter.com/djchairboy"]];
+Backbone.footers = [["email","mailto:brandon.selway@gmail.com"],["linkedin","https://www.linkedin.com/in/brandonselway"],["github","http://github.com/cellvia"],["twitter","http://twitter.com/djchairboy"]];
 
 //setup pageslider
 Backbone.transition = function(container, opts){
@@ -2411,6 +2411,7 @@ module.exports = View.extend({
 
 function slug(input, identifier)
 {
+	if(!input) return
 	if(identifier) input = input.replace(identifier, '') // Trim identifier
     return input
         .replace(/^\s\s*/, '') // Trim start
@@ -2428,15 +2429,24 @@ module.exports = View.extend({
 	render: function(){
 		if(this.shouldSkipPage()) return
 		if(!this.cached){
-			var rendered = this.html.render("content.html", {
+			var postsMap = this.posts.map(function(post){
+					return {'a': {
+								href: "/article/" + post.get("type") + "/" + post.get("slug"), 
+								class: "post listitem" 
+							},
+							'a span.item-content': post.get("title"),
+							'a span.action-icon': { class: "action-icon topcoat-icon--next" }
+						}
+				});
+			var map = {
 				'.goback a': { href: this.type ? "/" : "/tags" },
-				'.page-title span': this.type || this.tag,
-				'.page-content .menu li': this.posts.map(function(post){
-					return { 'a': {href: "/article/" + post.get("type") + "/" + post.get("slug"), 
-									_text: post.get("title") }
-							}
-				})
-			});
+				'.page-title span': this.type || this.tag
+			}
+			if(this.posts.length)
+				map['.page-content .menu li'] = postsMap;
+			else
+				map['.page-content .menu li a'] = {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"};
+			var rendered = this.html.render("content.html", map);
 			this.$el.html( rendered );
 			this.cached = true;
 		}
@@ -2499,6 +2509,7 @@ module.exports = View.extend({
 
 function slug(input, identifier)
 {
+	if(!input) return
 	if(identifier) input = input.replace(identifier, '') // Trim identifier
     return input
         .replace(/^\s\s*/, '') // Trim start
@@ -2507,8 +2518,8 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
 var View = require('../../shared/View');
 
 module.exports = View.extend({
@@ -2518,8 +2529,10 @@ module.exports = View.extend({
 		var rendered = this.html.render("content.html", { 
 			'.goback': { _html: "" },
 			'.page-title span': "Brandon Selway",
-			'.menu li.section': Backbone.sections.map(function(section){
-				return { 'a': { href: '/articles/'+section, _text: section } }
+			'.menu li': Backbone.sections.map(function(section){
+				return { 'a': { href: '/articles/'+section, class: "section listitem" },
+						 'a span.item-content': section
+				}
 			})
 		});
 		Backbone.transition( this.$el.html( rendered ), {reset: true} );
@@ -2635,8 +2648,8 @@ module.exports = {
       this.initialize(this.options);
     }
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],21:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],21:[function(require,module,exports){
 (function (process){
 var store = require('./store');
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
@@ -2681,8 +2694,8 @@ function newstore(options){
 	}
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
 /* Copyright (c) 2010-2013 Marcus Westin */
 (function(e){function o(){try{return r in e&&e[r]}catch(t){return!1}}var t={},n=e.document,r="localStorage",i="script",s;t.disabled=!1,t.set=function(e,t){},t.get=function(e){},t.remove=function(e){},t.clear=function(){},t.transact=function(e,n,r){var i=t.get(e);r==null&&(r=n,n=null),typeof i=="undefined"&&(i=n||{}),r(i),t.set(e,i)},t.getAll=function(){},t.forEach=function(){},t.serialize=function(e){return JSON.stringify(e)},t.deserialize=function(e){if(typeof e!="string")return undefined;try{return JSON.parse(e)}catch(t){return e||undefined}};if(o())s=e[r],t.set=function(e,n){return n===undefined?t.remove(e):(s.setItem(e,t.serialize(n)),n)},t.get=function(e){return t.deserialize(s.getItem(e))},t.remove=function(e){s.removeItem(e)},t.clear=function(){s.clear()},t.getAll=function(){var e={};return t.forEach(function(t,n){e[t]=n}),e},t.forEach=function(e){for(var n=0;n<s.length;n++){var r=s.key(n);e(r,t.get(r))}};else if(n.documentElement.addBehavior){var u,a;try{a=new ActiveXObject("htmlfile"),a.open(),a.write("<"+i+">document.w=window</"+i+'><iframe src="/favicon.ico"></iframe>'),a.close(),u=a.w.frames[0].document,s=u.createElement("div")}catch(f){s=n.createElement("div"),u=n.body}function l(e){return function(){var n=Array.prototype.slice.call(arguments,0);n.unshift(s),u.appendChild(s),s.addBehavior("#default#userData"),s.load(r);var i=e.apply(t,n);return u.removeChild(s),i}}var c=new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]","g");function h(e){return e.replace(/^d/,"___$&").replace(c,"___")}t.set=l(function(e,n,i){return n=h(n),i===undefined?t.remove(n):(e.setAttribute(n,t.serialize(i)),e.save(r),i)}),t.get=l(function(e,n){return n=h(n),t.deserialize(e.getAttribute(n))}),t.remove=l(function(e,t){t=h(t),e.removeAttribute(t),e.save(r)}),t.clear=l(function(e){var t=e.XMLDocument.documentElement.attributes;e.load(r);for(var n=0,i;i=t[n];n++)e.removeAttribute(i.name);e.save(r)}),t.getAll=function(e){var n={};return t.forEach(function(e,t){n[e]=t}),n},t.forEach=l(function(e,n){var r=e.XMLDocument.documentElement.attributes;for(var i=0,s;s=r[i];++i)n(s.name,t.deserialize(e.getAttribute(s.name)))})}try{var p="__storejs__";t.set(p,p),t.get(p)!=p&&(t.disabled=!0),t.remove(p)}catch(f){t.disabled=!0}t.enabled=!t.disabled,typeof module!="undefined"&&module.exports&&this.module!==module?module.exports=t:typeof define=="function"&&define.amd?define(t):e.store=t})(Function("return this")())
 
@@ -2722,7 +2735,7 @@ module.exports = function(options){
 			if(true){
 				this.fetched = true;
 				var self = this;
-				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["content.html"] = "<div class=\"header topcoat-navigation-bar\">\r\n\t<div class=\"goback\">\r\n\t\t<a><span class=\"topcoat-icon topcoat-icon--back\"></span></a>\r\n\t</div>\r\n\t<div class=\"page-title topcoat-navigation-bar__item center full\">\r\n\t\t<h1 class=\"topcoat-navigation-bar__title\"><span></span></h1>\r\n\t</div>\r\n</div>\r\n<div class=\"page-content topcoat-list__container\">\r\n\t<ul class=\"menu topcoat-list list\">\r\n\t\t<li class=\"topcoat-list__item section\"><a></a></li>\r\n\t</ul>\r\n</div>";returnMe["footer.html"] = "<div class=\"page-footer topcoat-navigation-bar center\">\r\n    <div class=\"topcoat-navigation-bar__item quarter\">\r\n\t\t<a></a>\r\n\t</div>\r\n</div>";returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"post-title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"post-content\">\r\n\r\n\t</div>\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
+				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["content.html"] = "<div class=\"header topcoat-navigation-bar\">\r\n\t<div class=\"goback\">\r\n\t\t<a><span class=\"topcoat-icon topcoat-icon--back\"></span></a>\r\n\t</div>\r\n\t<div class=\"page-title topcoat-navigation-bar__item center full\">\r\n\t\t<h1 class=\"topcoat-navigation-bar__title\"><span></span></h1>\r\n\t</div>\r\n</div>\r\n<div class=\"page-content topcoat-list__container\">\r\n\t<ul class=\"menu topcoat-list list\">\r\n\t\t<li class=\"topcoat-list__item\"><a><span class=\"item-content\"></span><span class=\"action-icon\"></span></a></li>\r\n\t</ul>\r\n</div>";returnMe["footer.html"] = "<div class=\"page-footer topcoat-navigation-bar center\">\r\n    <div class=\"topcoat-navigation-bar__item quarter\">\r\n\t\t<a></a>\r\n\t</div>\r\n</div>";returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"post-title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"post-content\">\r\n\r\n\t</div>\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
 				for(var name in htmls)
 					self.add({id: name, template: htmls[name]});
 				process.nextTick(function(){
@@ -2736,8 +2749,8 @@ module.exports = function(options){
 
 	return new HTMLCollection([], options);
 };
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	digistify = require('digistify'),
@@ -2870,8 +2883,8 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
@@ -2890,8 +2903,9 @@ module.exports = Backbone.Model.extend({
 			digistify(self.id, {}, function(err, data){
 				var contents = data.data;
 				var map = {
+						'h3' :{ class: "topcoat-list__header" },
 						'ul': { class: "topcoat-list list" },
-						'li': { class: "topcoat-list__item" },
+						'li': { class: "topcoat-list__item listitem" }
 					};
 				if(contents.length === 1){
 					var md = marked(contents[0].content);
@@ -2940,8 +2954,8 @@ module.exports = Backbone.Model.extend({
 		}
 	}
 })
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
 (function (process){
 function merge(a, b){
     for(var prop in b){
@@ -2954,8 +2968,8 @@ module.exports = function browser(srcObj){
     merge(browser, srcObj);
 };
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
 (function (process){
 var request = require('request');
 
@@ -3104,8 +3118,8 @@ function merge(a, b){ a = a || {}; for (var x in b){ if(typeof a[x] !== "undefin
 module.exports = exportObj.getGists;
 module.exports.setDefault = exportObj.setDefault;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -4716,8 +4730,8 @@ function bind(fn){
 function isArray(obj){
 	return ~Object.prototype.toString.call(obj).toLowerCase().indexOf("array");
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
 (function (process){
 if(typeof JSON === "undefined"){
 
@@ -6410,8 +6424,8 @@ function regExpEscape (s) {
 
 
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
 module.exports = sigmund
 function sigmund (subject, maxSessions) {
     maxSessions = maxSessions || 10;

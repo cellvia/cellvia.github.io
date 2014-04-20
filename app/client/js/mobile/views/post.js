@@ -52,6 +52,7 @@ module.exports = View.extend({
 
 function slug(input, identifier)
 {
+	if(!input) return
 	if(identifier) input = input.replace(identifier, '') // Trim identifier
     return input
         .replace(/^\s\s*/, '') // Trim start

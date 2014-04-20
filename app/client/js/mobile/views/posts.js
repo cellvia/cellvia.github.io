@@ -5,15 +5,24 @@ module.exports = View.extend({
 	render: function(){
 		if(this.shouldSkipPage()) return
 		if(!this.cached){
-			var rendered = this.html.render("content.html", {
+			var postsMap = this.posts.map(function(post){
+					return {'a': {
+								href: "/article/" + post.get("type") + "/" + post.get("slug"), 
+								class: "post listitem" 
+							},
+							'a span.item-content': post.get("title"),
+							'a span.action-icon': { class: "action-icon topcoat-icon--next" }
+						}
+				});
+			var map = {
 				'.goback a': { href: this.type ? "/" : "/tags" },
-				'.page-title span': this.type || this.tag,
-				'.page-content .menu li': this.posts.map(function(post){
-					return { 'a': {href: "/article/" + post.get("type") + "/" + post.get("slug"), 
-									_text: post.get("title") }
-							}
-				})
-			});
+				'.page-title span': this.type || this.tag
+			}
+			if(this.posts.length)
+				map['.page-content .menu li'] = postsMap;
+			else
+				map['.page-content .menu li a'] = {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"};
+			var rendered = this.html.render("content.html", map);
 			this.$el.html( rendered );
 			this.cached = true;
 		}
@@ -76,6 +85,7 @@ module.exports = View.extend({
 
 function slug(input, identifier)
 {
+	if(!input) return
 	if(identifier) input = input.replace(identifier, '') // Trim identifier
     return input
         .replace(/^\s\s*/, '') // Trim start

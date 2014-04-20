@@ -2252,7 +2252,7 @@ Backbone.sections.forEach(function(type){
 Backbone.collections.html = Backbone.collections.Html();
 
 //mobile footer icons ([[type, link]])
-Backbone.footers = [["email","mailto:brandon.selway@gmail.com"],["linkedin","http://www.linkedin.com/pub/brandon-selway/55/100/395"],["github","http://github.com/cellvia"],["twitter","http://twitter.com/djchairboy"]];
+Backbone.footers = [["email","mailto:brandon.selway@gmail.com"],["linkedin","https://www.linkedin.com/in/brandonselway"],["github","http://github.com/cellvia"],["twitter","http://twitter.com/djchairboy"]];
 
 //setup pageslider
 Backbone.transition = function(container, opts){
@@ -2411,6 +2411,7 @@ module.exports = View.extend({
 
 function slug(input, identifier)
 {
+	if(!input) return
 	if(identifier) input = input.replace(identifier, '') // Trim identifier
     return input
         .replace(/^\s\s*/, '') // Trim start
@@ -2428,15 +2429,24 @@ module.exports = View.extend({
 	render: function(){
 		if(this.shouldSkipPage()) return
 		if(!this.cached){
-			var rendered = this.html.render("content.html", {
+			var postsMap = this.posts.map(function(post){
+					return {'a': {
+								href: "/article/" + post.get("type") + "/" + post.get("slug"), 
+								class: "post listitem" 
+							},
+							'a span.item-content': post.get("title"),
+							'a span.action-icon': { class: "action-icon topcoat-icon--next" }
+						}
+				});
+			var map = {
 				'.goback a': { href: this.type ? "/" : "/tags" },
-				'.page-title span': this.type || this.tag,
-				'.page-content .menu li': this.posts.map(function(post){
-					return { 'a': {href: "/article/" + post.get("type") + "/" + post.get("slug"), 
-									_text: post.get("title") }
-							}
-				})
-			});
+				'.page-title span': this.type || this.tag
+			}
+			if(this.posts.length)
+				map['.page-content .menu li'] = postsMap;
+			else
+				map['.page-content .menu li a'] = {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"};
+			var rendered = this.html.render("content.html", map);
 			this.$el.html( rendered );
 			this.cached = true;
 		}
@@ -2499,6 +2509,7 @@ module.exports = View.extend({
 
 function slug(input, identifier)
 {
+	if(!input) return
 	if(identifier) input = input.replace(identifier, '') // Trim identifier
     return input
         .replace(/^\s\s*/, '') // Trim start
@@ -2518,8 +2529,10 @@ module.exports = View.extend({
 		var rendered = this.html.render("content.html", { 
 			'.goback': { _html: "" },
 			'.page-title span': "Brandon Selway",
-			'.menu li.section': Backbone.sections.map(function(section){
-				return { 'a': { href: '/articles/'+section, _text: section } }
+			'.menu li': Backbone.sections.map(function(section){
+				return { 'a': { href: '/articles/'+section, class: "section listitem" },
+						 'a span.item-content': section
+				}
 			})
 		});
 		Backbone.transition( this.$el.html( rendered ), {reset: true} );
@@ -2722,7 +2735,7 @@ module.exports = function(options){
 			if(true){
 				this.fetched = true;
 				var self = this;
-				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["content.html"] = "<div class=\"header topcoat-navigation-bar\">\r\n\t<div class=\"goback\">\r\n\t\t<a><span class=\"topcoat-icon topcoat-icon--back\"></span></a>\r\n\t</div>\r\n\t<div class=\"page-title topcoat-navigation-bar__item center full\">\r\n\t\t<h1 class=\"topcoat-navigation-bar__title\"><span></span></h1>\r\n\t</div>\r\n</div>\r\n<div class=\"page-content topcoat-list__container\">\r\n\t<ul class=\"menu topcoat-list list\">\r\n\t\t<li class=\"topcoat-list__item section\"><a></a></li>\r\n\t</ul>\r\n</div>";returnMe["footer.html"] = "<div class=\"page-footer topcoat-navigation-bar center\">\r\n    <div class=\"topcoat-navigation-bar__item quarter\">\r\n\t\t<a></a>\r\n\t</div>\r\n</div>";returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"post-title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"post-content\">\r\n\r\n\t</div>\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
+				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["content.html"] = "<div class=\"header topcoat-navigation-bar\">\r\n\t<div class=\"goback\">\r\n\t\t<a><span class=\"topcoat-icon topcoat-icon--back\"></span></a>\r\n\t</div>\r\n\t<div class=\"page-title topcoat-navigation-bar__item center full\">\r\n\t\t<h1 class=\"topcoat-navigation-bar__title\"><span></span></h1>\r\n\t</div>\r\n</div>\r\n<div class=\"page-content topcoat-list__container\">\r\n\t<ul class=\"menu topcoat-list list\">\r\n\t\t<li class=\"topcoat-list__item\"><a><span class=\"item-content\"></span><span class=\"action-icon\"></span></a></li>\r\n\t</ul>\r\n</div>";returnMe["footer.html"] = "<div class=\"page-footer topcoat-navigation-bar center\">\r\n    <div class=\"topcoat-navigation-bar__item quarter\">\r\n\t\t<a></a>\r\n\t</div>\r\n</div>";returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"post-title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"post-content\">\r\n\r\n\t</div>\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
 				for(var name in htmls)
 					self.add({id: name, template: htmls[name]});
 				process.nextTick(function(){
@@ -2890,8 +2903,9 @@ module.exports = Backbone.Model.extend({
 			digistify(self.id, {}, function(err, data){
 				var contents = data.data;
 				var map = {
+						'h3' :{ class: "topcoat-list__header" },
 						'ul': { class: "topcoat-list list" },
-						'li': { class: "topcoat-list__item" },
+						'li': { class: "topcoat-list__item listitem" }
 					};
 				if(contents.length === 1){
 					var md = marked(contents[0].content);

@@ -73,6 +73,14 @@ body{
 	z-index: 100;
 }
 
+.action-icon {
+	position: absolute;
+	width: 1rem;
+	height: 1rem;
+	right: 1rem;
+	display: inline-block;
+}
+
 .topcoat-icon--back {
 	background: url("../images/back.svg") no-repeat;
 	-webkit-background-size: cover;
@@ -145,19 +153,20 @@ div.post .page-title span{
 
 
 .topcoat-list__item{
+	padding: 0;
+}
+
+.listitem{
 	position: relative;
-	padding: 0 !important;
-	clear: both;
-}
-
-.list a{
 	display: block;
-	padding: 1.25rem 0 1.25rem 0;
+	clear: both;
+	text-align: left;
+	padding: 1.25rem;
 }
 
-.posts .list a, .post .list a {
-	padding-left: 1.25rem;
-	text-align: left;
+a.section.listitem{
+	text-align: center;
+	padding: 1.25rem 0 1.25rem 0;
 }
 
 .topcoat-list{
@@ -199,4 +208,35 @@ div.post .page-title span{
 
 .page-content p:last-child{
 	padding: 0 1.5rem;
+}
+
+
+span.contact-name{
+	float: left;
+	width: 100%;
+	font-weight: bold;
+}
+
+span.contact-contact{
+	float:right;
+}
+
+.topcoat-list__header{
+	border-top:0;
+}
+
+.article-experience .topcoat-list{
+	border-bottom: 0;
+}
+
+.topcoat-list:last-child{
+	border-bottom: 1px solid #eff1f1;
+}
+
+.topcoat-list__item:last-child {
+	border-bottom: 0;
+}
+
+div.post.section-rsum a{
+	text-decoration: underline !important;
 }

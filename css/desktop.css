@@ -5,6 +5,9 @@ a{
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
+.center{
+	text-align: center !important;
+}
 
 #page {
 	position: relative;

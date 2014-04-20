@@ -7,8 +7,10 @@ module.exports = View.extend({
 		var rendered = this.html.render("content.html", { 
 			'.goback': { _html: "" },
 			'.page-title span': "Brandon Selway",
-			'.menu li.section': Backbone.sections.map(function(section){
-				return { 'a': { href: '/articles/'+section, _text: section } }
+			'.menu li': Backbone.sections.map(function(section){
+				return { 'a': { href: '/articles/'+section, class: "section listitem" },
+						 'a span.item-content': section
+				}
 			})
 		});
 		Backbone.transition( this.$el.html( rendered ), {reset: true} );

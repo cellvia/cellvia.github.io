@@ -15,8 +15,9 @@ module.exports = Backbone.Model.extend({
 			digistify(self.id, {}, function(err, data){
 				var contents = data.data;
 				var map = {
+						'h3' :{ class: "topcoat-list__header" },
 						'ul': { class: "topcoat-list list" },
-						'li': { class: "topcoat-list__item" },
+						'li': { class: "topcoat-list__item listitem" }
 					};
 				if(contents.length === 1){
 					var md = marked(contents[0].content);
