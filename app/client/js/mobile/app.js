@@ -28,7 +28,7 @@ Backbone.footers = conf.footers;
 //setup pageslider
 Backbone.transition = function(container, opts){
 	var mobileTransition = require(conf.mobileTransitionModule);
-	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io")} );
+	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io") || !!~window.location.href.indexOf("brandonselway.com")} );
 	Backbone.transition._isset = true;
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
 }
@@ -45,5 +45,5 @@ new LayoutView();
 
 //start app!
 Backbone.history.start({
-  pushState: !!!~window.location.href.indexOf("github.io") && Modernizr.history
+  pushState: (!!!~window.location.href.indexOf("github.io") || !!!~window.location.href.indexOf("brandonselway.com")) && Modernizr.history
 });

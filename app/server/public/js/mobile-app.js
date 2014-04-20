@@ -2257,7 +2257,7 @@ Backbone.footers = [["email","mailto:brandon.selway@gmail.com"],["linkedin","htt
 //setup pageslider
 Backbone.transition = function(container, opts){
 	var mobileTransition = require("pageslide");
-	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io")} );
+	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io") || !!~window.location.href.indexOf("brandonselway.com")} );
 	Backbone.transition._isset = true;
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
 }
@@ -2274,7 +2274,7 @@ new LayoutView();
 
 //start app!
 Backbone.history.start({
-  pushState: !!!~window.location.href.indexOf("github.io") && Modernizr.history
+  pushState: (!!!~window.location.href.indexOf("github.io") || !!!~window.location.href.indexOf("brandonselway.com")) && Modernizr.history
 });
 },{"../shared/Router":18,"./views/layout":14,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\mobile\\routes\\error.js":11,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\mobile\\routes\\posts.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\Html.js":23,"C:\\node\\work\\personal\\cellvia.github.io\\app\\client\\js\\shared\\collections\\Posts.js":24,"confify":26,"fastclick":29,"foldify":30,"insert-css":35,"pageslide":37}],11:[function(require,module,exports){
 var ErrorView = require('../views/error');
