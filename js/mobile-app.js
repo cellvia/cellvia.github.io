@@ -2559,10 +2559,10 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: "sections",
 	viewEvents: {
-		"click .sections .page-title": "resume" 
+		"click h1.topcoat-navigation-bar__title span": "resume" 
 	},
 	resume: function(){
-		window.open("/BrandonSelway_resume.pdf");
+		window.open("/images/BrandonSelway_resume.pdf");
 	},
 	render: function(){
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
