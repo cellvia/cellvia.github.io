@@ -2379,7 +2379,6 @@ module.exports = View.extend({
 		if(this.post.fetched) return Backbone.transition( this.render().$el, {level:2} ); 
 
 		this.prerendering = true;
-		//add some kind of spinner?
 		var init = Backbone.transition( this.$el, {level:2} );
 		function signal(){ 
 			this.prerendering = false;
@@ -2469,14 +2468,15 @@ module.exports = View.extend({
 							'a span.action-icon': { class: "action-icon topcoat-icon--next" }
 						}
 				});
+			var menu = this.html.render( "list.html", {
+				'li': this.posts.length ? postsMap : {},
+				'li a': !this.posts.length ? {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"} : {}
+			});
 			var map = {
 				'.goback a': { href: this.type ? "/" : "/tags" },
-				'.page-title span': this.type || this.tag
+				'.page-title span': this.type || this.tag,
+				'.page-content': { _html: menu }
 			}
-			if(this.posts.length)
-				map['.page-content .menu li'] = postsMap;
-			else
-				map['.page-content .menu li a'] = {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"};
 			var rendered = this.html.render("content.html", map);
 			this.$el.html( rendered );
 			this.rendered = true;
@@ -2566,14 +2566,17 @@ module.exports = View.extend({
 	},
 	render: function(){
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
-		var rendered = this.html.render("content.html", { 
-			'.goback': { _html: "" },
-			'.page-title span': "Brandon Selway",
-			'.menu li': Backbone.sections.map(function(section){
+		var menu = this.html.render("list.html", {
+			'li.topcoat-list__item': Backbone.sections.map(function(section){
 				return { 'a': { href: '/articles/'+section, class: "section listitem" },
 						 'a span.item-content': section
 				}
 			})
+		});		
+		var rendered = this.html.render("content.html", { 
+			'.goback': { _html: "" },
+			'.page-title span': "Brandon Selway",
+			'.page-content': { _html: menu }
 		});
 		Backbone.transition( this.$el.html( rendered ), {level: 0} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
@@ -2805,7 +2808,7 @@ module.exports = function(options){
 			if(true){
 				this.fetched = true;
 				var self = this;
-				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["content.html"] = "<div class=\"header topcoat-navigation-bar\">\r\n\t<div class=\"goback\">\r\n\t\t<a><span class=\"topcoat-icon topcoat-icon--back\"></span></a>\r\n\t</div>\r\n\t<div class=\"page-title topcoat-navigation-bar__item center full\">\r\n\t\t<h1 class=\"topcoat-navigation-bar__title\"><span></span></h1>\r\n\t</div>\r\n</div>\r\n<div class=\"page-content topcoat-list__container\">\r\n\t<ul class=\"menu topcoat-list list\">\r\n\t\t<li class=\"topcoat-list__item\"><a><span class=\"item-content\"></span><span class=\"action-icon\"></span></a></li>\r\n\t</ul>\r\n</div>";returnMe["footer.html"] = "<div class=\"page-footer topcoat-navigation-bar center\">\r\n    <div class=\"topcoat-navigation-bar__item quarter\">\r\n\t\t<a></a>\r\n\t</div>\r\n</div>";returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"post-title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"post-content\">\r\n\r\n\t</div>\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
+				var htmls = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["content.html"] = "<div class=\"header topcoat-navigation-bar\">\r\n\t<div class=\"goback\">\r\n\t\t<a><span class=\"topcoat-icon topcoat-icon--back\"></span></a>\r\n\t</div>\r\n\t<div class=\"page-title topcoat-navigation-bar__item center full\">\r\n\t\t<h1 class=\"topcoat-navigation-bar__title\"><span></span></h1>\r\n\t</div>\r\n</div>\r\n<div class=\"page-content topcoat-list__container\">\r\n\t<span class=\"center spinner\"><img src=\"/images/spinner.gif\" /></span>\r\n</div>";returnMe["footer.html"] = "<div class=\"page-footer topcoat-navigation-bar center\">\r\n    <div class=\"topcoat-navigation-bar__item quarter\">\r\n\t\t<a></a>\r\n\t</div>\r\n</div>";returnMe["list.html"] = "<ul class=\"menu topcoat-list list\">\r\n\t<li class=\"topcoat-list__item\"><a><span class=\"item-content\"></span><span class=\"action-icon\"></span></a></li>\r\n</ul>";returnMe["post.html"] = "<div class=\"post\">\r\n\t<a class=\"link\"><h1 class=\"post-title\"></h1><span class=\"created\"></span></a>\r\n\t<div class=\"post-content\">\r\n\t</div>\r\n</div>";for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
 				for(var name in htmls)
 					self.add({id: name, template: htmls[name]});
 				process.nextTick(function(){

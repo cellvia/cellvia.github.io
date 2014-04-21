@@ -10,14 +10,17 @@ module.exports = View.extend({
 	},
 	render: function(){
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
-		var rendered = this.html.render("content.html", { 
-			'.goback': { _html: "" },
-			'.page-title span': "Brandon Selway",
-			'.menu li': Backbone.sections.map(function(section){
+		var menu = this.html.render("list.html", {
+			'li.topcoat-list__item': Backbone.sections.map(function(section){
 				return { 'a': { href: '/articles/'+section, class: "section listitem" },
 						 'a span.item-content': section
 				}
 			})
+		});		
+		var rendered = this.html.render("content.html", { 
+			'.goback': { _html: "" },
+			'.page-title span': "Brandon Selway",
+			'.page-content': { _html: menu }
 		});
 		Backbone.transition( this.$el.html( rendered ), {level: 0} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );

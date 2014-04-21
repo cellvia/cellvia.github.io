@@ -12,3 +12,9 @@ a{
 .sections .page-title{
 	cursor: pointer;
 }
+
+.spinner img{
+	margin-top: 9rem;
+	height: 8rem;
+	margin-left: .5rem;
+}

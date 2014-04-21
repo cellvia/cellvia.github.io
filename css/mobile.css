@@ -13,6 +13,12 @@ a{
 	cursor: pointer;
 }
 
+.spinner img{
+	margin-top: 9rem;
+	height: 8rem;
+	margin-left: .5rem;
+}
+
 body{
 	overflow:hidden;
 	width: 100%;

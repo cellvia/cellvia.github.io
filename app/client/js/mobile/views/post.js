@@ -15,7 +15,6 @@ module.exports = View.extend({
 		if(this.post.fetched) return Backbone.transition( this.render().$el, {level:2} ); 
 
 		this.prerendering = true;
-		//add some kind of spinner?
 		var init = Backbone.transition( this.$el, {level:2} );
 		function signal(){ 
 			this.prerendering = false;

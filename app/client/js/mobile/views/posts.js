@@ -14,14 +14,15 @@ module.exports = View.extend({
 							'a span.action-icon': { class: "action-icon topcoat-icon--next" }
 						}
 				});
+			var menu = this.html.render( "list.html", {
+				'li': this.posts.length ? postsMap : {},
+				'li a': !this.posts.length ? {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"} : {}
+			});
 			var map = {
 				'.goback a': { href: this.type ? "/" : "/tags" },
-				'.page-title span': this.type || this.tag
+				'.page-title span': this.type || this.tag,
+				'.page-content': { _html: menu }
 			}
-			if(this.posts.length)
-				map['.page-content .menu li'] = postsMap;
-			else
-				map['.page-content .menu li a'] = {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"};
 			var rendered = this.html.render("content.html", map);
 			this.$el.html( rendered );
 			this.rendered = true;
