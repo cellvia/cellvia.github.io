@@ -3,6 +3,7 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'post',
 	prerender: function(){
+		if(this.prerendered) return		
 		if(!this.rendered){
 			var rendered = this.html.render("content.html", { 
 				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.type },
@@ -10,27 +11,49 @@ module.exports = View.extend({
 			});
 			this.$el.html( rendered );
 		}
-		Backbone.transition( this.$el, {level:2} );
-    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
+		this.prerendered = true;
+		if(this.post.fetched) return Backbone.transition( this.render().$el, {level:2} ); 
+
+		this.prerendering = true;
+		//add some kind of spinner?
+		var init = Backbone.transition( this.$el, {level:2} );
+		function signal(){ 
+			this.prerendering = false;
+			this.trigger("prerendered");
+		};
+		if(init)
+			signal.call(this);
+		else
+			this.$el.one( "webkitTransitionEnd", signal.bind(this) );
 	},
 	render: function(){
-		if(this.rendered) return
+		if(!this.prerendered) return this.prerender();
+		if(this.rendered) return;
 		var rendered = this.html.render("post.html", {
 				'.created': this.post.get("created"),
 				'.post-content': { _html: this.post.get("content") }
 		});
-		this.$el.find('.page-content').html( rendered );
-		this.rendered = true;
+		function renderContent(){
+			this.$el.find('.page-content').html( rendered );
+			this.rendered = true;			
+	    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
+		}
+		if(this.prerendering)
+			this.once( "prerendered", renderContent.bind(this) );
+		else
+			renderContent.call(this);
+		return this;
 	},
 	fetchPost: function(){
 		if(this.fetched || !this.posts.fetched || !this.html.fetched) return
 		this.post = this.posts.findWhere({"slug": this.slug});
 		if(!this.post) return Backbone.trigger("go", {href: "/403", message: "Post does not exist!"});
-		this.prerender();
 	
 		this.listenToOnce( this.post, "fetched", this.render );
 		this.post.fetch();
 		this.fetched = true;
+
+		process.nextTick(this.prerender.bind(this));
 	},
 	initialize: function(options){
 		if(options.cached) return Backbone.transition( this.$el, {level:2} );

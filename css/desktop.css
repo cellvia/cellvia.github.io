@@ -9,6 +9,10 @@ a{
 	text-align: center !important;
 }
 
+.sections .page-title{
+	cursor: pointer;
+}
+
 #page {
 	position: relative;
 }

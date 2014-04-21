@@ -8,3 +8,7 @@ a{
 .center{
 	text-align: center !important;
 }
+
+.sections .page-title{
+	cursor: pointer;
+}

@@ -31,6 +31,7 @@ Backbone.transition = function(container, opts){
 	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io") || !!~window.location.href.indexOf("brandonselway.com")} );
 	Backbone.transition._isset = true;
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
+	return "init";
 }
 
 Backbone.iScroll = function(container){

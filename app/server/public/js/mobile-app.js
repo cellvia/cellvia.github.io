@@ -1628,8 +1628,8 @@ var substr = 'ab'.substr(-1) === 'b'
     }
 ;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
@@ -2225,8 +2225,8 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
 var router = require('../shared/Router'),
     foldify = require('foldify'),
 	insertCss = require("insert-css"),
@@ -2260,6 +2260,7 @@ Backbone.transition = function(container, opts){
 	Backbone.transition = mobileTransition( $("body"), {useHash: !!~window.location.href.indexOf("github.io") || !!~window.location.href.indexOf("brandonselway.com")} );
 	Backbone.transition._isset = true;
 	Backbone.transition.apply(Backbone.transition, [].slice.apply(arguments));
+	return "init";
 }
 
 Backbone.iScroll = function(container){
@@ -2360,11 +2361,13 @@ module.exports = View.extend({
 });
 
 },{"../../shared/View":19}],15:[function(require,module,exports){
+(function (process){
 var View = require('../../shared/View');
 
 module.exports = View.extend({
 	className: 'post',
 	prerender: function(){
+		if(this.prerendered) return		
 		if(!this.rendered){
 			var rendered = this.html.render("content.html", { 
 				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.type },
@@ -2372,27 +2375,49 @@ module.exports = View.extend({
 			});
 			this.$el.html( rendered );
 		}
-		Backbone.transition( this.$el, {level:2} );
-    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
+		this.prerendered = true;
+		if(this.post.fetched) return Backbone.transition( this.render().$el, {level:2} ); 
+
+		this.prerendering = true;
+		//add some kind of spinner?
+		var init = Backbone.transition( this.$el, {level:2} );
+		function signal(){ 
+			this.prerendering = false;
+			this.trigger("prerendered");
+		};
+		if(init)
+			signal.call(this);
+		else
+			this.$el.one( "webkitTransitionEnd", signal.bind(this) );
 	},
 	render: function(){
-		if(this.rendered) return
+		if(!this.prerendered) return this.prerender();
+		if(this.rendered) return;
 		var rendered = this.html.render("post.html", {
 				'.created': this.post.get("created"),
 				'.post-content': { _html: this.post.get("content") }
 		});
-		this.$el.find('.page-content').html( rendered );
-		this.rendered = true;
+		function renderContent(){
+			this.$el.find('.page-content').html( rendered );
+			this.rendered = true;			
+	    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
+		}
+		if(this.prerendering)
+			this.once( "prerendered", renderContent.bind(this) );
+		else
+			renderContent.call(this);
+		return this;
 	},
 	fetchPost: function(){
 		if(this.fetched || !this.posts.fetched || !this.html.fetched) return
 		this.post = this.posts.findWhere({"slug": this.slug});
 		if(!this.post) return Backbone.trigger("go", {href: "/403", message: "Post does not exist!"});
-		this.prerender();
 	
 		this.listenToOnce( this.post, "fetched", this.render );
 		this.post.fetch();
 		this.fetched = true;
+
+		process.nextTick(this.prerender.bind(this));
 	},
 	initialize: function(options){
 		if(options.cached) return Backbone.transition( this.$el, {level:2} );
@@ -2425,7 +2450,8 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-},{"../../shared/View":19}],16:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],16:[function(require,module,exports){
 (function (process){
 var View = require('../../shared/View');
 
@@ -2526,12 +2552,18 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
 var View = require('../../shared/View');
 
 module.exports = View.extend({
 	className: "sections",
+	viewEvents: {
+		"click h1.topcoat-navigation-bar__title span": "resume" 
+	},
+	resume: function(){
+		window.open("/images/BrandonSelway_resume.pdf");
+	},
 	render: function(){
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
 		var rendered = this.html.render("content.html", { 
@@ -2581,6 +2613,8 @@ module.exports = Backbone.View.extend(ViewCore);
 },{"./ViewCore":20}],20:[function(require,module,exports){
 (function (process){
 var viewCache = [];
+window.viewCache = viewCache
+
 var conf = require('confify');
 var MAXCACHE = 8;
 
@@ -2618,14 +2652,15 @@ module.exports = {
         if(el && el.length)
             el.replaceWith("<div id="+el.attr('id')+">");        
       });
+      if(options.replace !== true || Backbone.isMobile) return
       delete this._views[group];
     },
     manageCache: function(view){
-      viewCache.push(view);
-      if(viewCache.length > MAXCACHE){
-        var removeView = viewCache.shift().destroy();
+      if(viewCache.length+1 > MAXCACHE){
+        var removeView = viewCache.pop().destroy();
         removeView = null;
       }
+      viewCache.push(view);
     },
     exists: function(type){
       return this._views && this._views[type] && this._views[type].length; 
@@ -2633,23 +2668,20 @@ module.exports = {
     view: function(View, options){      
       options = options || {};
       options.group = options.group || "global";
+      if( options.resetAll !== false )
+        this.destroy(null, options);
       if(!this._views) this._views = {};
-      if(!this._views[options.group]){
-        if( options.resetAll !== false )
-          this.destroy(null, options);
+      if(!this._views[options.group])
         this._views[options.group] = [];
-      }else{
-        if( options.resetAll !== false )
-          this.destroy(null, options);
-        else if( options.reset !== false )
-          this.destroy(options.group, options);        
-      }
-      this._views[options.group] = [];
+      else if( options.reset !== false )
+        this.destroy(options.group, options);        
+      
       process.nextTick(function(){          
         var newview = new View(options);
         newview.parent = this;
         newview.group = options.group;
         newview.label = options.label;
+        newview.hits = 1;
         this._views[options.group].push(newview);
         this.manageCache(newview);
       }.bind(this));
@@ -2673,14 +2705,21 @@ module.exports = {
         Backbone.trigger('go', { href: '/'+resp.status });
     },
     reinitialize: function(){
+      this.hits++;
+      process.nextTick(function(){
+        viewCache.sort(function(prev, next){
+          if(next.hits === prev.hits) return 0;
+          return next.hits >= prev.hits ? 1 : -1;
+        });
+      });
       this.delegateEvents();
       var options = this.options || {};
       options.cached = true;
       this.initialize(options);
     }
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26}],21:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26}],21:[function(require,module,exports){
 (function (process){
 var store = require('./store');
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
@@ -2725,8 +2764,8 @@ function newstore(options){
 	}
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
 /* Copyright (c) 2010-2013 Marcus Westin */
 (function(e){function o(){try{return r in e&&e[r]}catch(t){return!1}}var t={},n=e.document,r="localStorage",i="script",s;t.disabled=!1,t.set=function(e,t){},t.get=function(e){},t.remove=function(e){},t.clear=function(){},t.transact=function(e,n,r){var i=t.get(e);r==null&&(r=n,n=null),typeof i=="undefined"&&(i=n||{}),r(i),t.set(e,i)},t.getAll=function(){},t.forEach=function(){},t.serialize=function(e){return JSON.stringify(e)},t.deserialize=function(e){if(typeof e!="string")return undefined;try{return JSON.parse(e)}catch(t){return e||undefined}};if(o())s=e[r],t.set=function(e,n){return n===undefined?t.remove(e):(s.setItem(e,t.serialize(n)),n)},t.get=function(e){return t.deserialize(s.getItem(e))},t.remove=function(e){s.removeItem(e)},t.clear=function(){s.clear()},t.getAll=function(){var e={};return t.forEach(function(t,n){e[t]=n}),e},t.forEach=function(e){for(var n=0;n<s.length;n++){var r=s.key(n);e(r,t.get(r))}};else if(n.documentElement.addBehavior){var u,a;try{a=new ActiveXObject("htmlfile"),a.open(),a.write("<"+i+">document.w=window</"+i+'><iframe src="/favicon.ico"></iframe>'),a.close(),u=a.w.frames[0].document,s=u.createElement("div")}catch(f){s=n.createElement("div"),u=n.body}function l(e){return function(){var n=Array.prototype.slice.call(arguments,0);n.unshift(s),u.appendChild(s),s.addBehavior("#default#userData"),s.load(r);var i=e.apply(t,n);return u.removeChild(s),i}}var c=new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]","g");function h(e){return e.replace(/^d/,"___$&").replace(c,"___")}t.set=l(function(e,n,i){return n=h(n),i===undefined?t.remove(n):(e.setAttribute(n,t.serialize(i)),e.save(r),i)}),t.get=l(function(e,n){return n=h(n),t.deserialize(e.getAttribute(n))}),t.remove=l(function(e,t){t=h(t),e.removeAttribute(t),e.save(r)}),t.clear=l(function(e){var t=e.XMLDocument.documentElement.attributes;e.load(r);for(var n=0,i;i=t[n];n++)e.removeAttribute(i.name);e.save(r)}),t.getAll=function(e){var n={};return t.forEach(function(e,t){n[e]=t}),n},t.forEach=l(function(e,n){var r=e.XMLDocument.documentElement.attributes;for(var i=0,s;s=r[i];++i)n(s.name,t.deserialize(e.getAttribute(s.name)))})}try{var p="__storejs__";t.set(p,p),t.get(p)!=p&&(t.disabled=!0),t.remove(p)}catch(f){t.disabled=!0}t.enabled=!t.disabled,typeof module!="undefined"&&module.exports&&this.module!==module?module.exports=t:typeof define=="function"&&define.amd?define(t):e.store=t})(Function("return this")())
 
@@ -2780,8 +2819,8 @@ module.exports = function(options){
 
 	return new HTMLCollection([], options);
 };
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	digistify = require('digistify'),
@@ -2914,8 +2953,8 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
@@ -2985,8 +3024,8 @@ module.exports = Backbone.Model.extend({
 		}
 	}
 })
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
 (function (process){
 function merge(a, b){
     for(var prop in b){
@@ -2999,8 +3038,8 @@ module.exports = function browser(srcObj){
     merge(browser, srcObj);
 };
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
 (function (process){
 var request = require('request');
 
@@ -3149,8 +3188,8 @@ function merge(a, b){ a = a || {}; for (var x in b){ if(typeof a[x] !== "undefin
 module.exports = exportObj.getGists;
 module.exports.setDefault = exportObj.setDefault;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -4761,8 +4800,8 @@ function bind(fn){
 function isArray(obj){
 	return ~Object.prototype.toString.call(obj).toLowerCase().indexOf("array");
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
 (function (process){
 if(typeof JSON === "undefined"){
 
@@ -6455,8 +6494,8 @@ function regExpEscape (s) {
 
 
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
 module.exports = sigmund
 function sigmund (subject, maxSessions) {
     maxSessions = maxSessions || 10;
@@ -8009,6 +8048,7 @@ function PageSlide(container, options) {
     var container = container,
         isJ = container instanceof jQuery,
         currentPage,
+        // history = [],
         stateHistory = [],
         lastLevel,
         allowPush = !options.useHash && testPushstate();
@@ -8016,19 +8056,20 @@ function PageSlide(container, options) {
     // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
     this.slidePage = function(page, opts) {
         opts = opts || {};
+        var state = allowPush ? window.location.pathname : window.location.hash;
 
         if( opts.hasOwnProperty('level') ){
             var level = +opts.level;
             if(typeof lastLevel === "undefined")
-                this.slidePageFrom(page);
+                this.slidePageFrom(page, undefined, state);
             else
-                this.slidePageFrom(page, level >= lastLevel ? 'right' : 'left' );
+                this.slidePageFrom(page, level >= lastLevel ? 'right' : 'left', state );
             lastLevel = level;
+            // if(!~history.indexOf(state)) history.push(state);
             return;
         }
 
-        var l = stateHistory.length,
-            state = allowPush ? window.location.pathname : window.location.hash;
+        var l = stateHistory.length;
 
         if(opts.reset){
             stateHistory = [state];
@@ -8049,13 +8090,15 @@ function PageSlide(container, options) {
     };
 
     // Use this function directly if you want to control the sliding direction outside PageSlider
-    this.slidePageFrom = function(page, from) {
-
-        container[isJ ? "append" : "appendChild"](page);
+    this.slidePageFrom = function(page, from, state) {
+        // var hasThisPage = ~history.indexOf(state);
+        // if( !hasThisPage || !currentPage)
+            container[isJ ? "append" : "appendChild"](page);
 
         if (!currentPage || !from) {
             if(isJ){
                 page.removeClass("left right transition").addClass("page center");            
+                // page.attr("class", "page center");            
             }else{
                 page.classList.remove("left", "right", "transition");
                 page.classList.add("page", "center");            
@@ -8067,7 +8110,9 @@ function PageSlide(container, options) {
         // Position the page at the starting position of the animation
         var notFrom = from === "left" ? "right" : "left";
         if(isJ){
-                page.removeClass(notFrom + " center transition").addClass("page " + from);
+            // if(hasThisPage) page.show();
+            page.removeClass(notFrom + " center transition").addClass("page " + from);
+            // page.attr("class", "page " + from);
         }else{
             page.classList.remove("center", notFrom, "transition");
             page.classList.add("page", from);
@@ -8075,7 +8120,8 @@ function PageSlide(container, options) {
 
         currentPage.one('webkitTransitionEnd', function(e) {
             if(isJ){
-                $(e.target).remove();            
+                // $(e.target).hide();
+                $(e.target).remove();
             }else{
                 e.target.parentNode.removeChild(e.target);
             }
@@ -8091,6 +8137,8 @@ function PageSlide(container, options) {
             currentPage
                 .removeClass("center " + (from === "left" ? "left" : "right"))
                 .addClass("page transition " + (from === "left" ? "right" : "left"));
+            // page.attr("class", "page transition center");
+            // currentPage.attr("class", "page transition " + (from === "left" ? "right" : "left"));
         }else{
             page.classList.remove("right", "left");
             page.classList.add("page", "transition", "center");

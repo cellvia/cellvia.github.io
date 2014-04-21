@@ -2,6 +2,12 @@ var View = require('../../shared/View');
 
 module.exports = View.extend({
 	className: "sections",
+	viewEvents: {
+		"click h1.topcoat-navigation-bar__title span": "resume" 
+	},
+	resume: function(){
+		window.open("/images/BrandonSelway_resume.pdf");
+	},
 	render: function(){
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
 		var rendered = this.html.render("content.html", { 
