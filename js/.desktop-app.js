@@ -1168,6 +1168,8 @@ module.exports = Backbone.View.extend(ViewCore);
 },{"./ViewCore":16}],16:[function(require,module,exports){
 (function (process){
 var viewCache = [];
+window.viewCache = viewCache
+
 var conf = require('confify');
 var MAXCACHE = 8;
 
@@ -1205,14 +1207,15 @@ module.exports = {
         if(el && el.length)
             el.replaceWith("<div id="+el.attr('id')+">");        
       });
+      if(options.replace !== true || Backbone.isMobile) return
       delete this._views[group];
     },
     manageCache: function(view){
-      viewCache.push(view);
-      if(viewCache.length > MAXCACHE){
-        var removeView = viewCache.shift().destroy();
+      if(viewCache.length+1 > MAXCACHE){
+        var removeView = viewCache.pop().destroy();
         removeView = null;
       }
+      viewCache.push(view);
     },
     exists: function(type){
       return this._views && this._views[type] && this._views[type].length; 
@@ -1220,23 +1223,20 @@ module.exports = {
     view: function(View, options){      
       options = options || {};
       options.group = options.group || "global";
+      if( options.resetAll !== false )
+        this.destroy(null, options);
       if(!this._views) this._views = {};
-      if(!this._views[options.group]){
-        if( options.resetAll !== false )
-          this.destroy(null, options);
+      if(!this._views[options.group])
         this._views[options.group] = [];
-      }else{
-        if( options.resetAll !== false )
-          this.destroy(null, options);
-        else if( options.reset !== false )
-          this.destroy(options.group, options);        
-      }
-      this._views[options.group] = [];
+      else if( options.reset !== false )
+        this.destroy(options.group, options);        
+      
       process.nextTick(function(){          
         var newview = new View(options);
         newview.parent = this;
         newview.group = options.group;
         newview.label = options.label;
+        newview.hits = 1;
         this._views[options.group].push(newview);
         this.manageCache(newview);
       }.bind(this));
@@ -1260,6 +1260,13 @@ module.exports = {
         Backbone.trigger('go', { href: '/'+resp.status });
     },
     reinitialize: function(){
+      this.hits++;
+      process.nextTick(function(){
+        viewCache.sort(function(prev, next){
+          if(next.hits === prev.hits) return 0;
+          return next.hits >= prev.hits ? 1 : -1;
+        });
+      });
       this.delegateEvents();
       var options = this.options || {};
       options.cached = true;
