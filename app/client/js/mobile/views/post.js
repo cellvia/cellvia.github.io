@@ -3,24 +3,24 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'post',
 	prerender: function(){
-		if(!this.cached){
+		if(!this.rendered){
 			var rendered = this.html.render("content.html", { 
 				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.type },
 				'.page-title span': this.post.get('title')
 			});
 			this.$el.html( rendered );
 		}
-		Backbone.transition( this.$el );
+		Backbone.transition( this.$el, {level:2} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 	},
 	render: function(){
-		if(this.cached) return
+		if(this.rendered) return
 		var rendered = this.html.render("post.html", {
 				'.created': this.post.get("created"),
 				'.post-content': { _html: this.post.get("content") }
 		});
 		this.$el.find('.page-content').html( rendered );
-		this.cached = true;
+		this.rendered = true;
 	},
 	fetchPost: function(){
 		if(this.fetched || !this.posts.fetched || !this.html.fetched) return
@@ -32,10 +32,12 @@ module.exports = View.extend({
 		this.post.fetch();
 		this.fetched = true;
 	},
-	initialize: function(opts){
+	initialize: function(options){
+		if(options.cached) return Backbone.transition( this.$el, {level:2} );
 
-		this.slug = opts.slug;
-		this.type = opts.type;
+		this.options = options || {};
+		this.slug = this.options.slug;
+		this.type = this.options.type;
 		this.$el.addClass("section-"+slug(this.type));
 		this.$el.addClass("article-"+this.slug);
 

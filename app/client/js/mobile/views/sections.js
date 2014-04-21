@@ -3,7 +3,7 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: "sections",
 	render: function(){
-		if(this.rendered) return Backbone.transition( this.$el, {reset: true} );
+		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
 		var rendered = this.html.render("content.html", { 
 			'.goback': { _html: "" },
 			'.page-title span': "Brandon Selway",
@@ -13,11 +13,13 @@ module.exports = View.extend({
 				}
 			})
 		});
-		Backbone.transition( this.$el.html( rendered ), {reset: true} );
+		Backbone.transition( this.$el.html( rendered ), {level: 0} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 		this.rendered = true;
 	},
-	initialize: function(){
+	initialize: function(options){
+		if(options.cached) return Backbone.transition( this.$el, {level: 0} );
+
 		this.html = Backbone.collections.html;
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();

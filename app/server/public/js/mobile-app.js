@@ -1628,8 +1628,8 @@ var substr = 'ab'.substr(-1) === 'b'
     }
 ;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
@@ -2225,8 +2225,8 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
 var router = require('../shared/Router'),
     foldify = require('foldify'),
 	insertCss = require("insert-css"),
@@ -2298,21 +2298,24 @@ var PostView = require('../views/post');
 module.exports = function(router){
 
 	router.route('', 'blog', function(type){
-		if(!router._views || !router._views.sections)
+		if(!router.exists("sections"))
 	    	router.view( SectionsView, {group: "sections"} );
 	    else
 	    	router._views.sections[0].reinitialize();
 	});
 
 	router.route('articles/:type', 'posts', function(type){
-		if(!router._views || !router._views[type])
+		if(!router.exists(type))
 	    	router.view( PostsView, {type: type, group: type} );
 	    else
 	    	router._views[type][0].reinitialize();
 	});
 
 	router.route('article/:type/:slug', 'post', function(type, slug){
-    	router.view( PostView, {"slug": slug, "type": type} );
+		if(!router.exists(type+slug))
+	    	router.view( PostView, {group: type+slug, slug: slug, type: type} );
+	    else
+	    	router._views[type+slug][0].reinitialize();
 	});
 
 	router.route('tag/:tag', 'taggedPosts', function(tag){
@@ -2362,24 +2365,24 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'post',
 	prerender: function(){
-		if(!this.cached){
+		if(!this.rendered){
 			var rendered = this.html.render("content.html", { 
 				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.type },
 				'.page-title span': this.post.get('title')
 			});
 			this.$el.html( rendered );
 		}
-		Backbone.transition( this.$el );
+		Backbone.transition( this.$el, {level:2} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 	},
 	render: function(){
-		if(this.cached) return
+		if(this.rendered) return
 		var rendered = this.html.render("post.html", {
 				'.created': this.post.get("created"),
 				'.post-content': { _html: this.post.get("content") }
 		});
 		this.$el.find('.page-content').html( rendered );
-		this.cached = true;
+		this.rendered = true;
 	},
 	fetchPost: function(){
 		if(this.fetched || !this.posts.fetched || !this.html.fetched) return
@@ -2391,10 +2394,12 @@ module.exports = View.extend({
 		this.post.fetch();
 		this.fetched = true;
 	},
-	initialize: function(opts){
+	initialize: function(options){
+		if(options.cached) return Backbone.transition( this.$el, {level:2} );
 
-		this.slug = opts.slug;
-		this.type = opts.type;
+		this.options = options || {};
+		this.slug = this.options.slug;
+		this.type = this.options.type;
 		this.$el.addClass("section-"+slug(this.type));
 		this.$el.addClass("article-"+this.slug);
 
@@ -2428,7 +2433,7 @@ module.exports = View.extend({
 	className: 'posts',
 	render: function(){
 		if(this.shouldSkipPage()) return
-		if(!this.cached){
+		if(!this.rendered){
 			var postsMap = this.posts.map(function(post){
 					return {'a': {
 								href: "/article/" + post.get("type") + "/" + post.get("slug"), 
@@ -2448,11 +2453,11 @@ module.exports = View.extend({
 				map['.page-content .menu li a'] = {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"};
 			var rendered = this.html.render("content.html", map);
 			this.$el.html( rendered );
-			this.cached = true;
+			this.rendered = true;
 		}
-		Backbone.transition( this.$el );
+		Backbone.transition( this.$el, {level: 1} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
-		this.rendered = true;
+		this.finished = true;
 	},
 	compileByTag: function(coll, models){
 		this.posts = coll;
@@ -2466,14 +2471,17 @@ module.exports = View.extend({
 	shouldSkipPage: function(){
 		if(this.posts.fetched && (this.skipPage = this.posts.length === 1)){
 			var post = this.posts.models[0];
+			var url = "/article/" + post.get('type') + "/" + post.get("slug");
 			process.nextTick(function(){
-				Backbone.trigger("go", {href: "/article/" + post.get('type') + "/" + post.get("slug")});
+				Backbone.trigger("go", {href: url, replace: true});
 			});
 		}
-		return !this.posts.fetched || !this.html.fetched || this.rendered || this.skipPage;
+		return !this.posts.fetched || !this.html.fetched || this.finished || this.skipPage;
 	},
 	initialize: function(options){
-		this.rendered = false;
+		if(this.skipPage) return this.shouldSkipPage();
+		if(options.cached) return Backbone.transition( this.$el, {level: 1} );
+
 		this.options = options || {};
 		this.counter = 0;
 		this.type = this.options.type;
@@ -2496,12 +2504,12 @@ module.exports = View.extend({
 			}.bind(this));
 		}else{
 			this.posts = Backbone.collections[this.type];
-			this.listenToOnce(this.posts, "fetched", this.render.bind(this, "posts") );
+			this.listenToOnce(this.posts, "fetched", this.render );
 			this.posts.fetch();							
 		}
 
 		this.html = Backbone.collections.html;
-		this.listenToOnce(this.html, "fetched", this.render.bind(this, "html") );
+		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
 
 	}
@@ -2518,14 +2526,14 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
 var View = require('../../shared/View');
 
 module.exports = View.extend({
 	className: "sections",
 	render: function(){
-		if(this.rendered) return Backbone.transition( this.$el, {reset: true} );
+		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
 		var rendered = this.html.render("content.html", { 
 			'.goback': { _html: "" },
 			'.page-title span': "Brandon Selway",
@@ -2535,11 +2543,13 @@ module.exports = View.extend({
 				}
 			})
 		});
-		Backbone.transition( this.$el.html( rendered ), {reset: true} );
+		Backbone.transition( this.$el.html( rendered ), {level: 0} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 		this.rendered = true;
 	},
-	initialize: function(){
+	initialize: function(options){
+		if(options.cached) return Backbone.transition( this.$el, {level: 0} );
+
 		this.html = Backbone.collections.html;
 		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
@@ -2552,7 +2562,8 @@ var ViewCore = require('./ViewCore');
 var Router = Backbone.Router.extend({
     go: function(data){
       this.navigate(data.href, {
-        trigger: (data.trigger === false) ? false : true 
+        trigger: (data.trigger === false) ? false : true, 
+        replace: (data.replace === true) ? true : false 
       });
     },
     initialize: function(){
@@ -2569,6 +2580,10 @@ var ViewCore = require('./ViewCore');
 module.exports = Backbone.View.extend(ViewCore);
 },{"./ViewCore":20}],20:[function(require,module,exports){
 (function (process){
+var viewCache = [];
+var conf = require('confify');
+var MAXCACHE = 8;
+
 module.exports = {
     events: function() {
       return _.extend({},this._events,this.viewEvents);
@@ -2605,14 +2620,26 @@ module.exports = {
       });
       delete this._views[group];
     },
+    manageCache: function(view){
+      viewCache.push(view);
+      if(viewCache.length > MAXCACHE){
+        var removeView = viewCache.shift().destroy();
+        removeView = null;
+      }
+    },
+    exists: function(type){
+      return this._views && this._views[type] && this._views[type].length; 
+    },
     view: function(View, options){      
       options = options || {};
       options.group = options.group || "global";
       if(!this._views) this._views = {};
       if(!this._views[options.group]){
+        if( options.resetAll !== false )
+          this.destroy(null, options);
         this._views[options.group] = [];
       }else{
-        if( options.resetAll === true )
+        if( options.resetAll !== false )
           this.destroy(null, options);
         else if( options.reset !== false )
           this.destroy(options.group, options);        
@@ -2624,6 +2651,7 @@ module.exports = {
         newview.group = options.group;
         newview.label = options.label;
         this._views[options.group].push(newview);
+        this.manageCache(newview);
       }.bind(this));
     },
     destroy: function(group, options, subview){
@@ -2635,6 +2663,7 @@ module.exports = {
           this._destroyViews(group, options, subview);
         }
       }
+      return this;
     },
     page_error: function(model, resp){
         if(Number(resp.status) === 401){
@@ -2645,11 +2674,13 @@ module.exports = {
     },
     reinitialize: function(){
       this.delegateEvents();
-      this.initialize(this.options);
+      var options = this.options || {};
+      options.cached = true;
+      this.initialize(options);
     }
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],21:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26}],21:[function(require,module,exports){
 (function (process){
 var store = require('./store');
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
@@ -2694,8 +2725,8 @@ function newstore(options){
 	}
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
 /* Copyright (c) 2010-2013 Marcus Westin */
 (function(e){function o(){try{return r in e&&e[r]}catch(t){return!1}}var t={},n=e.document,r="localStorage",i="script",s;t.disabled=!1,t.set=function(e,t){},t.get=function(e){},t.remove=function(e){},t.clear=function(){},t.transact=function(e,n,r){var i=t.get(e);r==null&&(r=n,n=null),typeof i=="undefined"&&(i=n||{}),r(i),t.set(e,i)},t.getAll=function(){},t.forEach=function(){},t.serialize=function(e){return JSON.stringify(e)},t.deserialize=function(e){if(typeof e!="string")return undefined;try{return JSON.parse(e)}catch(t){return e||undefined}};if(o())s=e[r],t.set=function(e,n){return n===undefined?t.remove(e):(s.setItem(e,t.serialize(n)),n)},t.get=function(e){return t.deserialize(s.getItem(e))},t.remove=function(e){s.removeItem(e)},t.clear=function(){s.clear()},t.getAll=function(){var e={};return t.forEach(function(t,n){e[t]=n}),e},t.forEach=function(e){for(var n=0;n<s.length;n++){var r=s.key(n);e(r,t.get(r))}};else if(n.documentElement.addBehavior){var u,a;try{a=new ActiveXObject("htmlfile"),a.open(),a.write("<"+i+">document.w=window</"+i+'><iframe src="/favicon.ico"></iframe>'),a.close(),u=a.w.frames[0].document,s=u.createElement("div")}catch(f){s=n.createElement("div"),u=n.body}function l(e){return function(){var n=Array.prototype.slice.call(arguments,0);n.unshift(s),u.appendChild(s),s.addBehavior("#default#userData"),s.load(r);var i=e.apply(t,n);return u.removeChild(s),i}}var c=new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]","g");function h(e){return e.replace(/^d/,"___$&").replace(c,"___")}t.set=l(function(e,n,i){return n=h(n),i===undefined?t.remove(n):(e.setAttribute(n,t.serialize(i)),e.save(r),i)}),t.get=l(function(e,n){return n=h(n),t.deserialize(e.getAttribute(n))}),t.remove=l(function(e,t){t=h(t),e.removeAttribute(t),e.save(r)}),t.clear=l(function(e){var t=e.XMLDocument.documentElement.attributes;e.load(r);for(var n=0,i;i=t[n];n++)e.removeAttribute(i.name);e.save(r)}),t.getAll=function(e){var n={};return t.forEach(function(e,t){n[e]=t}),n},t.forEach=l(function(e,n){var r=e.XMLDocument.documentElement.attributes;for(var i=0,s;s=r[i];++i)n(s.name,t.deserialize(e.getAttribute(s.name)))})}try{var p="__storejs__";t.set(p,p),t.get(p)!=p&&(t.disabled=!0),t.remove(p)}catch(f){t.disabled=!0}t.enabled=!t.disabled,typeof module!="undefined"&&module.exports&&this.module!==module?module.exports=t:typeof define=="function"&&define.amd?define(t):e.store=t})(Function("return this")())
 
@@ -2749,8 +2780,8 @@ module.exports = function(options){
 
 	return new HTMLCollection([], options);
 };
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	digistify = require('digistify'),
@@ -2883,8 +2914,8 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
@@ -2954,8 +2985,8 @@ module.exports = Backbone.Model.extend({
 		}
 	}
 })
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
 (function (process){
 function merge(a, b){
     for(var prop in b){
@@ -2968,8 +2999,8 @@ module.exports = function browser(srcObj){
     merge(browser, srcObj);
 };
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
 (function (process){
 var request = require('request');
 
@@ -3118,8 +3149,8 @@ function merge(a, b){ a = a || {}; for (var x in b){ if(typeof a[x] !== "undefin
 module.exports = exportObj.getGists;
 module.exports.setDefault = exportObj.setDefault;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -4730,8 +4761,8 @@ function bind(fn){
 function isArray(obj){
 	return ~Object.prototype.toString.call(obj).toLowerCase().indexOf("array");
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
 (function (process){
 if(typeof JSON === "undefined"){
 
@@ -6424,8 +6455,8 @@ function regExpEscape (s) {
 
 
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
 module.exports = sigmund
 function sigmund (subject, maxSessions) {
     maxSessions = maxSessions || 10;
@@ -7979,24 +8010,34 @@ function PageSlide(container, options) {
         isJ = container instanceof jQuery,
         currentPage,
         stateHistory = [],
-        allowPush = !options.useHash && testPushstate() && (options.allowTest !== false && doubleCheck());
+        lastLevel,
+        allowPush = !options.useHash && testPushstate();
 
     // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
     this.slidePage = function(page, opts) {
         opts = opts || {};
+
+        if( opts.hasOwnProperty('level') ){
+            var level = +opts.level;
+            if(typeof lastLevel === "undefined")
+                this.slidePageFrom(page);
+            else
+                this.slidePageFrom(page, level >= lastLevel ? 'right' : 'left' );
+            lastLevel = level;
+            return;
+        }
 
         var l = stateHistory.length,
             state = allowPush ? window.location.pathname : window.location.hash;
 
         if(opts.reset){
             stateHistory = [state];
-            this.slidePageFrom(page, 'left');
-            return;
+            return this.slidePageFrom(page, 'left');
         }else if (l === 0) {
             stateHistory.push(state);
-            this.slidePageFrom(page);
-            return;
+            return this.slidePageFrom(page);
         }
+
         if (state === stateHistory[l-2]) {
             stateHistory.pop();
             this.slidePageFrom(page, 'left');
@@ -8026,7 +8067,7 @@ function PageSlide(container, options) {
         // Position the page at the starting position of the animation
         var notFrom = from === "left" ? "right" : "left";
         if(isJ){
-            page.removeClass(notFrom + " center transition").addClass("page " + from);
+                page.removeClass(notFrom + " center transition").addClass("page " + from);
         }else{
             page.classList.remove("center", notFrom, "transition");
             page.classList.add("page", from);
@@ -8045,10 +8086,11 @@ function PageSlide(container, options) {
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         if(isJ){
-            page.removeClass("left right");
-            page.addClass("page transition center");
-            currentPage.removeClass("center " + (from === "left" ? "left" : "right"));
-            currentPage.addClass("page transition " + (from === "left" ? "right" : "left"));
+            page.removeClass("left right")
+                .addClass("page transition center");
+            currentPage
+                .removeClass("center " + (from === "left" ? "left" : "right"))
+                .addClass("page transition " + (from === "left" ? "right" : "left"));
         }else{
             page.classList.remove("right", "left");
             page.classList.add("page", "transition", "center");
@@ -8079,18 +8121,6 @@ function testPushstate(){
             return properCheck;
         }
     }
-}
-
-function doubleCheck(){
-    var original = window.location.pathname;
-        window.history.replaceState({}, 'pageSliderTest', '/pageSliderTest')
-    if(~window.location.pathname.indexOf("pageSliderTest")){
-        window.history.replaceState({}, original.replace("/", ""), original);
-        return true;
-    }else if(window.location.pathname !== original){
-        window.history.replaceState({}, original.replace("/", ""), original);
-    }
-    return false;
 }
 
 /*

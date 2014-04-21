@@ -4,7 +4,7 @@ module.exports = View.extend({
 	className: 'posts',
 	render: function(){
 		if(this.shouldSkipPage()) return
-		if(!this.cached){
+		if(!this.rendered){
 			var postsMap = this.posts.map(function(post){
 					return {'a': {
 								href: "/article/" + post.get("type") + "/" + post.get("slug"), 
@@ -24,11 +24,11 @@ module.exports = View.extend({
 				map['.page-content .menu li a'] = {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"};
 			var rendered = this.html.render("content.html", map);
 			this.$el.html( rendered );
-			this.cached = true;
+			this.rendered = true;
 		}
-		Backbone.transition( this.$el );
+		Backbone.transition( this.$el, {level: 1} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
-		this.rendered = true;
+		this.finished = true;
 	},
 	compileByTag: function(coll, models){
 		this.posts = coll;
@@ -42,14 +42,17 @@ module.exports = View.extend({
 	shouldSkipPage: function(){
 		if(this.posts.fetched && (this.skipPage = this.posts.length === 1)){
 			var post = this.posts.models[0];
+			var url = "/article/" + post.get('type') + "/" + post.get("slug");
 			process.nextTick(function(){
-				Backbone.trigger("go", {href: "/article/" + post.get('type') + "/" + post.get("slug")});
+				Backbone.trigger("go", {href: url, replace: true});
 			});
 		}
-		return !this.posts.fetched || !this.html.fetched || this.rendered || this.skipPage;
+		return !this.posts.fetched || !this.html.fetched || this.finished || this.skipPage;
 	},
 	initialize: function(options){
-		this.rendered = false;
+		if(this.skipPage) return this.shouldSkipPage();
+		if(options.cached) return Backbone.transition( this.$el, {level: 1} );
+
 		this.options = options || {};
 		this.counter = 0;
 		this.type = this.options.type;
@@ -72,12 +75,12 @@ module.exports = View.extend({
 			}.bind(this));
 		}else{
 			this.posts = Backbone.collections[this.type];
-			this.listenToOnce(this.posts, "fetched", this.render.bind(this, "posts") );
+			this.listenToOnce(this.posts, "fetched", this.render );
 			this.posts.fetch();							
 		}
 
 		this.html = Backbone.collections.html;
-		this.listenToOnce(this.html, "fetched", this.render.bind(this, "html") );
+		this.listenToOnce(this.html, "fetched", this.render );
 		this.html.fetch();
 
 	}

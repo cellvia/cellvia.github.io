@@ -1149,7 +1149,8 @@ var ViewCore = require('./ViewCore');
 var Router = Backbone.Router.extend({
     go: function(data){
       this.navigate(data.href, {
-        trigger: (data.trigger === false) ? false : true 
+        trigger: (data.trigger === false) ? false : true, 
+        replace: (data.replace === true) ? true : false 
       });
     },
     initialize: function(){
@@ -1166,6 +1167,10 @@ var ViewCore = require('./ViewCore');
 module.exports = Backbone.View.extend(ViewCore);
 },{"./ViewCore":16}],16:[function(require,module,exports){
 (function (process){
+var viewCache = [];
+var conf = require('confify');
+var MAXCACHE = 8;
+
 module.exports = {
     events: function() {
       return _.extend({},this._events,this.viewEvents);
@@ -1202,14 +1207,26 @@ module.exports = {
       });
       delete this._views[group];
     },
+    manageCache: function(view){
+      viewCache.push(view);
+      if(viewCache.length > MAXCACHE){
+        var removeView = viewCache.shift().destroy();
+        removeView = null;
+      }
+    },
+    exists: function(type){
+      return this._views && this._views[type] && this._views[type].length; 
+    },
     view: function(View, options){      
       options = options || {};
       options.group = options.group || "global";
       if(!this._views) this._views = {};
       if(!this._views[options.group]){
+        if( options.resetAll !== false )
+          this.destroy(null, options);
         this._views[options.group] = [];
       }else{
-        if( options.resetAll === true )
+        if( options.resetAll !== false )
           this.destroy(null, options);
         else if( options.reset !== false )
           this.destroy(options.group, options);        
@@ -1221,6 +1238,7 @@ module.exports = {
         newview.group = options.group;
         newview.label = options.label;
         this._views[options.group].push(newview);
+        this.manageCache(newview);
       }.bind(this));
     },
     destroy: function(group, options, subview){
@@ -1232,6 +1250,7 @@ module.exports = {
           this._destroyViews(group, options, subview);
         }
       }
+      return this;
     },
     page_error: function(model, resp){
         if(Number(resp.status) === 401){
@@ -1242,11 +1261,13 @@ module.exports = {
     },
     reinitialize: function(){
       this.delegateEvents();
-      this.initialize(this.options);
+      var options = this.options || {};
+      options.cached = true;
+      this.initialize(options);
     }
 }
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3}],17:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":3,"confify":22}],17:[function(require,module,exports){
 (function (process){
 var store = require('./store');
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;

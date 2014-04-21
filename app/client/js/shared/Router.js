@@ -3,7 +3,8 @@ var ViewCore = require('./ViewCore');
 var Router = Backbone.Router.extend({
     go: function(data){
       this.navigate(data.href, {
-        trigger: (data.trigger === false) ? false : true 
+        trigger: (data.trigger === false) ? false : true, 
+        replace: (data.replace === true) ? true : false 
       });
     },
     initialize: function(){

@@ -10,6 +10,7 @@ module.exports = {
 	"mobileTransitionModule": "pageslide",
 	"useIScroll": false,
 	"clientOnly": true,
+	"maxViewCache": 8,
 	"sections": ['about', 'résumé', 'code', 'sound&vision', 'reflections'],
 	"footers": [
 		["email", "mailto:brandon.selway@gmail.com"], 
