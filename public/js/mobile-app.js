@@ -2555,6 +2555,7 @@ function slug(input, identifier)
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
 },{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
 var View = require('../../shared/View');
+var conf = require('confify');
 
 module.exports = View.extend({
 	className: "sections",
@@ -2562,7 +2563,7 @@ module.exports = View.extend({
 		"click h1.topcoat-navigation-bar__title span": "resume" 
 	},
 	resume: function(){
-		window.open("/images/BrandonSelway_resume.pdf");
+		window.open("/public/images" + "/BrandonSelway_resume.pdf");
 	},
 	render: function(){
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
@@ -2591,7 +2592,7 @@ module.exports = View.extend({
 	}
 });
 
-},{"../../shared/View":19}],18:[function(require,module,exports){
+},{"../../shared/View":19,"confify":26}],18:[function(require,module,exports){
 var ViewCore = require('./ViewCore');
 
 var Router = Backbone.Router.extend({

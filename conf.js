@@ -5,6 +5,9 @@ module.exports = {
 		"root": root,
 		"html": root + "/client/html"
 	},
+	"pathnames": {
+		"images": "/public/images"
+	},
 	"desktopTransitionModule": false,
 	"mobileTransitionModule": "pageslide",
 	"useIScroll": false,

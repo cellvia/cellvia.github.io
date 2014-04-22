@@ -28,7 +28,3 @@ app.get(/^((?!(\/public\/css|\/public\/js|\/public\/font|\/public\/images)).)*$/
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
-
-
-
-

@@ -1,4 +1,5 @@
 var View = require('../../shared/View');
+var conf = require('confify');
 
 module.exports = View.extend({
 	className: "sections",
@@ -6,7 +7,7 @@ module.exports = View.extend({
 		"click h1.topcoat-navigation-bar__title span": "resume" 
 	},
 	resume: function(){
-		window.open("/images/BrandonSelway_resume.pdf");
+		window.open(conf.pathnames.images + "/BrandonSelway_resume.pdf");
 	},
 	render: function(){
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
