@@ -1,7 +1,7 @@
 @ECHO OFF
 TITLE=servers
 
-SET bootpath=C:\node\work\personal\cellvia.github.io\app
+SET bootpath=C:\node\work\personal\cellvia.github.io
 
 echo closing all previous node processes
 taskkill /F /IM node.exe > nul
