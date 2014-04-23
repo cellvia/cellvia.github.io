@@ -2306,7 +2306,6 @@ module.exports = function(router){
 	});
 
 	router.route('articles/:type', 'posts', function(type){
-		console.log("type"+type)
 		if(!router.exists(type))
 	    	router.view( PostsView, {type: type, group: type} );
 	    else
@@ -2485,6 +2484,7 @@ module.exports = View.extend({
 		}
 		var rendered = this.html.render("content.html", map);
 		this.$el.html( rendered );
+		console.log("transition")
 		Backbone.transition( this.$el, {level: 1} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 		this.rendered = true;
@@ -8163,7 +8163,7 @@ function PageSlide(container, options) {
                     console.log(e.target)
                     $(e.target).remove();
                 }
-                currentPage = page;
+                setTimeout(function(){ currentPage = page }, 300);
             });
         }else{
             var listener = function listener(e){

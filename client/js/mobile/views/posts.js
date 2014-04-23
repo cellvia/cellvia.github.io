@@ -24,6 +24,7 @@ module.exports = View.extend({
 		}
 		var rendered = this.html.render("content.html", map);
 		this.$el.html( rendered );
+		console.log("transition")
 		Backbone.transition( this.$el, {level: 1} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
 		this.rendered = true;
