@@ -8138,16 +8138,9 @@ function PageSlide(container, options) {
         }
 
         if(isJ){
+            console.log(tranType);
             currentPage.one(tranType, function(e) {
-                currentPage.trigger({ 
-                    type:'pageslideEnd', 
-                    slidFrom: from, 
-                    target: e.target, 
-                    $target: currentPage, 
-                    toTarget: page[0],
-                    $toTarget: page,
-                    stopPropogation: function(){e.stopPropogation();} 
-                });
+                console.log(tranType+"done");
                 page.trigger({ 
                     type:'pageslideEnd', 
                     slidFrom: from, 
@@ -8155,6 +8148,15 @@ function PageSlide(container, options) {
                     $target: page,
                     fromTarget: currentPage[0],
                     $fromTarget: currentPage,
+                    stopPropogation: function(){e.stopPropogation();} 
+                });
+                currentPage.trigger({ 
+                    type:'pageslideEnd', 
+                    slidFrom: from, 
+                    target: e.target, 
+                    $target: currentPage, 
+                    toTarget: page[0],
+                    $toTarget: page,
                     stopPropogation: function(){e.stopPropogation();} 
                 });
                 if(!e.isPropagationStopped()){
