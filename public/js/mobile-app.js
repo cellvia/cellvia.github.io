@@ -8143,6 +8143,7 @@ function PageSlide(container, options) {
                 });
                 if(!e.isPropagationStopped())
                     $(e.target).remove();
+                currentPage = null;
                 currentPage = page;
             });
         }else{
@@ -8156,6 +8157,7 @@ function PageSlide(container, options) {
                 e.target.dispatchEvent(event);
                 if(!event.isPropagationStopped())
                     e.target.parentNode.removeChild(e.target);
+                currentPage = null;
                 currentPage = page;
             };
             currentPage.addEventListener( tranType, listener );
