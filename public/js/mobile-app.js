@@ -2387,7 +2387,7 @@ module.exports = View.extend({
 		if(init)
 			signal.call(this);
 		else
-			this.$el.one( "webkitTransitionEnd", signal.bind(this) );
+			this.$el.one( "pageslideEnd", signal.bind(this) );
 	},
 	render: function(){
 		if(!this.prerendered) return this.prerender();
@@ -2397,6 +2397,7 @@ module.exports = View.extend({
 				'.post-content': { _html: this.post.get("content") }
 		});
 		function renderContent(){
+
 			this.$el.find('.page-content').html( rendered );
 			this.rendered = true;			
 	    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
@@ -8034,10 +8035,18 @@ if (typeof exports === 'object') {
 var insertCss = require('insert-css');
 var fs = require('fs');
 
+var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    // Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
+var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
+var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
+    // At least Safari 3+: "[object HTMLElementConstructor]"
+var isChrome = !!window.chrome && !isOpera;              // Chrome 1+
+var isIE = /*@cc_on!@*/false || !!document.documentMode; // At least IE6
+
 module.exports = function(container, options){
     options = options || {};
     if(options.insertCss !== false)
-        insertCss(Buffer("LnBhZ2Ugew0KICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTsNCiAgICB0b3A6IDA7DQogICAgbGVmdDogMDsNCiAgICB3aWR0aDogMTAwJTsNCiAgICBoZWlnaHQ6IDEwMCU7DQogICAgLXdlYmtpdC10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQp9DQoNCi5wYWdlLmxlZnQgew0KICAgIC13ZWJraXQtdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgtMTAwJSwgMCwgMCk7DQogICAgdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgtMTAwJSwgMCwgMCk7DQp9DQoNCi5wYWdlLmNlbnRlciB7DQogICAgLXdlYmtpdC10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQp9DQoNCi5wYWdlLnJpZ2h0IHsNCiAgICAtd2Via2l0LXRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMTAwJSwgMCwgMCk7DQogICAgdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgxMDAlLCAwLCAwKTsNCn0NCg0KLnBhZ2UudHJhbnNpdGlvbiB7DQogICAgLXdlYmtpdC10cmFuc2l0aW9uLWR1cmF0aW9uOiAuMjVzOw0KICAgIHRyYW5zaXRpb24tZHVyYXRpb246IC4yNXM7DQp9","base64"));
+        insertCss(Buffer("LnBhZ2Ugew0KICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTsNCiAgICB0b3A6IDA7DQogICAgbGVmdDogMDsNCiAgICB3aWR0aDogMTAwJTsNCiAgICBoZWlnaHQ6IDEwMCU7DQogICAgLXdlYmtpdC10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIC1tb3otdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgwLCAwLCAwKTsNCiAgICAtby10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQp9DQoNCi5wYWdlLmxlZnQgew0KICAgIC13ZWJraXQtdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgtMTAwJSwgMCwgMCk7DQogICAgLW1vei10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKC0xMDAlLCAwLCAwKTsNCiAgICAtby10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKC0xMDAlLCAwLCAwKTsNCiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKC0xMDAlLCAwLCAwKTsNCn0NCg0KLnBhZ2UuY2VudGVyIHsNCiAgICAtd2Via2l0LXRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQogICAgLW1vei10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIC1vLXRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQogICAgdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgwLCAwLCAwKTsNCn0NCg0KLnBhZ2UucmlnaHQgew0KICAgIC13ZWJraXQtdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgxMDAlLCAwLCAwKTsNCiAgICAtbW96LXRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMTAwJSwgMCwgMCk7DQogICAgLW8tdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgxMDAlLCAwLCAwKTsNCiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDEwMCUsIDAsIDApOw0KfQ0KDQoucGFnZS50cmFuc2l0aW9uIHsNCiAgICAtd2Via2l0LXRyYW5zaXRpb24tZHVyYXRpb246IC4yNXM7DQogICAgLW1vei10cmFuc2l0aW9uLWR1cmF0aW9uOiAuMjVzOw0KICAgIC1vLXRyYW5zaXRpb24tZHVyYXRpb246IC4yNXM7DQogICAgdHJhbnNpdGlvbi1kdXJhdGlvbjogLjI1czsNCn0=","base64"));
 
     var pageslider = new PageSlide(container, options);
 
@@ -8052,10 +8061,17 @@ function PageSlide(container, options) {
     var container = container,
         isJ = container instanceof jQuery,
         currentPage,
-        // history = [],
         stateHistory = [],
         lastLevel,
-        allowPush = !options.useHash && testPushstate();
+        allowPush = !options.useHash && testPushstate(),
+        tranType;
+
+    if(isSafari || isChrome)
+        tranType ='webkitTransitionEnd'
+    else if(isFirefox || isIE)
+        tranType = 'transitionend'
+    else if(isOpera)
+        tranType = 'otransitionend';
 
     // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
     this.slidePage = function(page, opts) {
@@ -8069,7 +8085,6 @@ function PageSlide(container, options) {
             else
                 this.slidePageFrom(page, level >= lastLevel ? 'right' : 'left', state );
             lastLevel = level;
-            // if(!~history.indexOf(state)) history.push(state);
             return;
         }
 
@@ -8095,14 +8110,12 @@ function PageSlide(container, options) {
 
     // Use this function directly if you want to control the sliding direction outside PageSlider
     this.slidePageFrom = function(page, from, state) {
-        // var hasThisPage = ~history.indexOf(state);
-        // if( !hasThisPage || !currentPage)
+        var notFrom = from === "left" ? "right" : "left";
             container[isJ ? "append" : "appendChild"](page);
 
         if (!currentPage || !from) {
             if(isJ){
                 page.removeClass("left right transition").addClass("page center");            
-                // page.attr("class", "page center");            
             }else{
                 page.classList.remove("left", "right", "transition");
                 page.classList.add("page", "center");            
@@ -8112,43 +8125,52 @@ function PageSlide(container, options) {
         }
 
         // Position the page at the starting position of the animation
-        var notFrom = from === "left" ? "right" : "left";
         if(isJ){
-            // if(hasThisPage) page.show();
             page.removeClass(notFrom + " center transition").addClass("page " + from);
-            // page.attr("class", "page " + from);
         }else{
             page.classList.remove("center", notFrom, "transition");
             page.classList.add("page", from);
         }
 
-        currentPage.one('webkitTransitionEnd', function(e) {
-            if(isJ){
-                // $(e.target).hide();
-                $(e.target).remove();
-            }else{
-                e.target.parentNode.removeChild(e.target);
-            }
-        });
+        if(isJ){
+            currentPage.one(tranType, function(e) {
+                currentPage.trigger({ 
+                    type:'pageslideEnd', 
+                    slidFrom: from, 
+                    target: e.target, 
+                    $target: currentPage, 
+                    stopPropogation: function(){e.stopPropogation();} 
+                });
+                if(!e.isPropagationStopped())
+                    $(e.target).remove();
+            });
+        }else{
+            var listener = function listener(e){
+                currentPage.removeEventListener( tranType, listener );
+                var event = new Event('pageslideEnd', { 
+                    type:'pageslideEnd', 
+                    slidFrom: from, 
+                    target: e.target 
+                });
+                e.target.dispatchEvent(event);
+                if(!event.isPropagationStopped())
+                    e.target.parentNode.removeChild(e.target);
+            };
+            currentPage.addEventListener( tranType, listener );
+        }
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
         container[0].offsetWidth;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-        if(isJ){
-            page.removeClass("left right")
-                .addClass("page transition center");
-            currentPage
-                .removeClass("center " + (from === "left" ? "left" : "right"))
-                .addClass("page transition " + (from === "left" ? "right" : "left"));
-            // page.attr("class", "page transition center");
-            // currentPage.attr("class", "page transition " + (from === "left" ? "right" : "left"));
-        }else{
-            page.classList.remove("right", "left");
-            page.classList.add("page", "transition", "center");
-            currentPage.classList.remove("center", from === "left" ? "left" : "right");
-            currentPage.classList.add("page", "transition", from === "left" ? "right" : "left");
-        }
+        var p = isJ ? page[0].classList : page.classList;
+        var cP = isJ ? currentPage[0].classList : currentPage.classList;
+
+        p.remove("left", "right");
+        cP.remove("center", from)
+
+        p.add("page","transition","center");
+        cP.add("page","transition",notFrom);
         currentPage = page;
     };
 

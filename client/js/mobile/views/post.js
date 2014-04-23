@@ -23,7 +23,7 @@ module.exports = View.extend({
 		if(init)
 			signal.call(this);
 		else
-			this.$el.one( "webkitTransitionEnd", signal.bind(this) );
+			this.$el.one( "pageslideEnd", signal.bind(this) );
 	},
 	render: function(){
 		if(!this.prerendered) return this.prerender();
@@ -33,6 +33,7 @@ module.exports = View.extend({
 				'.post-content': { _html: this.post.get("content") }
 		});
 		function renderContent(){
+
 			this.$el.find('.page-content').html( rendered );
 			this.rendered = true;			
 	    	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
