@@ -4,32 +4,29 @@ module.exports = View.extend({
 	className: 'posts',
 	render: function(){
 		if(this.shouldSkipPage()) return
-		if(!this.rendered){
-			var postsMap = this.posts.map(function(post){
-					return {'a': {
-								href: "/article/" + post.get("type") + "/" + post.get("slug"), 
-								class: "post listitem" 
-							},
-							'a span.item-content': post.get("title"),
-							'a span.action-icon': { class: "action-icon topcoat-icon--next" }
-						}
-				});
-			var menu = this.html.render( "list.html", {
-				'li': this.posts.length ? postsMap : {},
-				'li a': !this.posts.length ? {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"} : {}
+		var postsMap = this.posts.map(function(post){
+				return {'a': {
+							href: "/article/" + post.get("type") + "/" + post.get("slug"), 
+							class: "post listitem" 
+						},
+						'a span.item-content': post.get("title"),
+						'a span.action-icon': { class: "action-icon topcoat-icon--next" }
+					}
 			});
-			var map = {
-				'.goback a': { href: this.type ? "/" : "/tags" },
-				'.page-title span': this.type || this.tag,
-				'.page-content': { _html: menu }
-			}
-			var rendered = this.html.render("content.html", map);
-			this.$el.html( rendered );
-			this.rendered = true;
+		var menu = this.html.render( "list.html", {
+			'li': this.posts.length ? postsMap : {},
+			'li a': !this.posts.length ? {href: "/", class: "listitem", _text: "No posts yet, please come back soon!"} : {}
+		});
+		var map = {
+			'.goback a': { href: this.type ? "/" : "/tags" },
+			'.page-title span': this.type || this.tag,
+			'.page-content': { _html: menu }
 		}
+		var rendered = this.html.render("content.html", map);
+		this.$el.html( rendered );
 		Backbone.transition( this.$el, {level: 1} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
-		this.finished = true;
+		this.rendered = true;
 	},
 	compileByTag: function(coll, models){
 		this.posts = coll;
@@ -41,14 +38,14 @@ module.exports = View.extend({
 		this.render();
 	},
 	shouldSkipPage: function(){
-		if(this.posts.fetched && (this.skipPage = this.posts.length === 1)){
+		if(this.posts.fetched && (this.skipPage || (this.skipPage = this.posts.length === 1))){
 			var post = this.posts.models[0];
 			var url = "/article/" + post.get('type') + "/" + post.get("slug");
 			process.nextTick(function(){
 				Backbone.trigger("go", {href: url, replace: true});
 			});
 		}
-		return !this.posts.fetched || !this.html.fetched || this.finished || this.skipPage;
+		return !this.posts.fetched || !this.html.fetched || this.rendered || this.skipPage;
 	},
 	initialize: function(options){
 		if(this.skipPage) return this.shouldSkipPage();
