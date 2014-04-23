@@ -4,6 +4,7 @@ module.exports = {
       return _.extend({},events,this.viewEvents);
     },
     _link: function(e){
+      console.log("clicked")
         e.preventDefault();
         process.nextTick(function(){
           if(e.isPropagationStopped()) return false
