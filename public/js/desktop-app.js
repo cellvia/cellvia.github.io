@@ -1182,6 +1182,7 @@ module.exports = {
     },
     _link: function(e){
         e.preventDefault();
+        console.log("clicked")
         process.nextTick(function(){
           if(e.isPropagationStopped()) return
           var href = e.currentTarget.getAttribute('href');
