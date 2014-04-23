@@ -8086,9 +8086,9 @@ function PageSlide(container, options) {
         if( opts.hasOwnProperty('level') ){
             var level = +opts.level;
             if(typeof lastLevel === "undefined")
-                this.slidePageFrom(page, undefined, state);
+                this.slidePageFrom(page, undefined);
             else
-                this.slidePageFrom(page, level >= lastLevel ? 'right' : 'left', state );
+                this.slidePageFrom(page, level >= lastLevel ? 'right' : 'left' );
             lastLevel = level;
             return;
         }
@@ -8114,7 +8114,7 @@ function PageSlide(container, options) {
     };
 
     // Use this function directly if you want to control the sliding direction outside PageSlider
-    this.slidePageFrom = function(page, from, state) {
+    this.slidePageFrom = function(page, from) {
         var notFrom = from === "left" ? "right" : "left";
             container[isJ ? "append" : "appendChild"](page);
 
@@ -8161,6 +8161,8 @@ function PageSlide(container, options) {
                 });
                 if(!e.isPropagationStopped()){
                     console.log("remove in slider")
+                    console.log(e)
+                    console.log(e.target)
                     $(e.target).remove();
                 }
                 currentPage = page;
