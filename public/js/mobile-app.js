@@ -8077,6 +8077,7 @@ function PageSlide(container, options) {
 
     // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
     this.slidePage = function(page, opts) {
+        console.log("slidepage")
         opts = opts || {};
         var state = allowPush ? window.location.pathname : window.location.hash;
 
