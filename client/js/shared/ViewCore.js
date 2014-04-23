@@ -6,6 +6,7 @@ var MAXCACHE = conf.maxViewCache;
 
 module.exports = {
     events: function() {
+      this.undelegateEvents();
       return _.extend({},this._events,this.viewEvents);
     },
     _events: {

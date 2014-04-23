@@ -1175,6 +1175,7 @@ var MAXCACHE = 8;
 
 module.exports = {
     events: function() {
+      this.undelegateEvents();
       return _.extend({},this._events,this.viewEvents);
     },
     _events: {
