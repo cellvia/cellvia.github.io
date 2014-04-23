@@ -4,6 +4,8 @@ module.exports = View.extend({
 	className: 'posts',
 	render: function(){
 		if(this.shouldSkipPage()) return
+		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
+		this.rendered = true;
 		var postsMap = this.posts.map(function(post){
 				return {'a': {
 							href: "/article/" + post.get("type") + "/" + post.get("slug"), 
@@ -23,11 +25,8 @@ module.exports = View.extend({
 			'.page-content': { _html: menu }
 		}
 		var rendered = this.html.render("content.html", map);
-		this.$el.html( rendered );
-		console.log("transition")
-		Backbone.transition( this.$el, {level: 1} );
+		Backbone.transition( this.$el.html( rendered ), {level: 1} );
     	this.iscroll = Backbone.iScroll( this.$el.find(".topcoat-list__container") );
-		this.rendered = true;
 	},
 	compileByTag: function(coll, models){
 		this.posts = coll;
@@ -46,7 +45,7 @@ module.exports = View.extend({
 				Backbone.trigger("go", {href: url, replace: true});
 			});
 		}
-		return !this.posts.fetched || !this.html.fetched || this.rendered || this.skipPage;
+		return this.skipPage;
 	},
 	initialize: function(options){
 		if(this.skipPage) return this.shouldSkipPage();
