@@ -2306,6 +2306,7 @@ module.exports = function(router){
 	});
 
 	router.route('articles/:type', 'posts', function(type){
+		console.log("type"+type)
 		if(!router.exists(type))
 	    	router.view( PostsView, {type: type, group: type} );
 	    else
@@ -2465,6 +2466,7 @@ module.exports = View.extend({
 	render: function(){
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
+		console.log("rendering")
 		this.rendered = true;
 		var postsMap = this.posts.map(function(post){
 				return {'a': {
