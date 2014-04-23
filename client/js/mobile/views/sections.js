@@ -28,6 +28,7 @@ module.exports = View.extend({
 		this.rendered = true;
 	},
 	initialize: function(options){
+		this.options = options || {};
 		if(options.cached) return Backbone.transition( this.$el, {level: 0} );
 
 		this.html = Backbone.collections.html;

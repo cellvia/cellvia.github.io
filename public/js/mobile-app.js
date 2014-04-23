@@ -2227,8 +2227,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
-var router = require('../shared/Router'),
-    foldify = require('foldify'),
+var foldify = require('foldify'),
 	insertCss = require("insert-css"),
 	fastclick = require('fastclick'),
     conf = require('confify');
@@ -2238,6 +2237,10 @@ conf({displayType: "mobile"});
 
 var	routes = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["error"] = require("C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\error.js");returnMe["posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})()),
     LayoutView = require('./views/layout');
+
+//attach routes
+Backbone.router = require('../shared/Router');
+routes(Backbone.router);
 
 //grab global collections
 Backbone.collections = ((function(){ var bind = function bind(fn){ var args = Array.prototype.slice.call(arguments, 1); return function(){ var onearg = args.shift(); var newargs = args.concat(Array.prototype.slice.call(arguments,0)); var returnme = fn.apply(onearg, newargs ); return returnme; };  };var fold = require('foldify'), proxy = {}, map = false;var returnMe = bind( fold, {foldStatus: true, map: map}, proxy);returnMe["Html"] = require("C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Html.js");returnMe["Posts"] = require("C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Posts.js");for(var p in returnMe){ proxy[p] = returnMe[p]; }return returnMe;})());
@@ -2267,9 +2270,6 @@ Backbone.iScroll = function(container){
     return !!conf.useIScroll === false ? false : new IScroll( container[0], {click: true} );
 }
 
-//attach routes
-routes(router);
-
 //instantiate base page
 new LayoutView();
 
@@ -2277,7 +2277,7 @@ new LayoutView();
 Backbone.history.start({
   pushState: !!(!~window.location.href.indexOf("github.io") && !~window.location.href.indexOf("brandonselway.com") && Modernizr.history)
 });
-},{"../shared/Router":18,"./views/layout":14,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\error.js":11,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\posts.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Html.js":23,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Posts.js":24,"confify":26,"fastclick":29,"foldify":30,"insert-css":35,"pageslide":37}],11:[function(require,module,exports){
+},{"../shared/Router":18,"./views/layout":14,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\error.js":11,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\posts.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Html.js":24,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Posts.js":25,"confify":27,"fastclick":30,"foldify":31,"insert-css":36,"pageslide":38}],11:[function(require,module,exports){
 var ErrorView = require('../views/error');
 
 module.exports = function(router){
@@ -2306,7 +2306,6 @@ module.exports = function(router){
 	});
 
 	router.route('articles/:type', 'posts', function(type){
-		console.log("type"+type)
 		if(!router.exists(type))
 	    	router.view( PostsView, {type: type, group: type} );
 	    else
@@ -2466,7 +2465,6 @@ module.exports = View.extend({
 	render: function(){
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
-		console.log("rendering")
 		this.rendered = true;
 		var postsMap = this.posts.map(function(post){
 				return {'a': {
@@ -2589,6 +2587,7 @@ module.exports = View.extend({
 		this.rendered = true;
 	},
 	initialize: function(options){
+		this.options = options || {};
 		if(options.cached) return Backbone.transition( this.$el, {level: 0} );
 
 		this.html = Backbone.collections.html;
@@ -2597,7 +2596,7 @@ module.exports = View.extend({
 	}
 });
 
-},{"../../shared/View":19,"confify":26}],18:[function(require,module,exports){
+},{"../../shared/View":19,"confify":27}],18:[function(require,module,exports){
 var ViewCore = require('./ViewCore');
 
 var Router = Backbone.Router.extend({
@@ -2618,8 +2617,10 @@ Router = Router.extend(ViewCore);
 module.exports = new Router();
 },{"./ViewCore":20}],19:[function(require,module,exports){
 var ViewCore = require('./ViewCore');
-module.exports = Backbone.View.extend(ViewCore);
-},{"./ViewCore":20}],20:[function(require,module,exports){
+var ViewEventsCore = require('./ViewEventsCore');
+var viewCore = Backbone.View.extend(ViewCore);
+module.exports = viewCore.extend(ViewEventsCore);
+},{"./ViewCore":20,"./ViewEventsCore":21}],20:[function(require,module,exports){
 (function (process){
 var viewCache = [];
 window.viewCache = viewCache
@@ -2628,25 +2629,6 @@ var conf = require('confify');
 var MAXCACHE = 8;
 
 module.exports = {
-    events: function() {
-      this.undelegateEvents();
-      return _.extend({},this._events,this.viewEvents);
-    },
-    _events: {
-      'click a': '_link'
-    },
-    _link: function(e){
-        e.preventDefault();
-        console.log("clicked")
-        process.nextTick(function(){
-          if(e.isPropagationStopped()) return
-          var href = e.currentTarget.getAttribute('href');
-          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
-            Backbone.trigger("go", {href: href});          
-          else
-            window.open(href);
-        })
-    },
     _destroyViews: function(group, options, subview){
       options = options || {};
       if(!this._views.hasOwnProperty(group)) return;
@@ -2687,12 +2669,12 @@ module.exports = {
       else if( options.reset !== false )
         this.destroy(options.group, options);        
       
-      process.nextTick(function(){          
-        var newview = new View(options);
-        newview.parent = this;
-        newview.group = options.group;
-        newview.label = options.label;
-        newview.hits = 1;
+      process.nextTick(function(){
+        var opts = { parent: this, hits: 1 };
+        var returnOpts = _.extend(options, opts);
+        var newview = new View(returnOpts);
+        _.extend(newview, returnOpts);
+        
         this._views[options.group].push(newview);
         this.manageCache(newview);
       }.bind(this));
@@ -2730,7 +2712,28 @@ module.exports = {
     }
 }
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26}],21:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":27}],21:[function(require,module,exports){
+(function (process){
+module.exports = {
+    events: function(options) {
+      var events = this.options && this.options.parent && this.options.parent === Backbone.router ? { 'click a': '_link' } : {};
+      return _.extend({},events,this.viewEvents);
+    },
+    _link: function(e){
+        e.preventDefault();
+        process.nextTick(function(){
+          if(e.isPropagationStopped()) return false
+          var href = e.currentTarget.getAttribute('href');
+          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
+            Backbone.trigger("go", {href: href});          
+          else
+            window.open(href);
+          return false;
+        });
+    }
+}
+}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
 (function (process){
 var store = require('./store');
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
@@ -2776,11 +2779,11 @@ function newstore(options){
 }
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
+},{"./store":23,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],23:[function(require,module,exports){
 /* Copyright (c) 2010-2013 Marcus Westin */
 (function(e){function o(){try{return r in e&&e[r]}catch(t){return!1}}var t={},n=e.document,r="localStorage",i="script",s;t.disabled=!1,t.set=function(e,t){},t.get=function(e){},t.remove=function(e){},t.clear=function(){},t.transact=function(e,n,r){var i=t.get(e);r==null&&(r=n,n=null),typeof i=="undefined"&&(i=n||{}),r(i),t.set(e,i)},t.getAll=function(){},t.forEach=function(){},t.serialize=function(e){return JSON.stringify(e)},t.deserialize=function(e){if(typeof e!="string")return undefined;try{return JSON.parse(e)}catch(t){return e||undefined}};if(o())s=e[r],t.set=function(e,n){return n===undefined?t.remove(e):(s.setItem(e,t.serialize(n)),n)},t.get=function(e){return t.deserialize(s.getItem(e))},t.remove=function(e){s.removeItem(e)},t.clear=function(){s.clear()},t.getAll=function(){var e={};return t.forEach(function(t,n){e[t]=n}),e},t.forEach=function(e){for(var n=0;n<s.length;n++){var r=s.key(n);e(r,t.get(r))}};else if(n.documentElement.addBehavior){var u,a;try{a=new ActiveXObject("htmlfile"),a.open(),a.write("<"+i+">document.w=window</"+i+'><iframe src="/favicon.ico"></iframe>'),a.close(),u=a.w.frames[0].document,s=u.createElement("div")}catch(f){s=n.createElement("div"),u=n.body}function l(e){return function(){var n=Array.prototype.slice.call(arguments,0);n.unshift(s),u.appendChild(s),s.addBehavior("#default#userData"),s.load(r);var i=e.apply(t,n);return u.removeChild(s),i}}var c=new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]","g");function h(e){return e.replace(/^d/,"___$&").replace(c,"___")}t.set=l(function(e,n,i){return n=h(n),i===undefined?t.remove(n):(e.setAttribute(n,t.serialize(i)),e.save(r),i)}),t.get=l(function(e,n){return n=h(n),t.deserialize(e.getAttribute(n))}),t.remove=l(function(e,t){t=h(t),e.removeAttribute(t),e.save(r)}),t.clear=l(function(e){var t=e.XMLDocument.documentElement.attributes;e.load(r);for(var n=0,i;i=t[n];n++)e.removeAttribute(i.name);e.save(r)}),t.getAll=function(e){var n={};return t.forEach(function(e,t){n[e]=t}),n},t.forEach=l(function(e,n){var r=e.XMLDocument.documentElement.attributes;for(var i=0,s;s=r[i];++i)n(s.name,t.deserialize(e.getAttribute(s.name)))})}try{var p="__storejs__";t.set(p,p),t.get(p)!=p&&(t.disabled=!0),t.remove(p)}catch(f){t.disabled=!0}t.enabled=!t.disabled,typeof module!="undefined"&&module.exports&&this.module!==module?module.exports=t:typeof define=="function"&&define.amd?define(t):e.store=t})(Function("return this")())
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	hyperglue = require('hyperglue'),
@@ -2831,7 +2834,7 @@ module.exports = function(options){
 	return new HTMLCollection([], options);
 };
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":27,"foldify":31,"hyperglue":34}],25:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	digistify = require('digistify'),
@@ -2965,7 +2968,7 @@ function slug(input, identifier)
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
+},{"../adapters/dbAdapter.js":22,"../models/Post":26,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":28,"foldify":31,"util":9}],26:[function(require,module,exports){
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
@@ -3036,7 +3039,7 @@ module.exports = Backbone.Model.extend({
 	}
 })
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":28,"hyperglue":34,"marked":37}],27:[function(require,module,exports){
 (function (process){
 function merge(a, b){
     for(var prop in b){
@@ -3050,7 +3053,7 @@ module.exports = function browser(srcObj){
 };
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],28:[function(require,module,exports){
 (function (process){
 var request = require('request');
 
@@ -3200,7 +3203,7 @@ module.exports = exportObj.getGists;
 module.exports.setDefault = exportObj.setDefault;
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":29}],29:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -3613,7 +3616,7 @@ function b64_enc (data) {
     return enc;
 }
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /**
  * @preserve FastClick: polyfill to remove click delays on browsers with touch UIs.
  *
@@ -4405,7 +4408,7 @@ if (typeof define !== 'undefined' && define.amd) {
 	window.FastClick = FastClick;
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (process){
 var fs = require('fs'),
 	path = require('path'),
@@ -4812,7 +4815,7 @@ function isArray(obj){
 	return ~Object.prototype.toString.call(obj).toLowerCase().indexOf("array");
 }
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":32,"path":7}],32:[function(require,module,exports){
 (function (process){
 if(typeof JSON === "undefined"){
 
@@ -6506,7 +6509,7 @@ function regExpEscape (s) {
 
 
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
+},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":33}],33:[function(require,module,exports){
 module.exports = sigmund
 function sigmund (subject, maxSessions) {
     maxSessions = maxSessions || 10;
@@ -6547,7 +6550,7 @@ function sigmund (subject, maxSessions) {
 
 // vim: set softtabstop=4 shiftwidth=4:
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var domify = require('domify');
 
 module.exports = hyperglue;
@@ -6665,7 +6668,7 @@ function appendTo(dest) {
     } ); 
     return this;
 }
-},{"domify":34}],34:[function(require,module,exports){
+},{"domify":35}],35:[function(require,module,exports){
 
 /**
  * Expose `parse`.
@@ -6746,7 +6749,7 @@ function orphan(els) {
   return ret;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var inserted = {};
 
 module.exports = function (css) {
@@ -6766,7 +6769,7 @@ module.exports = function (css) {
     head.appendChild(elem);
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
 /**
  * marked - a markdown parser
@@ -8036,7 +8039,7 @@ if (typeof exports === 'object') {
 }());
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (Buffer){
 var insertCss = require('insert-css');
 var fs = require('fs');
@@ -8081,7 +8084,6 @@ function PageSlide(container, options) {
 
     // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
     this.slidePage = function(page, opts) {
-        console.log("slidepage")
         opts = opts || {};
         var state = allowPush ? window.location.pathname : window.location.hash;
 
@@ -8140,9 +8142,7 @@ function PageSlide(container, options) {
         }
 
         if(isJ){
-            console.log(tranType);
             currentPage.one(tranType, function(e) {
-                console.log(tranType+"done");
                 page.trigger({ 
                     type:'pageslideEnd', 
                     slidFrom: from, 
@@ -8161,13 +8161,9 @@ function PageSlide(container, options) {
                     $toTarget: page,
                     stopPropogation: function(){e.stopPropogation();} 
                 });
-                if(!e.isPropagationStopped()){
-                    console.log("remove in slider")
-                    console.log(e)
-                    console.log(e.target)
+                if(!e.isPropagationStopped())
                     $(e.target).remove();
-                }
-                setTimeout(function(){ currentPage = page }, 300);
+                currentPage = page;
             });
         }else{
             var listener = function listener(e){
@@ -8197,6 +8193,7 @@ function PageSlide(container, options) {
 
         p.add("page","transition","center");
         cP.add("page","transition",notFrom);
+        
     };
 
 }
@@ -8400,4 +8397,4 @@ if (objCtr.defineProperty) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":2,"fs":1,"insert-css":35}]},{},[10])
+},{"buffer":2,"fs":1,"insert-css":36}]},{},[10])

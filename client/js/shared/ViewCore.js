@@ -5,25 +5,6 @@ var conf = require('confify');
 var MAXCACHE = conf.maxViewCache;
 
 module.exports = {
-    events: function() {
-      this.undelegateEvents();
-      return _.extend({},this._events,this.viewEvents);
-    },
-    _events: {
-      'click a': '_link'
-    },
-    _link: function(e){
-        e.preventDefault();
-        console.log("clicked")
-        process.nextTick(function(){
-          if(e.isPropagationStopped()) return
-          var href = e.currentTarget.getAttribute('href');
-          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
-            Backbone.trigger("go", {href: href});          
-          else
-            window.open(href);
-        })
-    },
     _destroyViews: function(group, options, subview){
       options = options || {};
       if(!this._views.hasOwnProperty(group)) return;
@@ -64,12 +45,12 @@ module.exports = {
       else if( options.reset !== false )
         this.destroy(options.group, options);        
       
-      process.nextTick(function(){          
-        var newview = new View(options);
-        newview.parent = this;
-        newview.group = options.group;
-        newview.label = options.label;
-        newview.hits = 1;
+      process.nextTick(function(){
+        var opts = { parent: this, hits: 1 };
+        var returnOpts = _.extend(options, opts);
+        var newview = new View(returnOpts);
+        _.extend(newview, returnOpts);
+        
         this._views[options.group].push(newview);
         this.manageCache(newview);
       }.bind(this));

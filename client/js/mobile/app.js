@@ -1,5 +1,4 @@
-var router = require('../shared/Router'),
-    foldify = require('foldify'),
+var foldify = require('foldify'),
 	insertCss = require("insert-css"),
 	fastclick = require('fastclick'),
     conf = require('confify');
@@ -9,6 +8,10 @@ conf({displayType: "mobile"});
 
 var	routes = foldify(__dirname + '/routes'),
     LayoutView = require('./views/layout');
+
+//attach routes
+Backbone.router = require('../shared/Router');
+routes(Backbone.router);
 
 //grab global collections
 Backbone.collections = foldify(__dirname + '/../shared/collections');
@@ -37,9 +40,6 @@ Backbone.transition = function(container, opts){
 Backbone.iScroll = function(container){
     return !!conf.useIScroll === false ? false : new IScroll( container[0], {click: true} );
 }
-
-//attach routes
-routes(router);
 
 //instantiate base page
 new LayoutView();
