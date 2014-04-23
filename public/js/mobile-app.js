@@ -2380,7 +2380,12 @@ module.exports = View.extend({
 
 		this.prerendering = true;
 		var init = Backbone.transition( this.$el, {level:2} );
-		function signal(){ 
+		function signal(e){ 
+			if(e){
+				console.log("remove in app")
+				e.stopPropagation();
+				e.$fromTarget.remove();				
+			}
 			this.prerendering = false;
 			this.trigger("prerendered");
 		};
@@ -8139,11 +8144,23 @@ function PageSlide(container, options) {
                     slidFrom: from, 
                     target: e.target, 
                     $target: currentPage, 
+                    toTarget: page[0],
+                    $toTarget: page,
                     stopPropogation: function(){e.stopPropogation();} 
                 });
-                if(!e.isPropagationStopped())
+                page.trigger({ 
+                    type:'pageslideEnd', 
+                    slidFrom: from, 
+                    target: page[0],
+                    $target: page,
+                    fromTarget: currentPage[0],
+                    $fromTarget: currentPage,
+                    stopPropogation: function(){e.stopPropogation();} 
+                });
+                if(!e.isPropagationStopped()){
+                    console.log("remove in slider")
                     $(e.target).remove();
-                currentPage = null;
+                }
                 currentPage = page;
             });
         }else{
@@ -8157,7 +8174,6 @@ function PageSlide(container, options) {
                 e.target.dispatchEvent(event);
                 if(!event.isPropagationStopped())
                     e.target.parentNode.removeChild(e.target);
-                currentPage = null;
                 currentPage = page;
             };
             currentPage.addEventListener( tranType, listener );

@@ -16,7 +16,12 @@ module.exports = View.extend({
 
 		this.prerendering = true;
 		var init = Backbone.transition( this.$el, {level:2} );
-		function signal(){ 
+		function signal(e){ 
+			if(e){
+				console.log("remove in app")
+				e.stopPropagation();
+				e.$fromTarget.remove();				
+			}
 			this.prerendering = false;
 			this.trigger("prerendered");
 		};
