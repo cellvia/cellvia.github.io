@@ -8143,6 +8143,7 @@ function PageSlide(container, options) {
                 });
                 if(!e.isPropagationStopped())
                     $(e.target).remove();
+                currentPage = page;
             });
         }else{
             var listener = function listener(e){
@@ -8155,6 +8156,7 @@ function PageSlide(container, options) {
                 e.target.dispatchEvent(event);
                 if(!event.isPropagationStopped())
                     e.target.parentNode.removeChild(e.target);
+                currentPage = page;
             };
             currentPage.addEventListener( tranType, listener );
         }
@@ -8171,7 +8173,6 @@ function PageSlide(container, options) {
 
         p.add("page","transition","center");
         cP.add("page","transition",notFrom);
-        currentPage = page;
     };
 
 }
