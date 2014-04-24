@@ -3,7 +3,7 @@ var conf = require('confify');
 
 module.exports = View.extend({
 	className: "sections",
-	viewEvents: {
+	events: {
 		"click h1.topcoat-navigation-bar__title span": "resume" 
 	},
 	resume: function(){

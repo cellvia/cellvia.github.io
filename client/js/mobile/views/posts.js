@@ -51,10 +51,10 @@ module.exports = View.extend({
 	},
 	initialize: function(options){
 		console.log("init posts")
-		if(this.skipPage) return this.shouldSkipPage();
-		if(options.cached) return Backbone.transition( this.$el, {level: 1} );
-
 		this.options = options || {};
+		if(this.skipPage) return this.shouldSkipPage();
+		if(this.options.cached) return Backbone.transition( this.$el, {level: 1} );
+
 		this.counter = 0;
 		this.type = this.options.type;
 		this.$el.addClass("section-"+slug(this.type));

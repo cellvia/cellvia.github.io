@@ -17,18 +17,14 @@ module.exports = View.extend({
 		this.prerendering = true;
 		var init = Backbone.transition( this.$el, {level:2} );
 		function signal(e){ 
-			if(e){
-				console.log("remove in app")
-				e.stopPropagation();
-				e.$fromTarget.remove();				
-			}
 			this.prerendering = false;
 			this.trigger("prerendered");
 		};
 		if(init)
 			signal.call(this);
-		else
+		else{
 			this.$el.one( "pageslideEnd", signal.bind(this) );
+		}
 	},
 	render: function(){
 		if(!this.prerendered) return this.prerender();
@@ -61,9 +57,9 @@ module.exports = View.extend({
 		process.nextTick(this.prerender.bind(this));
 	},
 	initialize: function(options){
-		if(options.cached) return Backbone.transition( this.$el, {level:2} );
-
 		this.options = options || {};
+		if(this.options.cached) return Backbone.transition( this.$el, {level:2} );
+
 		this.slug = this.options.slug;
 		this.type = this.options.type;
 		this.$el.addClass("section-"+slug(this.type));

@@ -1671,8 +1671,6 @@ var exportObj = {
 		function finalize(){
 			if(offset || limit) gists = gists.slice(offset, limit);
 			if( transform ) gists = gists.map(transform);
-			console.log("gists");
-			console.log(gists);
 			cb(null, { data: gists, etag: etag });
 		}
 	},

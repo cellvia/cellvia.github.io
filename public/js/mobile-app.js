@@ -2306,6 +2306,7 @@ module.exports = function(router){
 	});
 
 	router.route('articles/:type', 'posts', function(type){
+		console.log("posts"+type)
 		if(!router.exists(type))
 	    	router.view( PostsView, {type: type, group: type} );
 	    else
@@ -2351,7 +2352,7 @@ module.exports = View.extend({
           if(e.isPropagationStopped()) return
           var href = e.currentTarget.getAttribute('href');
           if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
-            Backbone.trigger("go", {href: href});          
+            Backbone.trigger("go", {href: href});
           else
             window.open(href);
         });
@@ -2398,18 +2399,14 @@ module.exports = View.extend({
 		this.prerendering = true;
 		var init = Backbone.transition( this.$el, {level:2} );
 		function signal(e){ 
-			if(e){
-				console.log("remove in app")
-				e.stopPropagation();
-				e.$fromTarget.remove();				
-			}
 			this.prerendering = false;
 			this.trigger("prerendered");
 		};
 		if(init)
 			signal.call(this);
-		else
+		else{
 			this.$el.one( "pageslideEnd", signal.bind(this) );
+		}
 	},
 	render: function(){
 		if(!this.prerendered) return this.prerender();
@@ -2442,9 +2439,9 @@ module.exports = View.extend({
 		process.nextTick(this.prerender.bind(this));
 	},
 	initialize: function(options){
-		if(options.cached) return Backbone.transition( this.$el, {level:2} );
-
 		this.options = options || {};
+		if(this.options.cached) return Backbone.transition( this.$el, {level:2} );
+
 		this.slug = this.options.slug;
 		this.type = this.options.type;
 		this.$el.addClass("section-"+slug(this.type));
@@ -2480,8 +2477,10 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'posts',
 	render: function(){
+		console.log("render posts")
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
+		console.log("actually render posts")
 		this.rendered = true;
 		var postsMap = this.posts.map(function(post){
 				return {'a': {
@@ -2525,10 +2524,11 @@ module.exports = View.extend({
 		return this.skipPage;
 	},
 	initialize: function(options){
-		if(this.skipPage) return this.shouldSkipPage();
-		if(options.cached) return Backbone.transition( this.$el, {level: 1} );
-
+		console.log("init posts")
 		this.options = options || {};
+		if(this.skipPage) return this.shouldSkipPage();
+		if(this.options.cached) return Backbone.transition( this.$el, {level: 1} );
+
 		this.counter = 0;
 		this.type = this.options.type;
 		this.$el.addClass("section-"+slug(this.type));
@@ -2579,7 +2579,7 @@ var conf = require('confify');
 
 module.exports = View.extend({
 	className: "sections",
-	viewEvents: {
+	events: {
 		"click h1.topcoat-navigation-bar__title span": "resume" 
 	},
 	resume: function(){
@@ -3141,8 +3141,6 @@ var exportObj = {
 		function finalize(){
 			if(offset || limit) gists = gists.slice(offset, limit);
 			if( transform ) gists = gists.map(transform);
-			console.log("gists");
-			console.log(gists);
 			cb(null, { data: gists, etag: etag });
 		}
 	},
@@ -8072,11 +8070,13 @@ function PageSlide(container, options) {
         tranType;
 
     if(isSafari || isChrome)
-        tranType ='webkitTransitionEnd'
+        tranType ='webkitTransitionEnd';
     else if(isFirefox || isIE)
-        tranType = 'transitionend'
+        tranType = 'transitionend';
     else if(isOpera)
         tranType = 'otransitionend';
+    else
+        tranType ='webkitTransitionEnd';
 
     // Use this function if you want PageSlider to automatically determine the sliding direction based on the state history
     this.slidePage = function(page, opts) {
@@ -8181,14 +8181,17 @@ function PageSlide(container, options) {
         container[0].offsetWidth;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
+        page.removeClass("left right").addClass("page center transition");
+        currentPage.removeClass("center "+from).addClass("page transition "+ notFrom);
+
         var p = isJ ? page[0].classList : page.classList;
         var cP = isJ ? currentPage[0].classList : currentPage.classList;
 
-        p.remove("left", "right");
-        cP.remove("center", from)
+        // p.remove("left", "right");
+        // cP.remove("center", from)
 
-        p.add("page","transition","center");
-        cP.add("page","transition",notFrom);
+        // p.add("page","transition","center");
+        // cP.add("page","transition",notFrom);
         
     };
 
