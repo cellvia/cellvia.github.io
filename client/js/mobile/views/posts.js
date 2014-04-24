@@ -3,16 +3,14 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'posts',
 	render: function(){
-		console.log("render posts"+this.rendered)
-		console.log("render posts"+this.html.fetched)
-		console.log("render posts"+this.posts.fetched)
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
 		console.log("actually render posts")
 		this.rendered = true;
+		var self = this;
 		var postsMap = this.posts.map(function(post){
 				return {'a': {
-							href: "/article/" + post.get("type") + "/" + post.get("slug"), 
+							href: "/article/" + self.typeSlug + "/" + post.get("slug"), 
 							class: "post listitem" 
 						},
 						'a span.item-content': post.get("title"),
@@ -25,7 +23,7 @@ module.exports = View.extend({
 		});
 		var map = {
 			'.goback a': { href: this.type ? "/" : "/tags" },
-			'.page-title span': this.type || this.tag,
+			'.page-title span': this.typeTitle || this.tag,
 			'.page-content': { _html: menu }
 		}
 		var rendered = this.html.render("content.html", map);
@@ -44,7 +42,7 @@ module.exports = View.extend({
 	shouldSkipPage: function(){
 		if(this.posts.fetched && (this.skipPage || (this.skipPage = this.posts.length === 1))){
 			var post = this.posts.models[0];
-			var url = "/article/" + post.get('type') + "/" + post.get("slug");
+			var url = "/article/" + this.typeSlug + "/" + post.get("slug");
 			process.nextTick(function(){
 				Backbone.trigger("go", {href: url, replace: true});
 			});
@@ -52,14 +50,15 @@ module.exports = View.extend({
 		return this.skipPage;
 	},
 	initialize: function(options){
-		console.log("init posts")
 		this.options = options || {};
 		if(this.skipPage) return this.shouldSkipPage();
 		if(this.options.cached) return Backbone.transition( this.$el, {level: 1} );
 
 		this.counter = 0;
 		this.type = this.options.type;
-		this.$el.addClass("section-"+slug(this.type));
+		this.typeSlug = Backbone.collections[this.type].typeSlug;
+		this.typeTitle = Backbone.collections[this.type].typeTitle;
+		this.$el.addClass("section-"+this.typeSlug);
 
 		if(options.tag){
 			this.tag = this.options.tag;
@@ -88,15 +87,3 @@ module.exports = View.extend({
 
 	}
 });
-
-function slug(input, identifier)
-{
-	if(!input) return
-	if(identifier) input = input.replace(identifier, '') // Trim identifier
-    return input
-        .replace(/^\s\s*/, '') // Trim start
-        .replace(/\s\s*$/, '') // Trim end
-        .toLowerCase() // Camel case is bad
-        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
-        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
-}

@@ -2249,6 +2249,9 @@ Backbone.collections = ((function(){ var bind = function bind(fn){ var args = Ar
 Backbone.sections = ["about","résumé","code","sound&vision","reflections"];
 Backbone.sections.forEach(function(type){
 	Backbone.collections[type] = Backbone.collections.Posts({identifier: "~"+type+"~"});
+	Backbone.collections[type].typeSlug = slug(type);
+	Backbone.collections[type].typeTitle = type;
+	Backbone.collections[slug(type)] = Backbone.collections[type];	
 });
 
 //html template collection
@@ -2277,6 +2280,18 @@ new LayoutView();
 Backbone.history.start({
   pushState: !!(!~window.location.href.indexOf("github.io") && !~window.location.href.indexOf("brandonselway.com") && Modernizr.history)
 });
+
+function slug(input, identifier)
+{
+	if(!input) return
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}
 },{"../shared/Router":18,"./views/layout":14,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\error.js":11,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\posts.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Html.js":23,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Posts.js":24,"confify":26,"fastclick":29,"foldify":30,"insert-css":35,"pageslide":37}],11:[function(require,module,exports){
 var ErrorView = require('../views/error');
 
@@ -2306,7 +2321,6 @@ module.exports = function(router){
 	});
 
 	router.route('articles/:type', 'posts', function(type){
-		console.log("posts"+type)
 		if(!router.exists(type))
 	    	router.view( PostsView, {type: type, group: type} );
 	    else
@@ -2346,7 +2360,6 @@ module.exports = View.extend({
 		'click a': 'link'
 	},
 	link: function(e){
-		console.log("click")
         e.preventDefault();
         process.nextTick(function(){
           if(e.isPropagationStopped()) return
@@ -2390,7 +2403,7 @@ module.exports = View.extend({
 		if(this.prerendered) return		
 		if(!this.rendered){
 			var rendered = this.html.render("content.html", { 
-				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.type },
+				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.typeSlug },
 				'.page-title span': this.post.get('title')
 			});
 			this.$el.html( rendered );
@@ -2446,7 +2459,8 @@ module.exports = View.extend({
 
 		this.slug = this.options.slug;
 		this.type = this.options.type;
-		this.$el.addClass("section-"+slug(this.type));
+		this.typeSlug = Backbone.collections[this.type].typeSlug;
+		this.$el.addClass("section-"+this.typeSlug);
 		this.$el.addClass("article-"+this.slug);
 
 		this.html = Backbone.collections.html;
@@ -2460,17 +2474,6 @@ module.exports = View.extend({
 	}
 });
 
-function slug(input, identifier)
-{
-	if(!input) return
-	if(identifier) input = input.replace(identifier, '') // Trim identifier
-    return input
-        .replace(/^\s\s*/, '') // Trim start
-        .replace(/\s\s*$/, '') // Trim end
-        .toLowerCase() // Camel case is bad
-        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
-        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
-}
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
 },{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],16:[function(require,module,exports){
 (function (process){
@@ -2479,16 +2482,14 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'posts',
 	render: function(){
-		console.log("render posts"+this.rendered)
-		console.log("render posts"+this.html.fetched)
-		console.log("render posts"+this.posts.fetched)
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
 		console.log("actually render posts")
 		this.rendered = true;
+		var self = this;
 		var postsMap = this.posts.map(function(post){
 				return {'a': {
-							href: "/article/" + post.get("type") + "/" + post.get("slug"), 
+							href: "/article/" + self.typeSlug + "/" + post.get("slug"), 
 							class: "post listitem" 
 						},
 						'a span.item-content': post.get("title"),
@@ -2501,7 +2502,7 @@ module.exports = View.extend({
 		});
 		var map = {
 			'.goback a': { href: this.type ? "/" : "/tags" },
-			'.page-title span': this.type || this.tag,
+			'.page-title span': this.typeTitle || this.tag,
 			'.page-content': { _html: menu }
 		}
 		var rendered = this.html.render("content.html", map);
@@ -2520,7 +2521,7 @@ module.exports = View.extend({
 	shouldSkipPage: function(){
 		if(this.posts.fetched && (this.skipPage || (this.skipPage = this.posts.length === 1))){
 			var post = this.posts.models[0];
-			var url = "/article/" + post.get('type') + "/" + post.get("slug");
+			var url = "/article/" + this.typeSlug + "/" + post.get("slug");
 			process.nextTick(function(){
 				Backbone.trigger("go", {href: url, replace: true});
 			});
@@ -2528,14 +2529,15 @@ module.exports = View.extend({
 		return this.skipPage;
 	},
 	initialize: function(options){
-		console.log("init posts")
 		this.options = options || {};
 		if(this.skipPage) return this.shouldSkipPage();
 		if(this.options.cached) return Backbone.transition( this.$el, {level: 1} );
 
 		this.counter = 0;
 		this.type = this.options.type;
-		this.$el.addClass("section-"+slug(this.type));
+		this.typeSlug = Backbone.collections[this.type].typeSlug;
+		this.typeTitle = Backbone.collections[this.type].typeTitle;
+		this.$el.addClass("section-"+this.typeSlug);
 
 		if(options.tag){
 			this.tag = this.options.tag;
@@ -2565,17 +2567,6 @@ module.exports = View.extend({
 	}
 });
 
-function slug(input, identifier)
-{
-	if(!input) return
-	if(identifier) input = input.replace(identifier, '') // Trim identifier
-    return input
-        .replace(/^\s\s*/, '') // Trim start
-        .replace(/\s\s*$/, '') // Trim end
-        .toLowerCase() // Camel case is bad
-        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
-        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
-}
 }).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
 },{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
 var View = require('../../shared/View');
@@ -2593,7 +2584,7 @@ module.exports = View.extend({
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
 		var menu = this.html.render("list.html", {
 			'li.topcoat-list__item': Backbone.sections.map(function(section){
-				return { 'a': { href: '/articles/'+section, class: "section listitem" },
+				return { 'a': { href: '/articles/'+Backbone.collections[section].typeSlug, class: "section listitem" },
 						 'a span.item-content': section
 				}
 			})
@@ -2617,12 +2608,22 @@ module.exports = View.extend({
 	}
 });
 
+function slug(input, identifier)
+{
+	if(!input) return
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}
 },{"../../shared/View":19,"confify":26}],18:[function(require,module,exports){
 var ViewCore = require('./ViewCore');
 
 var Router = Backbone.Router.extend({
     go: function(data){
-      console.log("go"+data.href)
       this.navigate(data.href, {
         trigger: (data.trigger === false) ? false : true, 
         replace: (data.replace === true) ? true : false 

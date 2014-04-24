@@ -13,7 +13,7 @@ module.exports = View.extend({
 		if(this.rendered) return Backbone.transition( this.$el, {level: 0} );
 		var menu = this.html.render("list.html", {
 			'li.topcoat-list__item': Backbone.sections.map(function(section){
-				return { 'a': { href: '/articles/'+section, class: "section listitem" },
+				return { 'a': { href: '/articles/'+Backbone.collections[section].typeSlug, class: "section listitem" },
 						 'a span.item-content': section
 				}
 			})
@@ -36,3 +36,15 @@ module.exports = View.extend({
 		this.html.fetch();
 	}
 });
+
+function slug(input, identifier)
+{
+	if(!input) return
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}

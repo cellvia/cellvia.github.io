@@ -31,7 +31,6 @@ module.exports = View.extend({
 			})
 		}
 		var rendered = this.html.render("body.html", map);
-		console.log(rendered)
 		Backbone.transition( this.$el, rendered );
 	},
 	initialize: function(){

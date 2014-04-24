@@ -6,7 +6,6 @@ module.exports = View.extend({
 		'click a': 'link'
 	},
 	link: function(e){
-		console.log("click")
         e.preventDefault();
         process.nextTick(function(){
           if(e.isPropagationStopped()) return

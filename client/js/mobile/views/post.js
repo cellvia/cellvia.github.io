@@ -6,7 +6,7 @@ module.exports = View.extend({
 		if(this.prerendered) return		
 		if(!this.rendered){
 			var rendered = this.html.render("content.html", { 
-				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.type },
+				'.goback a': { href: this.post.collection.length === 1 ? "/" : "/articles/"+this.typeSlug },
 				'.page-title span': this.post.get('title')
 			});
 			this.$el.html( rendered );
@@ -62,7 +62,8 @@ module.exports = View.extend({
 
 		this.slug = this.options.slug;
 		this.type = this.options.type;
-		this.$el.addClass("section-"+slug(this.type));
+		this.typeSlug = Backbone.collections[this.type].typeSlug;
+		this.$el.addClass("section-"+this.typeSlug);
 		this.$el.addClass("article-"+this.slug);
 
 		this.html = Backbone.collections.html;
@@ -75,15 +76,3 @@ module.exports = View.extend({
 
 	}
 });
-
-function slug(input, identifier)
-{
-	if(!input) return
-	if(identifier) input = input.replace(identifier, '') // Trim identifier
-    return input
-        .replace(/^\s\s*/, '') // Trim start
-        .replace(/\s\s*$/, '') // Trim end
-        .toLowerCase() // Camel case is bad
-        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
-        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
-}

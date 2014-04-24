@@ -12,7 +12,6 @@ module.exports = function(router){
 	});
 
 	router.route('articles/:type', 'posts', function(type){
-		console.log("posts"+type)
 		if(!router.exists(type))
 	    	router.view( PostsView, {type: type, group: type} );
 	    else

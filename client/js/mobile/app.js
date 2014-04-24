@@ -20,6 +20,9 @@ Backbone.collections = foldify(__dirname + '/../shared/collections');
 Backbone.sections = conf.sections;
 Backbone.sections.forEach(function(type){
 	Backbone.collections[type] = Backbone.collections.Posts({identifier: "~"+type+"~"});
+	Backbone.collections[type].typeSlug = slug(type);
+	Backbone.collections[type].typeTitle = type;
+	Backbone.collections[slug(type)] = Backbone.collections[type];	
 });
 
 //html template collection
@@ -48,3 +51,15 @@ new LayoutView();
 Backbone.history.start({
   pushState: !!(!~window.location.href.indexOf("github.io") && !~window.location.href.indexOf("brandonselway.com") && Modernizr.history)
 });
+
+function slug(input, identifier)
+{
+	if(!input) return
+	if(identifier) input = input.replace(identifier, '') // Trim identifier
+    return input
+        .replace(/^\s\s*/, '') // Trim start
+        .replace(/\s\s*$/, '') // Trim end
+        .toLowerCase() // Camel case is bad
+        .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
+        .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
+}
