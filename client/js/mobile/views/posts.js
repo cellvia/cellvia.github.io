@@ -3,7 +3,9 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'posts',
 	render: function(){
-		console.log("render posts")
+		console.log("render posts"+this.rendered)
+		console.log("render posts"+this.html.fetched)
+		console.log("render posts"+this.posts.fetched)
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
 		console.log("actually render posts")
