@@ -2351,8 +2351,10 @@ module.exports = View.extend({
         process.nextTick(function(){
           if(e.isPropagationStopped()) return
           var href = e.currentTarget.getAttribute('href');
-          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
+          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) ){
+          	console.log("going")
             Backbone.trigger("go", {href: href});
+          }
           else
             window.open(href);
         });
@@ -2620,6 +2622,7 @@ var ViewCore = require('./ViewCore');
 
 var Router = Backbone.Router.extend({
     go: function(data){
+      console.log("go"+data.href)
       this.navigate(data.href, {
         trigger: (data.trigger === false) ? false : true, 
         replace: (data.replace === true) ? true : false 
