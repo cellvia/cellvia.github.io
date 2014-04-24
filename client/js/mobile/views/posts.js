@@ -3,8 +3,10 @@ var View = require('../../shared/View');
 module.exports = View.extend({
 	className: 'posts',
 	render: function(){
+		console.log("render posts")
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
+		console.log("actually render posts")
 		this.rendered = true;
 		var postsMap = this.posts.map(function(post){
 				return {'a': {
@@ -48,6 +50,7 @@ module.exports = View.extend({
 		return this.skipPage;
 	},
 	initialize: function(options){
+		console.log("init posts")
 		if(this.skipPage) return this.shouldSkipPage();
 		if(options.cached) return Backbone.transition( this.$el, {level: 1} );
 
