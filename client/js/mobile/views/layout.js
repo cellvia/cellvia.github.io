@@ -10,10 +10,8 @@ module.exports = View.extend({
         process.nextTick(function(){
           if(e.isPropagationStopped()) return
           var href = e.currentTarget.getAttribute('href');
-          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) ){
-          	console.log("going")
+          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
             Backbone.trigger("go", {href: href});
-          }
           else
             window.open(href);
         });

@@ -11,7 +11,7 @@ if( isMobile ){
 	loadMeta()
 
 	//avoid click delay in iphone
-	if(isIphone) fastclick(document.body);
+	fastclick(document.body);
 
 	loadCss('/public/css/topcoat-mobile-light.min.css');
 	loadCss('/public/css/mobile.css?_=' + now);

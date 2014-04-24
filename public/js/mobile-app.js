@@ -2364,10 +2364,8 @@ module.exports = View.extend({
         process.nextTick(function(){
           if(e.isPropagationStopped()) return
           var href = e.currentTarget.getAttribute('href');
-          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) ){
-          	console.log("going")
+          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
             Backbone.trigger("go", {href: href});
-          }
           else
             window.open(href);
         });
@@ -2484,7 +2482,6 @@ module.exports = View.extend({
 	render: function(){
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
-		console.log("actually render posts")
 		this.rendered = true;
 		var self = this;
 		var postsMap = this.posts.map(function(post){

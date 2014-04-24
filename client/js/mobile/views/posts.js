@@ -5,7 +5,6 @@ module.exports = View.extend({
 	render: function(){
 		if(this.shouldSkipPage()) return
 		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
-		console.log("actually render posts")
 		this.rendered = true;
 		var self = this;
 		var postsMap = this.posts.map(function(post){
