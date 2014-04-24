@@ -2,6 +2,21 @@ var View = require('../../shared/View');
 
 module.exports = View.extend({
 	el: "body",
+	events: {
+		'click a': 'link'
+	},
+	link: function(e){
+		console.log("click")
+        e.preventDefault();
+        process.nextTick(function(){
+          if(e.isPropagationStopped()) return
+          var href = e.currentTarget.getAttribute('href');
+          if( !~href.indexOf(".") || ~href.indexOf(document.location.hostname) )
+            Backbone.trigger("go", {href: href});          
+          else
+            window.open(href);
+        });
+	},
 	render: function(){
 		var rendered = this.html.render("footer.html", {
 			".topcoat-navigation-bar__item": Backbone.footers.map(function(item){
