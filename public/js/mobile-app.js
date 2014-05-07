@@ -1,13 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
 },{}],2:[function(require,module,exports){
-/**
+/*!
  * The buffer module from node.js, for the browser.
  *
- * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * License:  MIT
- *
- * `npm install buffer`
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
  */
 
 var base64 = require('base64-js')
@@ -24,17 +22,14 @@ Buffer.poolSize = 8192
  *   === false   Use Object implementation (compatible down to IE6)
  */
 Buffer._useTypedArrays = (function () {
-   // Detect if browser supports Typed Arrays. Supported browsers are IE 10+,
-   // Firefox 4+, Chrome 7+, Safari 5.1+, Opera 11.6+, iOS 4.2+.
-  if (typeof Uint8Array !== 'function' || typeof ArrayBuffer !== 'function')
-    return false
-
-  // Does the browser support adding properties to `Uint8Array` instances? If
-  // not, then that's the same as no `Uint8Array` support. We need to be able to
-  // add all the node Buffer API methods.
-  // Bug in Firefox 4-29, now fixed: https://bugzilla.mozilla.org/show_bug.cgi?id=695438
+  // Detect if browser supports Typed Arrays. Supported browsers are IE 10+, Firefox 4+,
+  // Chrome 7+, Safari 5.1+, Opera 11.6+, iOS 4.2+. If the browser does not support adding
+  // properties to `Uint8Array` instances, then that's the same as no `Uint8Array` support
+  // because we need to be able to add all the node Buffer API methods. This is an issue
+  // in Firefox 4-29. Now fixed: https://bugzilla.mozilla.org/show_bug.cgi?id=695438
   try {
-    var arr = new Uint8Array(0)
+    var buf = new ArrayBuffer(0)
+    var arr = new Uint8Array(buf)
     arr.foo = function () { return 42 }
     return 42 === arr.foo() &&
         typeof arr.subarray === 'function' // Chrome 9-10 lack `subarray`
@@ -77,14 +72,14 @@ function Buffer (subject, encoding, noZero) {
   else if (type === 'string')
     length = Buffer.byteLength(subject, encoding)
   else if (type === 'object')
-    length = coerce(subject.length) // Assume object is an array
+    length = coerce(subject.length) // assume that object is array-like
   else
     throw new Error('First argument needs to be a number, array or string.')
 
   var buf
   if (Buffer._useTypedArrays) {
     // Preferred: Return an augmented `Uint8Array` instance for best performance
-    buf = augment(new Uint8Array(length))
+    buf = Buffer._augment(new Uint8Array(length))
   } else {
     // Fallback: Return THIS instance of Buffer (created by `new`)
     buf = this
@@ -93,9 +88,8 @@ function Buffer (subject, encoding, noZero) {
   }
 
   var i
-  if (Buffer._useTypedArrays && typeof Uint8Array === 'function' &&
-      subject instanceof Uint8Array) {
-    // Speed optimization -- use set if we're copying from a Uint8Array
+  if (Buffer._useTypedArrays && typeof subject.byteLength === 'number') {
+    // Speed optimization -- use set if we're copying from a typed array
     buf._set(subject)
   } else if (isArrayish(subject)) {
     // Treat array-ish objects as a byte array
@@ -392,9 +386,14 @@ Buffer.prototype.copy = function (target, target_start, start, end) {
   if (target.length - target_start < end - start)
     end = target.length - target_start + start
 
-  // copy!
-  for (var i = 0; i < end - start; i++)
-    target[i + target_start] = this[i + start]
+  var len = end - start
+
+  if (len < 100 || !Buffer._useTypedArrays) {
+    for (var i = 0; i < len; i++)
+      target[i + target_start] = this[i + start]
+  } else {
+    target._set(this.subarray(start, start + len), target_start)
+  }
 }
 
 function _base64Slice (buf, start, end) {
@@ -463,7 +462,7 @@ Buffer.prototype.slice = function (start, end) {
   end = clamp(end, len, len)
 
   if (Buffer._useTypedArrays) {
-    return augment(this.subarray(start, end))
+    return Buffer._augment(this.subarray(start, end))
   } else {
     var sliceLen = end - start
     var newBuf = new Buffer(sliceLen, undefined, true)
@@ -906,7 +905,7 @@ Buffer.prototype.inspect = function () {
  * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
  */
 Buffer.prototype.toArrayBuffer = function () {
-  if (typeof Uint8Array === 'function') {
+  if (typeof Uint8Array !== 'undefined') {
     if (Buffer._useTypedArrays) {
       return (new Buffer(this)).buffer
     } else {
@@ -931,9 +930,9 @@ function stringtrim (str) {
 var BP = Buffer.prototype
 
 /**
- * Augment the Uint8Array *instance* (not the class!) with Buffer methods
+ * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
  */
-function augment (arr) {
+Buffer._augment = function (arr) {
   arr._isBuffer = true
 
   // save reference to original Uint8Array get/set methods before overwriting
@@ -1391,6 +1390,13 @@ process.browser = true;
 process.env = {};
 process.argv = [];
 
+function noop() {}
+
+process.on = noop;
+process.once = noop;
+process.off = noop;
+process.emit = noop;
+
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
 }
@@ -1628,8 +1634,8 @@ var substr = 'ab'.substr(-1) === 'b'
     }
 ;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],8:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
@@ -2225,8 +2231,8 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./support/isBuffer":8,"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"inherits":5}],10:[function(require,module,exports){
 var foldify = require('foldify'),
 	insertCss = require("insert-css"),
 	fastclick = require('fastclick'),
@@ -2292,7 +2298,7 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-},{"../shared/Router":18,"./views/layout":14,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\error.js":11,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\posts.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Html.js":23,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Posts.js":24,"confify":26,"fastclick":29,"foldify":30,"insert-css":35,"pageslide":37}],11:[function(require,module,exports){
+},{"../shared/Router":18,"./views/layout":14,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\error.js":11,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\mobile\\routes\\posts.js":12,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Html.js":23,"C:\\node\\work\\personal\\cellvia.github.io\\client\\js\\shared\\collections\\Posts.js":24,"confify":26,"fastclick":29,"foldify":30,"insert-css":36,"pageslide":38}],11:[function(require,module,exports){
 var ErrorView = require('../views/error');
 
 module.exports = function(router){
@@ -2390,8 +2396,8 @@ module.exports = View.extend({
 	}
 });
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],15:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../shared/View":19,"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],15:[function(require,module,exports){
 (function (process){
 var View = require('../../shared/View');
 
@@ -2472,8 +2478,8 @@ module.exports = View.extend({
 	}
 });
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],16:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../shared/View":19,"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],16:[function(require,module,exports){
 (function (process){
 var View = require('../../shared/View');
 
@@ -2564,8 +2570,8 @@ module.exports = View.extend({
 	}
 });
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../../shared/View":19,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../../shared/View":19,"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],17:[function(require,module,exports){
 var View = require('../../shared/View');
 var conf = require('confify');
 
@@ -2731,8 +2737,8 @@ module.exports = {
       this.initialize(options);
     }
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26}],21:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26}],21:[function(require,module,exports){
 (function (process){
 var store = require('./store');
 var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
@@ -2777,8 +2783,8 @@ function newstore(options){
 	}
 }
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"./store":22,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"./store":22,"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],22:[function(require,module,exports){
 /* Copyright (c) 2010-2013 Marcus Westin */
 (function(e){function o(){try{return r in e&&e[r]}catch(t){return!1}}var t={},n=e.document,r="localStorage",i="script",s;t.disabled=!1,t.set=function(e,t){},t.get=function(e){},t.remove=function(e){},t.clear=function(){},t.transact=function(e,n,r){var i=t.get(e);r==null&&(r=n,n=null),typeof i=="undefined"&&(i=n||{}),r(i),t.set(e,i)},t.getAll=function(){},t.forEach=function(){},t.serialize=function(e){return JSON.stringify(e)},t.deserialize=function(e){if(typeof e!="string")return undefined;try{return JSON.parse(e)}catch(t){return e||undefined}};if(o())s=e[r],t.set=function(e,n){return n===undefined?t.remove(e):(s.setItem(e,t.serialize(n)),n)},t.get=function(e){return t.deserialize(s.getItem(e))},t.remove=function(e){s.removeItem(e)},t.clear=function(){s.clear()},t.getAll=function(){var e={};return t.forEach(function(t,n){e[t]=n}),e},t.forEach=function(e){for(var n=0;n<s.length;n++){var r=s.key(n);e(r,t.get(r))}};else if(n.documentElement.addBehavior){var u,a;try{a=new ActiveXObject("htmlfile"),a.open(),a.write("<"+i+">document.w=window</"+i+'><iframe src="/favicon.ico"></iframe>'),a.close(),u=a.w.frames[0].document,s=u.createElement("div")}catch(f){s=n.createElement("div"),u=n.body}function l(e){return function(){var n=Array.prototype.slice.call(arguments,0);n.unshift(s),u.appendChild(s),s.addBehavior("#default#userData"),s.load(r);var i=e.apply(t,n);return u.removeChild(s),i}}var c=new RegExp("[!\"#$%&'()*+,/\\\\:;<=>?@[\\]^`{|}~]","g");function h(e){return e.replace(/^d/,"___$&").replace(c,"___")}t.set=l(function(e,n,i){return n=h(n),i===undefined?t.remove(n):(e.setAttribute(n,t.serialize(i)),e.save(r),i)}),t.get=l(function(e,n){return n=h(n),t.deserialize(e.getAttribute(n))}),t.remove=l(function(e,t){t=h(t),e.removeAttribute(t),e.save(r)}),t.clear=l(function(e){var t=e.XMLDocument.documentElement.attributes;e.load(r);for(var n=0,i;i=t[n];n++)e.removeAttribute(i.name);e.save(r)}),t.getAll=function(e){var n={};return t.forEach(function(e,t){n[e]=t}),n},t.forEach=l(function(e,n){var r=e.XMLDocument.documentElement.attributes;for(var i=0,s;s=r[i];++i)n(s.name,t.deserialize(e.getAttribute(s.name)))})}try{var p="__storejs__";t.set(p,p),t.get(p)!=p&&(t.disabled=!0),t.remove(p)}catch(f){t.disabled=!0}t.enabled=!t.disabled,typeof module!="undefined"&&module.exports&&this.module!==module?module.exports=t:typeof define=="function"&&define.amd?define(t):e.store=t})(Function("return this")())
 
@@ -2832,8 +2838,8 @@ module.exports = function(options){
 
 	return new HTMLCollection([], options);
 };
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":33}],24:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"confify":26,"foldify":30,"hyperglue":34}],24:[function(require,module,exports){
 (function (process){
 var foldify = require('foldify'),
 	digistify = require('digistify'),
@@ -2966,8 +2972,8 @@ function slug(input, identifier)
         .replace(/[^a-z0-9_\-~!\+\s]+/g, '') // Exchange invalid chars
         .replace(/[\s]+/g, '-'); // Swap whitespace for single hyphen
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"../adapters/dbAdapter.js":21,"../models/Post":25,"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"foldify":30,"util":9}],25:[function(require,module,exports){
 (function (process){
 var digistify = require('digistify');
 var marked = require('marked');
@@ -3037,9 +3043,8 @@ module.exports = Backbone.Model.extend({
 		}
 	}
 })
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":33,"marked":36}],26:[function(require,module,exports){
-(function (process){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"digistify":27,"hyperglue":34,"marked":37}],26:[function(require,module,exports){
 function merge(a, b){
     for(var prop in b){
         a[prop] = b[prop];
@@ -3047,12 +3052,10 @@ function merge(a, b){
 }
 
 module.exports = function browser(srcObj){
-	if(!process.browser && typeof srcObj === "string") srcObj = require(srcObj);
     merge(browser, srcObj);
 };
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6}],27:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (process){
 var request = require('request');
 
@@ -3199,8 +3202,8 @@ function merge(a, b){ a = a || {}; for (var x in b){ if(typeof a[x] !== "undefin
 module.exports = exportObj.getGists;
 module.exports.setDefault = exportObj.setDefault;
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"request":28}],28:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -4409,7 +4412,8 @@ if (typeof define !== 'undefined' && define.amd) {
 (function (process){
 var fs = require('fs'),
 	path = require('path'),
-	minimatch = require('minimatchify');
+	minimatch = require('minimatchify'),
+    callsite = require('callsite');
 
 module.exports = fold;
 
@@ -4419,8 +4423,9 @@ function fold(toBeFolded){
 		mergeToMe = {},
 		options,
 		individual,
-		originalFullPath;
-
+		originalFullPath,
+		stack;
+	   
 	if(isArray(toBeFolded)){
 		options = moreArgs[0];
 		originalFullPath = options.fullPath;
@@ -4452,6 +4457,8 @@ function fold(toBeFolded){
 	switch(false){
 		case !isDir:
 			options = moreArgs[0] || {};
+			stack = callsite();
+			options.requester = stack[1].getFileName();
 			output = populate.apply(this, [toBeFolded, options]);
 		break;
 		case !isFoldObj:
@@ -4495,7 +4502,8 @@ function populate(dirname, options){
 		separator,
 		parts,
 		map = options.tree ? {} : false,
-		files = [];
+		files = [],
+		matches;
 
 	if(toString){
 		returnMe = "";
@@ -4506,6 +4514,12 @@ function populate(dirname, options){
 	}
 
     try{
+    	if(/(^\.\/)|(^\.\.\/)/.test(dirname)){
+    		dirname = dirname
+                    .replace(/^\.\//, path.dirname(options.requester)+"/")
+                    .replace(/^\.\.\//, path.dirname(options.requester)+"/../");
+            throw "done";
+    	}
 	    if(~dirname.indexOf("/"))
 	        separator = "/";
 	    if(~dirname.indexOf("\\"))
@@ -4811,8 +4825,20 @@ function bind(fn){
 function isArray(obj){
 	return ~Object.prototype.toString.call(obj).toLowerCase().indexOf("array");
 }
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"fs":1,"minimatchify":31,"path":7}],31:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"callsite":31,"fs":1,"minimatchify":32,"path":7}],31:[function(require,module,exports){
+
+module.exports = function(){
+  var orig = Error.prepareStackTrace;
+  Error.prepareStackTrace = function(_, stack){ return stack; };
+  var err = new Error;
+  Error.captureStackTrace(err, arguments.callee);
+  var stack = err.stack;
+  Error.prepareStackTrace = orig;
+  return stack;
+};
+
+},{}],32:[function(require,module,exports){
 (function (process){
 if(typeof JSON === "undefined"){
 
@@ -6505,8 +6531,8 @@ function regExpEscape (s) {
 
 
 
-}).call(this,require("C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
-},{"C:\\Users\\Anthropos\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":32}],32:[function(require,module,exports){
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"))
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"path":7,"sigmund":33}],33:[function(require,module,exports){
 module.exports = sigmund
 function sigmund (subject, maxSessions) {
     maxSessions = maxSessions || 10;
@@ -6547,7 +6573,7 @@ function sigmund (subject, maxSessions) {
 
 // vim: set softtabstop=4 shiftwidth=4:
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var domify = require('domify');
 
 module.exports = hyperglue;
@@ -6665,7 +6691,7 @@ function appendTo(dest) {
     } ); 
     return this;
 }
-},{"domify":34}],34:[function(require,module,exports){
+},{"domify":35}],35:[function(require,module,exports){
 
 /**
  * Expose `parse`.
@@ -6746,7 +6772,7 @@ function orphan(els) {
   return ret;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var inserted = {};
 
 module.exports = function (css) {
@@ -6766,7 +6792,7 @@ module.exports = function (css) {
     head.appendChild(elem);
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
 /**
  * marked - a markdown parser
@@ -8036,10 +8062,14 @@ if (typeof exports === 'object') {
 }());
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
-(function (Buffer){
-var insertCss = require('insert-css');
-var fs = require('fs');
+},{}],38:[function(require,module,exports){
+(function (process,Buffer){
+var insertCss, fs;
+
+if(process && process.browser){
+    insertCss = require('insert-css');
+    fs = require('fs');
+}
 
 var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
     // Opera 8.0+ (UA detection to detect Blink/v8-powered Opera)
@@ -8051,7 +8081,7 @@ var isIE = /*@cc_on!@*/false || !!document.documentMode; // At least IE6
 
 module.exports = function(container, options){
     options = options || {};
-    if(options.insertCss !== false)
+    if(process && process.browser && options.insertCss !== false)
         insertCss(Buffer("LnBhZ2Ugew0KICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTsNCiAgICB0b3A6IDA7DQogICAgbGVmdDogMDsNCiAgICB3aWR0aDogMTAwJTsNCiAgICBoZWlnaHQ6IDEwMCU7DQogICAgLXdlYmtpdC10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIC1tb3otdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgwLCAwLCAwKTsNCiAgICAtby10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQp9DQoNCi5wYWdlLmxlZnQgew0KICAgIC13ZWJraXQtdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgtMTAwJSwgMCwgMCk7DQogICAgLW1vei10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKC0xMDAlLCAwLCAwKTsNCiAgICAtby10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKC0xMDAlLCAwLCAwKTsNCiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKC0xMDAlLCAwLCAwKTsNCn0NCg0KLnBhZ2UuY2VudGVyIHsNCiAgICAtd2Via2l0LXRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQogICAgLW1vei10cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDAsIDAsIDApOw0KICAgIC1vLXRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMCwgMCwgMCk7DQogICAgdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgwLCAwLCAwKTsNCn0NCg0KLnBhZ2UucmlnaHQgew0KICAgIC13ZWJraXQtdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgxMDAlLCAwLCAwKTsNCiAgICAtbW96LXRyYW5zZm9ybTogdHJhbnNsYXRlM2QoMTAwJSwgMCwgMCk7DQogICAgLW8tdHJhbnNmb3JtOiB0cmFuc2xhdGUzZCgxMDAlLCAwLCAwKTsNCiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZTNkKDEwMCUsIDAsIDApOw0KfQ0KDQoucGFnZS50cmFuc2l0aW9uIHsNCiAgICAtd2Via2l0LXRyYW5zaXRpb24tZHVyYXRpb246IC4yNXM7DQogICAgLW1vei10cmFuc2l0aW9uLWR1cmF0aW9uOiAuMjVzOw0KICAgIC1vLXRyYW5zaXRpb24tZHVyYXRpb246IC4yNXM7DQogICAgdHJhbnNpdGlvbi1kdXJhdGlvbjogLjI1czsNCn0=","base64"));
 
     var pageslider = new PageSlide(container, options);
@@ -8164,6 +8194,8 @@ function PageSlide(container, options) {
                     $(e.target).remove();
                 currentPage = page;
             });
+            if(options.onEnd && typeof options.onEnd === "function")
+                currentPage.one(tranType, options.onEnd);                
         }else{
             var listener = function listener(e){
                 currentPage.removeEventListener( tranType, listener );
@@ -8178,23 +8210,27 @@ function PageSlide(container, options) {
                 currentPage = page;
             };
             currentPage.addEventListener( tranType, listener );
+            if(options.onEnd && typeof options.onEnd === "function")
+                currentPage.addEventListener( tranType, options.onEnd );
         }
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
         container[0].offsetWidth;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-        page.removeClass("left right").addClass("page center transition");
-        currentPage.removeClass("center "+from).addClass("page transition "+ notFrom);
+        if(isJ){
+            page.removeClass("left right").addClass("page center transition");
+            currentPage.removeClass("center "+from).addClass("page transition "+ notFrom);
+        }else{
+            var p = page.classList;
+            var cP = currentPage.classList;
 
-        var p = isJ ? page[0].classList : page.classList;
-        var cP = isJ ? currentPage[0].classList : currentPage.classList;
+            p.remove("left", "right");
+            cP.remove("center", from);
 
-        // p.remove("left", "right");
-        // cP.remove("center", from)
-
-        // p.add("page","transition","center");
-        // cP.add("page","transition",notFrom);
+            p.add("page","transition","center");
+            cP.add("page","transition",notFrom);            
+        }
         
     };
 
@@ -8398,5 +8434,5 @@ if (objCtr.defineProperty) {
 
 }
 
-}).call(this,require("buffer").Buffer)
-},{"buffer":2,"fs":1,"insert-css":35}]},{},[10])
+}).call(this,require("C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js"),require("buffer").Buffer)
+},{"C:\\Users\\Anthropos\\.nodist\\bin\\node_modules\\watchify\\node_modules\\browserify\\node_modules\\insert-module-globals\\node_modules\\process\\browser.js":6,"buffer":2,"fs":1,"insert-css":36}]},{},[10])

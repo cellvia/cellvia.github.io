@@ -1,29 +1,27 @@
 {
   "name": "BrandonSelway",
   "author": "Brandon Selway",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "This is the website of Brandon Selway",
   "main": "app.js",
   "dependencies": {
     "express": "3.4.4",
     "hyperglue": "git+http://github.com/cellvia/hyperglue.git",
-    "intervalEmitter": "*",
     "insert-css": "~0.1.0",
-    "less": "~1.6.1",
-    "digistify": "0.0.2",
+    "digistify": "*",
     "foldify": "*",
     "confify": "*",
-    "marked": "^0.3.2",
-    "topcoat": "^0.7.5",
-    "topcoat-grid": "^0.1.0",
-    "lazyloader": "^2.0.3",
-    "pageslide": "^0.2.0",
-    "fastclick": "^1.0.1",
-    "topcoat-icons": "^0.2.0"
+    "marked": "~0.3.2",
+    "topcoat": "~0.7.5",
+    "lazyloader": "~2.0.3",
+    "pageslide": "~0.2.0",
+    "fastclick": "~1.0.1"
   },
   "devDependencies": {
-    "catw": "^0.2.0",
-    "npm-css": "^0.2.3"
+    "catw": "~0.2.0",
+    "npm-css": "~0.2.3",
+    "topcoat": "*",
+    "topcoat-icons": "~0.2.0"
   },
   "scripts": {
     "build-loader": "browserify client/js/loader.js -o public/js/loader.js",
