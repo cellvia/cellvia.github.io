@@ -44,16 +44,11 @@ module.exports = {
         this._views[options.group] = [];
       else if( options.reset !== false )
         this.destroy(options.group, options);        
-      
-      process.nextTick(function(){
-        var opts = { parent: this, hits: 1 };
-        var returnOpts = _.extend(options, opts);
-        var newview = new View(returnOpts);
-        _.extend(newview, returnOpts);
-        
-        this._views[options.group].push(newview);
-        this.manageCache(newview);
-      }.bind(this));
+
+      var opts = { parent: this, hits: 1 };      
+      _.extend(View, options, opts);
+      this._views[options.group].push(View);
+      this.manageCache(View);
     },
     destroy: function(group, options, subview){
       if(group && this._views[group]){

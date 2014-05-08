@@ -18,7 +18,7 @@ if( isMobile ){
 	loadCss('/public/css/mobile.css?_=' + now);
 	lazyloader('/public/js/desktop-vendor.js', function(){
 		//for iscroll support
-		if(!!conf.useIScroll) $(document).on('touchmove', function (e) { e.preventDefault(); });
+		if(!!true) $(document).on('touchmove', function (e) { e.preventDefault(); });
 		//load app
 		lazyloader('/public/js/mobile-app.js?_=' + now);
 	});	
@@ -33,7 +33,7 @@ if( isMobile ){
 	loadCss('/public/css/mobile.css?_=' + now);
 	lazyloader('/public/js/desktop-vendor.js', function(){
 		//for iscroll support
-		if(!!conf.useIScroll) $(document).on('touchmove', function (e) { e.preventDefault(); });
+		if(!!true) $(document).on('touchmove', function (e) { e.preventDefault(); });
 		//load app
 		lazyloader('/public/js/mobile-app.js?_=' + now);
 	});	

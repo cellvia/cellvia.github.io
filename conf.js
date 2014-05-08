@@ -8,15 +8,16 @@ module.exports = {
 	"pathnames": {
 		"images": "/public/images"
 	},
-	"desktopTransitionModule": false,
+	"desktopTransitionModule": "pageslide",
 	"mobileTransitionModule": "pageslide",
-	"useIScroll": false,
+	"useIScroll": true,
 	"clientOnly": true,
 	"maxViewCache": 8,
 	"sections": ['about', 'résumé', 'code', 'sound&vision', 'reflections'],
 	"footers": [
 		["email", "mailto:brandon.selway@gmail.com"], 
 		["linkedin", "https://www.linkedin.com/in/brandonselway"], 
-		["github", "http://github.com/cellvia"], ["twitter", "http://twitter.com/djchairboy"]
+		["github", "http://github.com/cellvia"],
+		["twitter", "http://twitter.com/djchairboy"]
 	]
 };

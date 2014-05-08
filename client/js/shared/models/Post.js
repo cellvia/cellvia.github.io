@@ -12,7 +12,7 @@ module.exports = Backbone.Model.extend({
 			});
 		}else{
 			var self = this;
-			digistify(self.id, {}, function(err, data){
+			digistify.getFiles(self.get("gistId"), {}, function(err, data){
 				var contents = data.data;
 				var map = {
 						'h3' :{ class: "topcoat-list__header" },
@@ -50,7 +50,7 @@ module.exports = Backbone.Model.extend({
 					}
 					self.set("content", content );
 				}
-				Backbone.gists.put(self.toJSON());
+				Backbone.db.put(self.toJSON());
 				self.fetched = true;
 				self.trigger('fetched');
 			});

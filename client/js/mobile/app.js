@@ -6,7 +6,7 @@ var foldify = require('foldify'),
 //set config
 conf({displayType: "mobile"});
 
-var	routes = foldify(__dirname + '/routes'),
+var	routes = foldify('./routes'),
     LayoutView = require('./views/layout');
 
 //attach routes
@@ -14,12 +14,12 @@ Backbone.router = require('../shared/Router');
 routes(Backbone.router);
 
 //grab global collections
-Backbone.collections = foldify(__dirname + '/../shared/collections');
+Backbone.collections = foldify('../shared/collections');
 
 //attach global collections
 Backbone.sections = conf.sections;
 Backbone.sections.forEach(function(type){
-	Backbone.collections[type] = Backbone.collections.Posts({identifier: "~"+type+"~"});
+	Backbone.collections[type] = Backbone.collections.Posts({type: type, identifier: "~"+type+"~"});
 	Backbone.collections[type].typeSlug = slug(type);
 	Backbone.collections[type].typeTitle = type;
 	Backbone.collections[slug(type)] = Backbone.collections[type];	

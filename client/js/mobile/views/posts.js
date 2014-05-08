@@ -1,10 +1,21 @@
 var View = require('../../shared/View');
+var foldify = require('foldify');
+var mixins = foldify('./mixins');
 
-module.exports = View.extend({
+module.exports = function(options){
+	var FinalView = mixins["posts-"+options.type]
+		? BaseView.extend(mixins["posts-"+options.type])
+		: BaseView;
+	return new FinalView(options);
+}
+
+var BaseView = View.extend({
 	className: 'posts',
+	renderGatekeeper: function(){
+		if(this.shouldSkipPage() || !this.posts.fetched || !this.html.fetched || this.rendered) return true;
+	},
 	render: function(){
-		if(this.shouldSkipPage()) return
-		if(!this.posts.fetched || !this.html.fetched || this.rendered) return;
+		if(this.renderGatekeeper()) return;
 		this.rendered = true;
 		var self = this;
 		var postsMap = this.posts.map(function(post){

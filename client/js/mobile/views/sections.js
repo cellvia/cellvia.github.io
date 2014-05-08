@@ -1,7 +1,11 @@
 var View = require('../../shared/View');
 var conf = require('confify');
 
-module.exports = View.extend({
+module.exports = function(options){
+	return new BaseView(options);
+}
+
+var BaseView = View.extend({
 	className: "sections",
 	events: {
 		"click h1.topcoat-navigation-bar__title span": "resume" 

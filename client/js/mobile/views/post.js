@@ -1,6 +1,15 @@
 var View = require('../../shared/View');
+var foldify = require('foldify');
+var mixins = foldify('./mixins');
 
-module.exports = View.extend({
+module.exports = function(options){
+	var FinalView = mixins["post-"+options.type]
+		? BaseView.extend(mixins["post-"+options.type])
+		: BaseView;
+	return new FinalView(options);
+}
+
+var BaseView = View.extend({
 	className: 'post',
 	prerender: function(){
 		if(this.prerendered) return		
