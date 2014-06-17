@@ -18,16 +18,17 @@
     "fastclick": "~1.0.1"
   },
   "devDependencies": {
-    "catw": "~0.2.0",
+    "catw": "*",
     "npm-css": "~0.2.3",
     "topcoat": "*",
     "topcoat-icons": "~0.2.0"
   },
   "scripts": {
+    "start": "node app.js & npm run build-mobile && npm run watch-mobile",
     "build-loader": "browserify client/js/loader.js -o public/js/loader.js",
-    "build-desktop": "browserify client/js/desktop/app.js -o public/js/desktop-app.js",
-    "build-ie": "browserify client/js/ie/app.js -o public/js/ie-app.js",
-    "build-mobile": "browserify client/js/mobile/app.js -o public/js/mobile-app.js",
+    "build-desktop": "browserify client/js/desktop/app.js -d -o public/js/desktop-app.js",
+    "build-ie": "browserify client/js/ie/app.js -d -o public/js/ie-app.js",
+    "build-mobile": "browserify client/js/mobile/app.js -d -o public/js/mobile-app.js",
     "build-vendor": "node node_modules/catw/bin/cmd.js client/vendor/*.js -w false -o public/js/desktop-vendor.js",
     "build-desktop-css": "node node_modules/npm-css/bin/npm-css client/css/desktop/entry.css -o public/css/desktop.css",
     "build-mobile-css": "node node_modules/npm-css/bin/npm-css client/css/mobile/entry.css -o public/css/mobile.css",

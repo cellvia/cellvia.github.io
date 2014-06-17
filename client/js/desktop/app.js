@@ -4,11 +4,11 @@ var router = require('../shared/Router'),
 
 conf({displayType: "desktop"});
 
-var routes = foldify(__dirname + '/routes'),
+var routes = foldify('./routes'),
     LayoutView = require('./views/layout');
 
 //grab global collections
-Backbone.collections = foldify(__dirname + '/../shared/collections');
+Backbone.collections = foldify('../shared/collections');
 
 //attach routes
 routes(router);

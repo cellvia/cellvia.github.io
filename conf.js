@@ -1,4 +1,4 @@
-var root = "C:\\node\\work\\personal\\cellvia.github.io";
+var root = "/home/anthropos/work/personal/cellvia.github.io";
 
 module.exports = {
 	"paths": {
@@ -10,7 +10,7 @@ module.exports = {
 	},
 	"desktopTransitionModule": "pageslide",
 	"mobileTransitionModule": "pageslide",
-	"useIScroll": true,
+	"useIScroll": false,
 	"clientOnly": true,
 	"maxViewCache": 8,
 	"sections": ['about', 'résumé', 'code', 'sound&vision', 'reflections'],

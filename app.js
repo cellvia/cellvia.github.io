@@ -3,10 +3,11 @@
  */
 
 var path = require('path')
+	, http = require('http')
+	, exec = require('child_process').exec
 	, util = require('util')
 	, express = require('express')
 	, app = express()
-	, http = require('http')
 	, fs = require('fs')
 	, html = fs.readFileSync(__dirname + '/index.html');
 
@@ -25,6 +26,20 @@ app.get(/^((?!(\/public\/css|\/public\/js|\/public\/font|\/public\/images)).)*$/
 	res.end( html );
 });	
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
+var n = 8080, server;
+function recurs(e){
+	if(n > 9000 || e && e.code !== "EADDRINUSE"){
+		console.log(e);
+		return;
+	};
+	var msg = 'Listening on port '+n+'...';
+	var url = 'http://localhost:'+n;
+	server = http.createServer(app).listen(n++);
+	server.on("error", recurs);	
+	server.on("listening", function(){
+		var command = ~process.platform.indexOf("linux") ? "xdg-" : "";
+		exec(command += "open "+url+" > /dev/null");
+		console.log(msg);	
+	});
+}
+recurs();

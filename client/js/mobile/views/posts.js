@@ -1,6 +1,7 @@
 var View = require('../../shared/View');
 var foldify = require('foldify');
 var mixins = foldify('./mixins');
+var util = require('util');
 
 module.exports = function(options){
 	var FinalView = mixins["posts-"+options.type]
@@ -50,6 +51,7 @@ var BaseView = View.extend({
 		this.render();
 	},
 	shouldSkipPage: function(){
+
 		if(this.posts.fetched && (this.skipPage || (this.skipPage = this.posts.length === 1))){
 			var post = this.posts.models[0];
 			var url = "/article/" + this.typeSlug + "/" + post.get("slug");

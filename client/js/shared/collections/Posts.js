@@ -105,13 +105,6 @@ var GistCollection = Backbone.Collection.extend({
 			if(!Backbone.db.initialized)
 				return this.listenToOnce( Backbone, "db", this.fetch.bind(this, "db") );
 
-			/* if IE load manually
-				var conf = require('confify');
-				var gists = foldify(conf.paths.root, {whitelist: "gists.json"});
-				this.addGists(false, {data: gists})
-				return this.toCollection();
-			*/
-
 			if(!Backbone.db.updated){
 				this.listenToOnce( Backbone, "gistsUpdated", this.fetch );
 				return this.checkGists();					
@@ -166,7 +159,6 @@ function firstLetterUpper(string)
 function spliceOne(arr, index) {
     var len=arr.length;
     if (!len) return
-    console.log(arr[index])
     while (index<len) { 
     	arr[index] = arr[index+1]; 
     	index++; 

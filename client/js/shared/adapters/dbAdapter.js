@@ -24,15 +24,11 @@ function newstore(options){
 		get: function(id, cb){
 			return cb(store.get(""+id));
 		},
+		getAll: function(cb){	
+			return cb( _.values(store.getAll()) );
+		},
 		put: function(item){
 			return store.set(""+item.id, item);
-		},
-		iterate: function(iter, opts){
-			var all = store.getAll();
-			var n = 0;
-			for(var p in all)
-				if(iter(all[p], n++) === false) break;			
-			return opts.onEnd ? opts.onEnd() : false;
 		},
 		clear: function(cb){
 			store.clear();
