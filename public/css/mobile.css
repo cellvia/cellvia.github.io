@@ -19,7 +19,7 @@ a{
 	margin-left: .5rem;
 }
 
-@-webkit-keyframes rotate {
+/*@-webkit-keyframes rotate {
   from {
     -webkit-transform: rotate(0deg);
   }
@@ -46,7 +46,7 @@ a{
   }
 }
 
-
+*/
 body{
 	overflow:hidden;
 	width: 100%;
@@ -238,7 +238,7 @@ a.section.listitem{
 	width: 8rem;
 	height: 8rem;
 	border-radius: 50%;
-    -webkit-animation-name:             rotate; 
+/*    -webkit-animation-name:             rotate; 
     -webkit-animation-duration:         3.5s; 
     -webkit-animation-iteration-count:  infinite;
     -webkit-animation-timing-function: linear;
@@ -254,7 +254,7 @@ a.section.listitem{
     animation-duration:         3.5s; 
     animation-iteration-count:  infinite;
     animation-timing-function: linear;
-}
+*/}
 
 .image-container img{
 	width: 100%;
